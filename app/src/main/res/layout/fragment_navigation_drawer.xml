@@ -5,30 +5,48 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-
-
     <RelativeLayout
         android:id="@+id/nav_header_container"
         android:layout_width="match_parent"
         android:layout_height="140dp"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:background="@color/colorPrimaryDark">
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="0dp">
 
-                    <ImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:layout_centerInParent="true"
-                        android:scaleType="fitCenter"
-                        app:srcCompat="@drawable/pedro"  />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="276dp"
+            android:layout_height="96dp"
+            android:src="@drawable/pedro"
+            app:civ_border_color="@color/colorAccent"
+            app:civ_border_width="3dp" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="216dp"
+            android:layout_height="28dp"
+            android:layout_below="@+id/profile_image"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="85dp"
+            android:layout_marginLeft="85dp"
+            android:layout_marginTop="-5dp"
+            android:layout_marginEnd="59dp"
+            android:layout_marginRight="59dp"
+            android:layout_marginBottom="21dp"
             android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:text="Pedro"
-            android:textColor="@color/colorBlanco"
+            android:text="Pedro Flores"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="24sp" />
+            android:textColor="@color/colorBlanco"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:fontFamily="@font/roboto" />
 
 
     </RelativeLayout>
