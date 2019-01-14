@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingTop="10dp"
+        android:paddingRight="24dp">
+
+    <TextView
+        android:id="@+id/tvCliente"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="2dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="25dp"
+        android:text="Datos Cliente"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvDireccion"
+        android:layout_alignParentTop="true"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="15dp"
+        android:text="Datos Cliente"
+        />
+    <TextView
+        android:id="@+id/tvDescripcion"
+        android:layout_alignParentTop="true"
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="15dp"
+        android:text="Datos Cliente"
+       />
+    <TextView
+        android:id="@+id/tvEstatus"
+        android:layout_alignParentTop="true"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="15dp"
+        android:text="Datos Cliente"
+        />
+    <TextView
+        android:id="@+id/tvDetalle"
+        android:layout_alignParentTop="true"
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="15dp"
+        android:text="Datos Cliente"
+        />
+    <TextView
+        android:id="@+id/tvFirma"
+        android:layout_alignParentTop="true"
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="15dp"
+        android:text="Datos Cliente"
+        android:visibility="gone"
+       />
+    <TextView
+        android:id="@+id/tvTotal"
+        android:layout_alignParentTop="true"
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:textSize="15dp"
+        android:text="Datos Cliente"
+
+      />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="170dp"
+            android:text="Firmar" android:layout_width="100dp" android:id="@+id/btnFirmar" />
+
+        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="170dp"
+            android:text="Limpiar" android:layout_width="100dp" android:id="@+id/btnLimpiarFirmar"
+            android:layout_marginLeft="135dp"
+            />
+        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="170dp"
+            android:text="Surtir" android:layout_width="100dp" android:id="@+id/btnSurtirPedido"
+            android:layout_marginLeft="235dp"
+            />
+
+
+
+        <ImageView
+            android:id="@+id/imageViewIncidencia"
+            android:layout_width="300dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_menu_camera"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="270dp"
+
+            >
+        </ImageView>
+
+
+        <EditText
+            android:id="@+id/textViewObservaciones"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textMultiLine"
+            android:lines="4"
+            android:maxLines="10"
+            android:hint="Observaciones:"
+            android:layout_marginTop="350dp"
+            android:background="@color/colorBlanco"
+            android:scrollbars="vertical"/>
+
+
+
+    </RelativeLayout>
+
+
+    <!--
+        <LinearLayout
+            android:layout_width="400dp" android:layout_height="450dp"
+            android:orientation="vertical"
+            android:paddingLeft="24dp"
+            android:paddingTop="300dp"
+            android:paddingRight="24dp">
+
+
+        <RelativeLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Firmar"
+            />
+        </LinearLayout>
+    -->
+
+
+    <RelativeLayout
+    android:layout_width="380dp" android:layout_height="450dp"
+    android:orientation="vertical"
+    android:paddingLeft="24dp"
+    android:paddingTop="300dp"
+    android:paddingRight="24dp">
+
+        <!--
+    <RelativeLayout
+        android:id="@+id/canvasLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical" />
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="80dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:src="@android:color/transparent" />
+            -->
+
+
+
+
+        <ImageView
+            android:id="@+id/imgFirma"
+            android:layout_width="300dp"
+            android:layout_height="140dp"
+            android:layout_gravity="center"
+            android:src="@android:color/transparent" />
+
+        <com.github.gcacace.signaturepad.views.SignaturePad
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:id="@+id/signaturePad"/>
+
+
+</RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

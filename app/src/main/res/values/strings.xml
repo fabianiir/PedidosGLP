@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">GLP Pedidos</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="nav_item_pedidos">Pedidos</string>
+    <string name="nav_item_operador">Operador</string>
+    <string name="nav_item_mapa">Mapa</string>
+    <string name="nav_item_ajustes">Ajustes</string>
+    <string name="nav_item_pedidos_realziados">Pedidos Realizados</string>
+    <string name="nav_item_pedidos_cerrasesion">Cerrar Sesión</string>
+
+
+    <!-- navigation drawer item labels  -->
+    <string-array name="nav_drawer_labels">
+        <item>@string/nav_item_pedidos</item>
+        <item>@string/nav_item_operador</item>
+        <item>@string/nav_item_mapa</item>
+        <item>@string/nav_item_ajustes</item>
+        <item>@string/nav_item_pedidos_realziados</item>
+        <item>@string/nav_item_pedidos_cerrasesion</item>
+
+    </string-array>
+
+    <string-array name="nav_drawer_icons">
+        <item>@drawable/ic_mobile</item>
+        <item>@drawable/ic_usuario</item>
+        <item>@drawable/ic_ajustes</item>
+        <item>@drawable/ic_ajustes</item>
+        <item>@drawable/ic_pedidos_realizados</item>
+        <item>@drawable/ic_cerrar</item>
+
+    </string-array>
+
+
+
+
+
+
+    <string name="title_pedidos">Pedidos</string>
+    <string name="title_operador">Datos Operador</string>
+    <string name="title_mapa">Mapa</string>
+    <string name="title_ajustes">Ajustes</string>
+    <string name="title_pedidosrealizados">Pedidos Realizados</string>
+    <string name="title_cerrarsesion">Cerrar Sesión</string>
+
+    <string name="external_dir">firmas</string>
+
+
+</resources>

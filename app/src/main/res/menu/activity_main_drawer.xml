@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_pedidos"
+            android:icon="@drawable/ic_mobile"
+            android:title="Pedidos" />
+        <item
+            android:id="@+id/nav_operador"
+            android:icon="@drawable/ic_usuario"
+            android:title="Operador" />
+        <item
+            android:id="@+id/nav_mapa"
+            android:icon="@drawable/ic_mapa"
+            android:title="Mapa" />
+        <item
+            android:id="@+id/nav_ajustes"
+            android:icon="@drawable/ic_ajustes"
+            android:title="Ajustes" />
+        <item
+            android:id="@+id/nav_prealizados"
+            android:icon="@drawable/ic_pedidos_realizados"
+            android:title="Pedidos Realizados" />
+        <item
+            android:id="@+id/nav_cerrar"
+            android:icon="@drawable/ic_cerrar"
+            android:title="Cerrar Sesion" />
+
+    </group>
+
+
+
+</menu>
