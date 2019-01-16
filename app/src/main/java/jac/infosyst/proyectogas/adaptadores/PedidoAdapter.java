@@ -103,10 +103,6 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 }
 
 
-                
-
-
-
 /*
                 DetallePedidoFragment dpf = new DetallePedidoFragment(mCtx);
 
