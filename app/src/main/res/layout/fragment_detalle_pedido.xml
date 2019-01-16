@@ -1,136 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout"
+        android:layout_width="402dp"
+        android:layout_height="219dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
         android:paddingLeft="24dp"
         android:paddingTop="10dp"
-        android:paddingRight="24dp">
+        android:paddingRight="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/tvCliente"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="2dp"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/tvCliente"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="2dp"
 
-        android:textSize="25dp"
-        android:text="Datos Cliente"
-        android:textStyle="bold"/>
+            android:text="Datos Cliente"
+            android:textSize="25dp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/tvDireccion"
-        android:layout_alignParentTop="true"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/tvDireccion"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
 
-        android:textSize="15dp"
-        android:text="Datos Cliente"
-        />
-    <TextView
-        android:id="@+id/tvDescripcion"
-        android:layout_alignParentTop="true"
+            android:text="Datos Cliente"
+            android:textSize="15dp" />
 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/tvDescripcion"
+            android:layout_width="fill_parent"
 
-        android:textSize="15dp"
-        android:text="Datos Cliente"
-       />
-    <TextView
-        android:id="@+id/tvEstatus"
-        android:layout_alignParentTop="true"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
 
-        android:textSize="15dp"
-        android:text="Datos Cliente"
-        />
-    <TextView
-        android:id="@+id/tvDetalle"
-        android:layout_alignParentTop="true"
+            android:text="Datos Cliente"
+            android:textSize="15dp" />
 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/tvEstatus"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
 
-        android:textSize="15dp"
-        android:text="Datos Cliente"
-        />
-    <TextView
-        android:id="@+id/tvFirma"
-        android:layout_alignParentTop="true"
+            android:text="Datos Cliente"
+            android:textSize="15dp" />
 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/tvDetalle"
+            android:layout_width="fill_parent"
 
-        android:textSize="15dp"
-        android:text="Datos Cliente"
-        android:visibility="gone"
-       />
-    <TextView
-        android:id="@+id/tvTotal"
-        android:layout_alignParentTop="true"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+            android:text="Datos Cliente"
+            android:textSize="15dp" />
 
-        android:textSize="15dp"
-        android:text="Datos Cliente"
+        <TextView
+            android:id="@+id/tvFirma"
+            android:layout_width="fill_parent"
 
-      />
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:text="Datos Cliente"
+            android:textSize="15dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="fill_parent"
+
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:text="Datos Cliente"
+            android:textSize="15dp"
+
+            />
 
     </LinearLayout>
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="170dp"
-            android:text="Firmar" android:layout_width="100dp" android:id="@+id/btnFirmar" />
+        android:layout_height="412dp"
+        android:layout_marginTop="19dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="170dp"
-            android:text="Limpiar" android:layout_width="100dp" android:id="@+id/btnLimpiarFirmar"
-            android:layout_marginLeft="135dp"
-            />
-        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="170dp"
-            android:text="Surtir" android:layout_width="100dp" android:id="@+id/btnSurtirPedido"
-            android:layout_marginLeft="235dp"
-            />
+        <Button
+            android:id="@+id/btnFirmar"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="20dp"
+            android:text="Firmar"
+            app:layout_constraintBottom_toTopOf="@+id/imageViewIncidencia"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnSurtirPedido"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/btnLimpiarFirmar"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="20dp"
+            android:text="Limpiar"
+            app:layout_constraintBottom_toTopOf="@+id/imageViewIncidencia"
+            app:layout_constraintEnd_toStartOf="@+id/btnSurtirPedido"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnSurtirPedido"
+            android:layout_width="100dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="20dp"
+            android:text="Surtir"
+            app:layout_constraintBottom_toTopOf="@+id/imageViewIncidencia"
+            app:layout_constraintEnd_toStartOf="@+id/btnFirmar"
+            app:layout_constraintStart_toEndOf="@+id/btnLimpiarFirmar"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <ImageView
             android:id="@+id/imageViewIncidencia"
-            android:layout_width="300dp"
+            android:layout_width="396dp"
             android:layout_height="80dp"
-            android:src="@drawable/ic_menu_camera"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="270dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
 
-            >
-        </ImageView>
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/ic_menu_camera"
+            app:layout_constraintBottom_toTopOf="@+id/textViewObservaciones"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnSurtirPedido"></ImageView>
 
 
         <EditText
             android:id="@+id/textViewObservaciones"
+            android:layout_width="400dp"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="14dp"
+            android:background="@color/colorBlanco"
+            android:hint="Observaciones:"
             android:inputType="textMultiLine"
             android:lines="4"
             android:maxLines="10"
-            android:hint="Observaciones:"
-            android:layout_marginTop="350dp"
-            android:background="@color/colorBlanco"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewIncidencia" />
 
 
-
-    </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
 
     <!--
@@ -152,12 +219,25 @@
     -->
 
 
-    <RelativeLayout
-    android:layout_width="380dp" android:layout_height="450dp"
-    android:orientation="vertical"
-    android:paddingLeft="24dp"
-    android:paddingTop="300dp"
-    android:paddingRight="24dp">
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="404dp"
+        android:layout_height="143dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingTop="300dp"
+        android:paddingRight="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.581"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <!--
     <RelativeLayout
@@ -175,21 +255,18 @@
             -->
 
 
-
-
         <ImageView
             android:id="@+id/imgFirma"
             android:layout_width="300dp"
             android:layout_height="140dp"
-            android:layout_gravity="center"
             android:src="@android:color/transparent" />
 
         <com.github.gcacace.signaturepad.views.SignaturePad
+            android:id="@+id/signaturePad"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:id="@+id/signaturePad"/>
+            android:layout_height="200dp" />
 
 
-</RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

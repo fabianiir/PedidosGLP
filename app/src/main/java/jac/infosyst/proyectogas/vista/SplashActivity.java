@@ -9,6 +9,8 @@ import android.os.Bundle;
 import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
+import jac.infosyst.proyectogas.modelo.Pedido;
 
 public class SplashActivity extends Activity {
 
@@ -21,7 +23,7 @@ public class SplashActivity extends Activity {
         {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
 
