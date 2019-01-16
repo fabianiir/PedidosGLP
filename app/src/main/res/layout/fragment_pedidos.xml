@@ -26,6 +26,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
+        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="200dp"
+            android:text="Atender" android:layout_width="5dp" android:id="@+id/btnAtenderPedido"
+            android:layout_marginLeft="20dp"
+            />
+        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="200dp"
+            android:text="Imprimir" android:layout_width="5dp" android:id="@+id/btnImprimirPedido"
+            android:layout_marginLeft="25dp"
+            />
+
+        <Button android:layout_height="50dp" android:layout_weight=".35" android:layout_marginTop="200dp"
+            android:text="Cancelar" android:layout_width="5dp" android:id="@+id/btnCancelarPedido"
+            android:layout_marginLeft="30dp"
+            />
 
 
 

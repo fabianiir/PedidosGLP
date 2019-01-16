@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,7 @@ import jac.infosyst.proyectogas.R;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -48,8 +51,10 @@ public class PedidosFragment extends Fragment{
     private ArrayList<String> pedidoList = new ArrayList<>();
 
     int tiempoActualizarPedidos = 30000;
-    int tipoPedidos;
+    int tipoPedidos, idPedido;
     String strtext;
+    Button btnAtenderPedido, btnCancelarPedido, btnImprimirPedido;
+    FragmentManager f_manager;
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -98,25 +103,78 @@ public class PedidosFragment extends Fragment{
         */
 
        // String strtext = this.getArguments().getString("tipoPedidos");
-        String strNameTittle = String.valueOf(((AppCompatActivity)getActivity()).getSupportActionBar().getTitle());
 
         //Toast.makeText(getActivity(),  strNameTittle , Toast.LENGTH_SHORT).show();
 
 
+        //idPedido =  ((Sessions)getActivity().getApplicationContext()).getSesIdPedido();
+
+
+        btnAtenderPedido = (Button) rootView.findViewById(R.id.btnAtenderPedido);
+        btnAtenderPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DetallePedidoFragment dpf = new DetallePedidoFragment(getActivity().getBaseContext());
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, dpf);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+        btnCancelarPedido = (Button) rootView.findViewById(R.id.btnCancelarPedido);
+        btnCancelarPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CancelarPedidoFragment cpf = new CancelarPedidoFragment(getActivity().getBaseContext());
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, cpf);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+        btnImprimirPedido = (Button) rootView.findViewById(R.id.btnImprimirPedido);
+        btnImprimirPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ReimpresionPedidoFragment rpf = new ReimpresionPedidoFragment(getActivity().getBaseContext());
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, rpf);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+
+
+        String strNameTittle = String.valueOf(((AppCompatActivity)getActivity()).getSupportActionBar().getTitle());
+
         if(strNameTittle.equals("Pedidos")){
+            btnAtenderPedido.setVisibility(View.VISIBLE);
+            btnCancelarPedido.setVisibility(View.VISIBLE);
+            btnImprimirPedido.setVisibility(View.GONE);
             tipoPedidos = 0;
 
             Toast.makeText(getActivity(), "Actualizando pedidos..." , Toast.LENGTH_SHORT).show();
 
         }
         if(strNameTittle.equals("Pedidos Realizados")){
+            btnAtenderPedido.setVisibility(View.GONE);
+            btnCancelarPedido.setVisibility(View.GONE);
+            btnImprimirPedido.setVisibility(View.VISIBLE);
             tipoPedidos = 1;
 
             Toast.makeText(getActivity(), "Actualizando pedidos realizados..." , Toast.LENGTH_SHORT).show();
 
         }
 
+
+
+
+
         actualizarPedidos(tipoPedidos);
+
         return rootView;
     }
 

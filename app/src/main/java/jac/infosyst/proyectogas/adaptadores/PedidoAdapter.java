@@ -2,6 +2,7 @@ package jac.infosyst.proyectogas.adaptadores;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +58,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(PedidoAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final PedidoAdapter.ViewHolder holder, final int position) {
         Pedido pedido = pedidos.get(position);
         holder.textViewCliente.setText(pedido.getcliente());
         holder.textViewDescripcion.setText(pedido.getdescripcion());
@@ -67,6 +69,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         holder.textViewfirmaurl.setText(pedido.getfirmaurl());
         holder.textViewtotal.setText(Double.toString(pedido.gettotal()));
 
+        //holder.parentLayout.setBackgroundColor(Color.parseColor("#567845"));
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +82,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 ((Sessions)mCtx.getApplicationContext()).setSesIdPedido(pedidos.get(position).getId());
                 String strIdPedido = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido());
 
-                Toast.makeText(mCtx, "Se asigno: " + strIdPedido, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx, "Se selecciono: " + strIdPedido, Toast.LENGTH_SHORT).show();
 
                 ((Sessions)mCtx.getApplicationContext()).setSesCliente(pedidos.get(position).getcliente());
                 ((Sessions)mCtx.getApplicationContext()).setsesDireccion(pedidos.get(position).getdireccion());
@@ -90,12 +93,30 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 ((Sessions)mCtx.getApplicationContext()).setsesTotal(Double.toString(pedidos.get(position).gettotal()));
 
 
+                if(position==pedidos.get(position).getId()) {
+                    holder.relativeRow.setBackgroundColor(Color.parseColor("#004c7a"));
+
+                }else {
+
+                    holder.relativeRow.setBackgroundColor(Color.parseColor("#ffffff"));
+
+                }
+
+
+
+
+/*
                 DetallePedidoFragment dpf = new DetallePedidoFragment(mCtx);
 
 
                 FragmentTransaction transaction = f_manager.beginTransaction();
                 transaction.replace(R.id.container_body, dpf);
                 transaction.commit();
+
+*/
+
+
+
 
             }
         });
@@ -139,12 +160,16 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
             textViewtotal = (TextView) itemView.findViewById(R.id.textViewtotal);
 
             parentLayout = itemView.findViewById(R.id.parent_layout);
+            relativeRow = itemView.findViewById(R.id.relativeRow);
+
 
 
 
         }
 
         LinearLayout parentLayout;
+        RelativeLayout relativeRow;
+
     }
 
 }
