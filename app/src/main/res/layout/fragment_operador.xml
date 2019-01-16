@@ -1,53 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/linearLayout2"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:orientation="vertical"
         android:paddingLeft="24dp"
         android:paddingTop="10dp"
-        android:paddingRight="24dp">
+        android:paddingRight="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/tvNombreOperador"
-        android:layout_alignParentTop="true"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="276dp"
+            android:layout_height="96dp"
+            android:src="@drawable/pedro"
+            app:civ_border_color="@color/colorAccent"
+            app:civ_border_width="3dp" />
 
-        android:textSize="25dp"
-        android:text="Nombre: Pedro Flores"
-        />
+        <TextView
+            android:id="@+id/tvNombreOperador"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:text="Nombre"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="23sp"
+            android:textStyle="bold"
+            app:fontFamily="@font/roboto" />
+
+        <TextView
+            android:id="@+id/Nom_Operador"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:text="Pedro Flores Macedo"
+            android:textSize="25sp"
+            app:fontFamily="@font/roboto" />
+
         <TextView
             android:id="@+id/tvUnidadOperador"
-            android:layout_alignParentTop="true"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
 
-            android:textSize="25dp"
-            android:text="Unidad: 150-TBZ"
-            />
+            android:text="Unidad:"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="23sp"
+            android:textStyle="bold"
+            app:fontFamily="@font/roboto" />
+
         <TextView
-            android:id="@+id/tvTelefonoOperador"
-            android:layout_alignParentTop="true"
-            android:layout_width="fill_parent"
+            android:id="@+id/Nom_Unidad"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
 
-            android:textSize="25dp"
-            android:text="Telefono: 553208321"
-            />
+            android:text="150-TBZ"
+            android:textSize="25sp"
+            app:fontFamily="@font/roboto" />
+
         <TextView
-            android:id="@+id/tvIMEIOperador"
-            android:layout_alignParentTop="true"
+            android:id="@+id/Num_Telefono"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
 
-            android:textSize="25dp"
-            android:text="IMEI: 2197423597123123123"
-            />
+            android:text="Telefono:"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="23sp"
+            android:textStyle="bold"
+            app:fontFamily="@font/roboto" />
+
+        <TextView
+            android:id="@+id/tvTelefonoOperador2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:text="553208321"
+            android:textSize="25sp"
+            app:fontFamily="@font/roboto" />
+
+        <TextView
+            android:id="@+id/Num_IMEI"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+
+            android:text="IMEI: "
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textSize="23sp"
+            android:textStyle="bold"
+            app:fontFamily="@font/roboto" />
+
+        <TextView
+            android:id="@+id/tvIMEIOperador2"
+            android:layout_width="match_parent"
+            android:layout_height="81dp"
+            android:layout_alignParentTop="true"
+
+            android:text="2197423597123123123"
+            android:textSize="25sp"
+            app:fontFamily="@font/roboto" />
 
     </LinearLayout>
 
