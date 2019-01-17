@@ -24,17 +24,21 @@ import retrofit2.http.Path;
 
 public interface ServicioUsuario {
 
-/*
+
     @FormUrlEncoded
     @POST("login.php/{username}/{password}")
     Call<ObjetoRes>login(@Field("username") String username, @Field("password") String password);
-*/
 
+
+/*
 
   @FormUrlEncoded
   //@Headers("Content-Type:application/x-www-form-urlencoded")
   @POST("log/")
   Call<ObjetoRes>login(@Field("user") String username, @Field("passw") String password);
+
+
+  */
 
 
 
