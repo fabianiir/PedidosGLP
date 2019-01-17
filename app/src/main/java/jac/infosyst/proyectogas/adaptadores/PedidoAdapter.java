@@ -79,7 +79,8 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         }
         else
             // view is selected
-            holder.relativeRow.setBackgroundColor(Color.CYAN);
+            holder.relativeRow.setBackgroundColor(Color.parseColor("#004C7A"));
+
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,7 +105,10 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
 
                // view.setBackgroundColor(Color.CYAN);
-                holder.relativeRow.setBackgroundColor(Color.parseColor("#303F9F"));
+                holder.relativeRow.setBackgroundColor(Color.parseColor("#004C7A"));
+
+
+
 
                 if (selected.isEmpty()){
                     selected.add(position);
