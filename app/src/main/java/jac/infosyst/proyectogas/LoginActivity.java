@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity{
 
 
     private void login(final String pusername, String ppassword) {
+
         Call call = userService.login(pusername,ppassword);
         call.enqueue(new Callback() {
             @Override
@@ -94,9 +95,13 @@ public class LoginActivity extends AppCompatActivity{
                     } else {
                         Toast.makeText(LoginActivity.this, resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                } else {
+                }
+
+                else {
                     Toast.makeText(LoginActivity.this, "Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
+
+
             }
 
             @Override

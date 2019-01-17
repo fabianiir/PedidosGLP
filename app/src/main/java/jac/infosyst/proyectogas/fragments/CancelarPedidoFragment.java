@@ -5,23 +5,39 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
+import jac.infosyst.proyectogas.modelo.ModeloSpinner;
+import jac.infosyst.proyectogas.modelo.Productos;
+import jac.infosyst.proyectogas.utils.ApiUtils;
+import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
 
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView;
 
-import org.w3c.dom.Text;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jac.infosyst.proyectogas.modelo.Spinners;
+
 
 @SuppressLint("ValidFragment")
 
@@ -33,6 +49,9 @@ public class CancelarPedidoFragment  extends Fragment {
     Button btnAceptarCancelarPedido;
     int idPedido;
     private Context mCtx;
+
+    ModeloSpinner spinnerMod;
+Spinner spinner;
 
     public CancelarPedidoFragment(Context mCtx) {
         this.mCtx = mCtx;
@@ -66,20 +85,64 @@ public class CancelarPedidoFragment  extends Fragment {
 
         textViewObservaciones = (EditText) rootView.findViewById(R.id.textViewObservaciones);
 
-        Spinner spinner = (Spinner) rootView.findViewById(R.id.spinnerMotivoCancelacion);
-        String[] letra = {"Cliente Ausente","Datos erroneos","Servicio realziado por otro proveedor"};
-        spinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, letra));
+
+        spinner = (Spinner) rootView.findViewById(R.id.spinnerMotivoCancelacion);
+
+        /*
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ApiUtils.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call<MotivoCancelacion> call = service.getMotivosCancelacion();
+
+        call.enqueue(new Callback<MotivoCancelacion>() {
+            @Override
+            public void onResponse(Call<MotivoCancelacion> call, Response<MotivoCancelacion> response) {
+*/
+
+
+
+
+               // adapter = new PedidoAdapter(response.body().getPedidos(), getActivity(), getFragmentManager() );
+
+
+
+              //  ArrayAdapter<MotivoCancelacion>
+                //        adapter = new ArrayAdapter<MotivoCancelacion>(response.body().getMotivosCancelacion(), android.R.layout.simple_spinner_item, motivos);
+
+
+                // adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+
+                //spinner.setAdapter(adapter);
+
+                //recyclerViewPedidos.setAdapter(adapter);
+
+
+          /*  }
+
+            @Override
+            public void onFailure(Call<MotivoCancelacion> call, Throwable t) {
+
+            }
+
+        });
+        */
+
+
+        llenarMotivosCancelacion();
+
+
 
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
 
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id)
             {
                 Toast.makeText(adapterView.getContext(),
                         (String) adapterView.getItemAtPosition(pos), Toast.LENGTH_SHORT).show();
             }
-
-
             public void onNothingSelected(AdapterView<?> parent)
             {
 
@@ -112,6 +175,100 @@ public class CancelarPedidoFragment  extends Fragment {
 
     }
 
+
+    public void llenarMotivosCancelacion(){
+
+
+        String[] letra = {"Cliente Ausente","Datos erroneos","Servicio realziado por otro proveedor"};
+       // spinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, letra));
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ApiUtils.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call<Spinners> call = service.getProductos2(1);
+
+       // Toast.makeText(getActivity(), "Pedido por producto" + strIdPedido, Toast.LENGTH_SHORT).show();
+
+        final List<String> formatedTimes = new ArrayList<>();
+
+
+        call.enqueue(new Callback<Spinners>() {
+
+            @Override
+            public void onResponse(Call<Spinners> call, Response<Spinners> response) {
+
+                Spinners res = response.body();
+                //ArrayList<Spinners> medicalCenters = res.setspinners();
+
+                for (String time : spinnerMod.getAvailabilityTimes()) {
+                    formatedTimes.add(time);
+                }
+
+
+              //  ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, formatedTimes);
+              //  spinner.setAdapter(adapter);
+
+
+               // adapter = new ProductoAdapter(response.body().getspinners(), getActivity(),  getFragmentManager());
+
+
+            }
+
+            @Override
+            public void onFailure(Call<Spinners> call, Throwable t) {
+
+            }
+        });
+
+
+
+        /*
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ApiUtils.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+
+        ServicioUsuario api = retrofit.create(ServicioUsuario.class);
+        api.obtenerMotivosCancelacion(new Callback<JsonArray>() {
+            @Override
+            public void success(JsonArray jsonElements, Response response) {
+                try{
+
+                    for (int i = 0; i < jsonElements.size(); i++) {
+
+                        JsonObject jsonObject= jsonElements.get(i).getAsJsonObject();
+                        int year =  jsonObject.get("releaseYear").getAsInt();
+                        integerList.add(String.valueOf(year));
+                    }
+
+                }catch (JsonIOException  e){
+
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(MainActivity.this, ""+error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        ArrayAdapter<String> stringArrayAdapter = new ArrayAdapter<String>(
+                this,android.R.layout.simple_spinner_item,integerList);
+        getSpin.setAdapter(stringArrayAdapter);
+
+*/
+
+
+
+
+    }
 
 
     @Override

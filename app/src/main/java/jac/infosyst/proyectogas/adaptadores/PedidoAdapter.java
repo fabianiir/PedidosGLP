@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +42,10 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
     private static final String TAG = "PedidoAdapter";
 
+    private SparseBooleanArray selectedItems;
+    private final ArrayList<Integer> selected = new ArrayList<>();
 
-   // public PedidoAdapter(List<Pedido> pedidos, Context mCtx, FragmentManager f_manager) {
+
    public PedidoAdapter(List<Pedido> pedidos, Context mCtx, FragmentManager f_manager) {
         this.pedidos = pedidos;
         this.mCtx = mCtx;
@@ -70,6 +73,13 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         holder.textViewtotal.setText(Double.toString(pedido.gettotal()));
 
         //holder.parentLayout.setBackgroundColor(Color.parseColor("#567845"));
+        if (!selected.contains(position)){
+            // view not selected
+            holder.relativeRow.setBackgroundColor(Color.parseColor("#ffffff"));
+        }
+        else
+            // view is selected
+            holder.relativeRow.setBackgroundColor(Color.CYAN);
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,14 +103,24 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 ((Sessions)mCtx.getApplicationContext()).setsesTotal(Double.toString(pedidos.get(position).gettotal()));
 
 
-                if(position==pedidos.get(position).getId()) {
-                    holder.relativeRow.setBackgroundColor(Color.parseColor("#004c7a"));
+               // view.setBackgroundColor(Color.CYAN);
+                holder.relativeRow.setBackgroundColor(Color.parseColor("#303F9F"));
 
+                if (selected.isEmpty()){
+                    selected.add(position);
                 }else {
-
-                    holder.relativeRow.setBackgroundColor(Color.parseColor("#ffffff"));
-
+                    int oldSelected = selected.get(0);
+                    selected.clear();
+                    selected.add(position);
+                    notifyItemChanged(oldSelected);
                 }
+
+                //holder.relativeRow.setSelected(selectedItems.get(position, false));
+
+
+//                holder.relativeRow.setSelected(selectedItems.get(((Sessions)mCtx.getApplicationContext()).getSesIdPedido(), false));
+
+
 
 
 /*
@@ -166,7 +186,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         }
 
         LinearLayout parentLayout;
-        RelativeLayout relativeRow;
+        final RelativeLayout relativeRow;
 
     }
 
