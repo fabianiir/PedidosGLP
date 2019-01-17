@@ -10,7 +10,11 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@android:color/background_light"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,28 +25,27 @@
             android:paddingRight="24dp">
 
             <!-- Email Label -->
-            <RelativeLayout
-                android:layout_width="335dp"
-                android:layout_height="75dp">
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/textView_Configuracion"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="88dp"
-                    android:layout_marginLeft="88dp"
-                    android:layout_marginEnd="92dp"
-                    android:layout_marginRight="92dp"
+                    android:layout_marginStart="138dp"
+                    android:layout_marginLeft="138dp"
+                    android:layout_marginEnd="138dp"
+                    android:layout_marginRight="138dp"
                     android:text="Configuración"
                     android:textColor="@color/colorAccent"
                     android:textSize="24sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
