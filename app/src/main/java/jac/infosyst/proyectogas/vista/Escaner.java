@@ -15,6 +15,7 @@ import java.util.TimerTask;
 
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.Record.NFC;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class Escaner extends AppCompatActivity implements ZXingScannerView.ResultHandler {
@@ -29,7 +30,7 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
         btnNFC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Escaner.this, MainActivity.class);
+                Intent intent = new Intent(Escaner.this, NFC.class);
                 startActivity(intent);
             }
         });
