@@ -5,29 +5,30 @@ import java.util.List;
 
 public class Spinner {
 
-        private int idProducto;
-        private String detalle;
-        private List<String> mAvailabilityTimes;
+        private int oid;
+        private String nombre;
+        //private List<String> mAvailabilityTimes;
 
-        public Spinner(int idProducto , String detalle) {
-            this.idProducto = idProducto;
-            this.detalle = detalle;
+        public Spinner(int oid , String nombre) {
+            this.oid = oid;
+            this.nombre = nombre;
 
         }
 
 
 
-        public int getIdProducto() {
-            return idProducto;
+        public int getoid() {
+            return oid;
         }
 
-        public String getdetalle() {
-            return detalle;
+        public String getnombre() {
+            return nombre;
         }
 
-    public List<String> getAvailabilityTimes() {
+   /* public List<String> getAvailabilityTimes() {
         return mAvailabilityTimes;
-    }
+    }*/
+
 
 
 

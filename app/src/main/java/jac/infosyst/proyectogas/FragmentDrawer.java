@@ -8,11 +8,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,8 @@ import java.util.List;
 import jac.infosyst.proyectogas.R;
 import  jac.infosyst.proyectogas.adaptadores.NavigationDrawerAdapter;
 import jac.infosyst.proyectogas.modelo.NavDrawerItem;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
+import jac.infosyst.proyectogas.utils.Sessions;
 
 
 public class FragmentDrawer extends Fragment {
@@ -32,8 +36,11 @@ public class FragmentDrawer extends Fragment {
         private NavigationDrawerAdapter adapter;
         private View containerView;
         private static String[] titles = null;
-        private static int[] icons;
+        private static int icons[] = null;
         private FragmentDrawerListener drawerListener;
+
+        static String strUsuarioRol;
+
 
     public FragmentDrawer() {
 
@@ -46,14 +53,37 @@ public class FragmentDrawer extends Fragment {
         public static List<NavDrawerItem> getData () {
         List<NavDrawerItem> data = new ArrayList<>();
 
-
         // preparing navigation drawer items
         for (int i = 0; i < titles.length; i++) {
             NavDrawerItem navItem = new NavDrawerItem();
-            navItem.setTitle(titles[i]);
+
+
+                navItem.setTitle(titles[i]);
+
+
             navItem.setimgMenu(icons[i]);
+
+
             data.add(navItem);
+
+
         }
+
+/*
+            Sessions ss = new Sessions();
+            String str = ss.getsesUsuarioRol();
+            Log.i("GEORGE", "mensaje:::" + str);
+
+  */
+
+
+
+
+
+            if(strUsuarioRol.equals("Operador")) {
+                data.remove(3);
+            }
+
         return data;
     }
 
@@ -63,7 +93,13 @@ public class FragmentDrawer extends Fragment {
 
         // drawer labels
         titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels);
+
         icons = getActivity().getResources().getIntArray(R.array.nav_drawer_icons);
+
+
+        strUsuarioRol = ((Sessions)getActivity().getApplication()).getsesUsuarioRol();
+
+
 
         }
 

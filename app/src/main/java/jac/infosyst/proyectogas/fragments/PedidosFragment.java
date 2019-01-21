@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import jac.infosyst.proyectogas.modelo.Pedido;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
@@ -41,6 +42,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.Cursor;
+import android.util.Log;
 
 
 public class PedidosFragment extends Fragment{
@@ -56,6 +61,11 @@ public class PedidosFragment extends Fragment{
     String strtext;
     Button btnAtenderPedido, btnCancelarPedido, btnImprimirPedido;
     FragmentManager f_manager;
+
+    private SQLiteDBHelper sqLiteDBHelper = null;
+    private String DB_NAME = "proyectogas.db";
+    private int DB_VERSION = 1;
+    private String TABLE_NAME = "usuarios";
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -175,6 +185,8 @@ public class PedidosFragment extends Fragment{
 
 
         actualizarPedidos(tipoPedidos);
+        obtenerDatosUsuario();
+
 
         return rootView;
     }
@@ -193,6 +205,8 @@ public class PedidosFragment extends Fragment{
         call.enqueue(new Callback<Pedidos>() {
             @Override
             public void onResponse(Call<Pedidos> call, Response<Pedidos> response) {
+                Toast.makeText(getActivity(), "call: "  + response.body().getPedidos(), Toast.LENGTH_SHORT).show();
+
                 adapter = new PedidoAdapter(response.body().getPedidos(), getActivity(), getFragmentManager() );
                 recyclerViewPedidos.setAdapter(adapter);
             }
@@ -203,6 +217,63 @@ public class PedidosFragment extends Fragment{
             }
 
         });
+
+
+    }
+
+
+    public void obtenerDatosUsuario(){
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+
+        if(sqLiteDBHelper!=null) {
+            // Create the database tables again, this time because database version increased so the onUpgrade() method is invoked.
+            SQLiteDatabase sqLiteDatabase = sqLiteDBHelper.getWritableDatabase();
+            Cursor cursor = sqLiteDatabase.query(SQLiteDBHelper.USUARIOS_TABLE_NAME, null, null, null, null, null, null);
+
+            boolean hasRecord = cursor.moveToFirst();
+            if(hasRecord)
+            {
+                do{
+                    int id = cursor.getInt(cursor.getColumnIndex("id"));
+                    String nombre = cursor.getString(cursor.getColumnIndex("nombre"));
+
+                    StringBuffer bookInfoBuf = new StringBuffer();
+                    bookInfoBuf.append("book id : ");
+                    bookInfoBuf.append(id);
+                    bookInfoBuf.append(" , Nombre : ");
+                    bookInfoBuf.append(nombre);
+
+                   // Log.d(SQLiteDBHelper.LOG_TAG_SQLITE_DB, bookInfoBuf.toString());
+
+                }while(cursor.moveToNext());
+            }
+            String name = "Login Correcto";
+            Cursor c = sqLiteDatabase.rawQuery("SELECT * FROM usuarios WHERE TRIM(nombre) = '"+name.trim()+"'", null);
+            boolean hasRecord2 = c.moveToFirst();
+            if(hasRecord2)
+            {
+                do{
+                    int id = c.getInt(c.getColumnIndex("id"));
+                    String nombre = c.getString(c.getColumnIndex("nombre"));
+
+                    StringBuffer bookInfoBuf = new StringBuffer();
+                    bookInfoBuf.append("book id IOS: ");
+                    bookInfoBuf.append(id);
+                    bookInfoBuf.append(" , Nombre S.O.MOVIL2 : ");
+                    bookInfoBuf.append(nombre);
+
+                    Log.d(SQLiteDBHelper.LOG_TAG_SQLITE_DB, bookInfoBuf.toString());
+
+                }while(c.moveToNext());
+            }
+
+
+
+            Toast.makeText(getActivity(), "Look at android monitor console to see the query result.", Toast.LENGTH_LONG).show();
+        }else
+        {
+            Toast.makeText(getActivity(), "Please create database first.", Toast.LENGTH_LONG).show();
+        }
 
 
     }

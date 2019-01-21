@@ -4,6 +4,8 @@ package jac.infosyst.proyectogas.utils;
  * Created by jorgeaguilar on 12/27/18.
  */
 
+import java.util.List;
+
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 
 import jac.infosyst.proyectogas.modelo.Pedidos;
@@ -12,11 +14,12 @@ import jac.infosyst.proyectogas.modelo.Pedidos;
 
 import jac.infosyst.proyectogas.modelo.Productos;
 import jac.infosyst.proyectogas.modelo.Spinners;
+import jac.infosyst.proyectogas.modelo.Usuario;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
-
+import retrofit2.http.GET;
 
 import retrofit2.Call;
 import retrofit2.http.Path;
@@ -28,6 +31,7 @@ public interface ServicioUsuario {
     @FormUrlEncoded
     @POST("login.php/{username}/{password}")
     Call<ObjetoRes>login(@Field("username") String username, @Field("password") String password);
+  // Call<Usuario>login(@Field("username") String username, @Field("password") String password);
 
 
 /*
@@ -93,6 +97,9 @@ public interface ServicioUsuario {
   @POST("obtenerProductos.php/{idPedido}")
   Call<Spinners> getProductos2(@Field("idPedido") int idPedido);
 
+
+    @GET("obtenerMotivosCancelacion.php")
+     Call<Spinners> obtenerMotivosCancelacion();
 
 
 

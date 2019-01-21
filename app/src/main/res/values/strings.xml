@@ -26,7 +26,7 @@
 
     </string-array>
 
-    <string-array name="nav_drawer_icons">
+    <integer-array name="nav_drawer_icons">
         <item>@drawable/ic_mobile</item>
         <item>@drawable/ic_usuario</item>
         <item>@drawable/ic_ajustes</item>
@@ -34,7 +34,7 @@
         <item>@drawable/ic_pedidos_realizados</item>
         <item>@drawable/ic_cerrar</item>
 
-    </string-array>
+    </integer-array>
 
 
 

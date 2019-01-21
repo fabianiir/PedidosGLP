@@ -202,14 +202,8 @@ public class DetallePedidoFragment  extends Fragment{
 
             }
         });
-        btnLimpiarFirma = (Button)rootView.findViewById(R.id.btnLimpiarFirmar);
-        btnLimpiarFirma.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signaturePad.clear();
-                limpiarFirmaImagen();
-            }
-        });
+
+
         btnSurtirPedido = (Button)rootView.findViewById(R.id.btnSurtirPedido);
         btnSurtirPedido.setOnClickListener(new View.OnClickListener() {
             @Override

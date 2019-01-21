@@ -38,10 +38,17 @@ public class MainActivity extends AppCompatActivity
    // Bundle bundle;
     PedidosFragment pedidoObj;
 
+    String strRolUsuario;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
+        Toast.makeText(this, "Main! " +strRolUsuario, Toast.LENGTH_SHORT).show();
+
+
 /*
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,6 +86,8 @@ public class MainActivity extends AppCompatActivity
 
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         drawerFragment.setDrawerListener(this);
+
+
 
         // display the first navigation drawer view on app launch
         displayView(0);
@@ -166,70 +175,62 @@ public class MainActivity extends AppCompatActivity
 
 
         switch (position) {
+
+
             case 0:
-/*
-                Bundle bundle = new Bundle();
-                bundle.putString("tipoPedidos", "From Activity");
-                PedidosFragment fragobj = new PedidosFragment();
-                fragobj.setArguments(bundle);
-*/
-
-
-                //strSess.setSesnameTitle("Pedidos");
-               // bundle.putString("tipoPedidos", "Pedidos");
                 title = getString(R.string.title_pedidos);
-                //Toast.makeText(this, "asignando..." +  strSess.getSesnameTitle(), Toast.LENGTH_SHORT).show();
-
                 fragment = new PedidosFragment();
                 break;
-/*
             case 1:
                 fragment = new OperadorFragment();
                 title = getString(R.string.title_operador);
                 break;
-            case 101:
-                fragment = new DetallePedidoFragment();Result
-                title = "Datos Cliente";
-                break;
-*/
-
-            case 1:
-                fragment = new OperadorFragment();
-                title = getString(R.string.title_operador);
-                break;
-
             case 2:
                 fragment = new MapsActivity();
                 title = getString(R.string.title_mapa);
                 break;
             case 3:
-                Intent i = new Intent(MainActivity.this, Configuracion.class);
-                startActivity(i);
-                ((Activity) MainActivity.this).overridePendingTransition(0,0);
+                if (strRolUsuario.equals("Administrador")) {
+                    Intent i = new Intent(MainActivity.this, Configuracion.class);
+                    startActivity(i);
+                    ((Activity) MainActivity.this).overridePendingTransition(0, 0);
+                }
+                if(strRolUsuario.equals("Operador")){
+
+                    title = getString(R.string.title_pedidosrealizados);
+                    fragment = new PedidosFragment();
+                }
 
                 break;
 
             case 4:
-               // strSess.setSesnameTitle("Pedidos Realizados");
-                title = getString(R.string.title_pedidosrealizados);
+                if (strRolUsuario.equals("Administrador")) {
+                    title = getString(R.string.title_pedidosrealizados);
+                    fragment = new PedidosFragment();
+                }
+                if(strRolUsuario.equals("Operador")){
+                    Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(i2);
+                    ((Activity) MainActivity.this).overridePendingTransition(0,0);
 
-                fragment = new PedidosFragment();
+                }
+
+
                 break;
 
             case 5:
                 Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(i2);
                 ((Activity) MainActivity.this).overridePendingTransition(0,0);
-
                 break;
 
             default:
                 break;
 
-
-
-
         }
+
+
+
 
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -240,13 +241,7 @@ public class MainActivity extends AppCompatActivity
             // set the toolbar title
             getSupportActionBar().setTitle(title);
 
-
-
-
         }
     }
-
-
-
 
 }

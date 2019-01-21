@@ -113,4 +113,17 @@ public class Sessions  extends Application {
     }
 
 
+
+    private String sesUsuarioRol;
+
+    public String getsesUsuarioRol() {
+        return sesUsuarioRol;
+    }
+
+    public void setsesUsuarioRol(String sesUsuarioRol) {
+        this.sesUsuarioRol = sesUsuarioRol;
+    }
+
+
+
 }

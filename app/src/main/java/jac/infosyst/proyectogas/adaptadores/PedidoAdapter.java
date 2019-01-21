@@ -76,6 +76,10 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         if (!selected.contains(position)){
             // view not selected
             holder.relativeRow.setBackgroundColor(Color.parseColor("#ffffff"));
+            holder.textViewCliente.setTextColor(Color.parseColor("#000000"));
+            holder.textViewDescripcion.setTextColor(Color.parseColor("#000000"));
+            holder.textViewDireccion.setTextColor(Color.parseColor("#000000"));
+            holder.textViewEstatus.setTextColor(Color.parseColor("#000000"));
         }
         else
             // view is selected
@@ -106,8 +110,10 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
                // view.setBackgroundColor(Color.CYAN);
                 holder.relativeRow.setBackgroundColor(Color.parseColor("#004C7A"));
-
-
+                holder.textViewCliente.setTextColor(Color.parseColor("#ffffff"));
+                holder.textViewDescripcion.setTextColor(Color.parseColor("#ffffff"));
+                holder.textViewDireccion.setTextColor(Color.parseColor("#ffffff"));
+                holder.textViewEstatus.setTextColor(Color.parseColor("#ffffff"));
 
 
                 if (selected.isEmpty()){

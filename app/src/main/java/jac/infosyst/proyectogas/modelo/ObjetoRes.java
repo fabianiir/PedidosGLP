@@ -1,5 +1,7 @@
 package jac.infosyst.proyectogas.modelo;
 
+import java.util.ArrayList;
+
 /**
  * Created by jorgeaguilar on 12/27/18.
  */
@@ -28,4 +30,15 @@ public class ObjetoRes {
     }
 
 
+
+    public Usuario[] user;
+
+    public Usuario[] getuser() {
+        return user;
+    }
+
+
+
+
 }
+

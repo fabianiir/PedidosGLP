@@ -10,10 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
 import jac.infosyst.proyectogas.modelo.ModeloSpinner;
+import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Productos;
+import jac.infosyst.proyectogas.modelo.Usuario;
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -34,6 +37,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jac.infosyst.proyectogas.modelo.Spinners;
@@ -179,7 +183,7 @@ Spinner spinner;
     public void llenarMotivosCancelacion(){
 
 
-        String[] letra = {"Cliente Ausente","Datos erroneos","Servicio realziado por otro proveedor"};
+        final String[] letra = {"Cliente Ausente","Datos erroneos","Servicio realziado por otro proveedor"};
        // spinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, letra));
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -189,7 +193,7 @@ Spinner spinner;
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call<Spinners> call = service.getProductos2(1);
+        Call<Spinners> call = service.obtenerMotivosCancelacion();
 
        // Toast.makeText(getActivity(), "Pedido por producto" + strIdPedido, Toast.LENGTH_SHORT).show();
 
@@ -200,17 +204,37 @@ Spinner spinner;
 
             @Override
             public void onResponse(Call<Spinners> call, Response<Spinners> response) {
+                if(response.isSuccessful()) {
+                    Spinners resSpinners = (Spinners) response.body();
+                    Toast.makeText(getActivity(), "resSpinners! " + resSpinners.getmotivoscancelacion(), Toast.LENGTH_SHORT).show();
+                    ArrayList<jac.infosyst.proyectogas.modelo.Spinner> latLngData = new ArrayList<jac.infosyst.proyectogas.modelo.Spinner>();
+                    latLngData.addAll(Arrays.asList(resSpinners.getmotivoscancelacion()));
+                    ArrayList<String> list = new ArrayList<String>();
 
-                Spinners res = response.body();
-                //ArrayList<Spinners> medicalCenters = res.setspinners();
 
-                for (String time : spinnerMod.getAvailabilityTimes()) {
-                    formatedTimes.add(time);
+                    for (int i = 0; i < latLngData.size(); i++) {
+                        String lat = latLngData.get(i).getnombre();
+                        list.add(lat);
+                    }
+                    StringBuilder builder = new StringBuilder();
+                    for (String value : list) {
+                        builder.append(value);
+                    }
+                    String text = builder.toString();
+
+                    // Toast.makeText(LoginActivity.this, "Bienvenido!" + resObj.getuser(), Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(LoginActivity.this, "Bienvenido!" + latLngData, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Motivo! " + text, Toast.LENGTH_SHORT).show();
+
+
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, list);
+                    spinner.setAdapter(adapter);
                 }
 
-
-              //  ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, formatedTimes);
-              //  spinner.setAdapter(adapter);
+                else {
+                    Toast.makeText(getActivity(), "error", Toast.LENGTH_SHORT).show();
+                }
 
 
                // adapter = new ProductoAdapter(response.body().getspinners(), getActivity(),  getFragmentManager());

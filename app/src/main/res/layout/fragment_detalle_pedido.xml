@@ -236,7 +236,7 @@
                 android:text="Firmar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnComoLlegar" />
-
+<!--
             <Button
                 android:id="@+id/btnLimpiarFirmar"
                 android:layout_width="100dp"
@@ -246,7 +246,8 @@
                 android:layout_marginRight="8dp"
                 android:text="Limpiar"
                 app:layout_constraintEnd_toStartOf="@+id/btnFirmar"
-                app:layout_constraintTop_toBottomOf="@+id/btnComoLlegar" />
+               app:layout_constraintTop_toBottomOf="@+id/btnComoLlegar" />
+-->
 
             <Button
                 android:id="@+id/btnSurtirPedido"
