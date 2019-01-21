@@ -21,6 +21,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import jac.infosyst.proyectogas.ImpresoraBluetooth.Impresora;
+import jac.infosyst.proyectogas.ImpresoraBluetooth.Print_Bluetooth;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
@@ -111,7 +113,24 @@ public class SurtirPedidoFragment  extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
+
+
+                try
+                {
+                    Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
+
+
+                    Impresora impresora = new Impresora();
+
+                    impresora.FindBluetoothDevice();
+                    impresora.openBluetoothPrinter();
+                    impresora.printData("Prueba de Impresion");
+                    Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                }
 
             }
         });

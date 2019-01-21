@@ -1,15 +1,8 @@
-package jac.infosyst.proyectogas.Record;
+package jac.infosyst.proyectogas.LectorNFC;
 
-import android.app.Activity;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
-import android.support.v4.content.ContextCompat;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.LinearLayout;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;

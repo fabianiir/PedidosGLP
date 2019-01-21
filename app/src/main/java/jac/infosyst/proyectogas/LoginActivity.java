@@ -23,7 +23,7 @@ import jac.infosyst.proyectogas.utils.ServicioUsuario;
 
 
 import jac.infosyst.proyectogas.utils.Sessions;
-import jac.infosyst.proyectogas.vista.Escaner;
+import jac.infosyst.proyectogas.LectorQR.Escaner;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
