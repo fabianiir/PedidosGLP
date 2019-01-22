@@ -174,54 +174,20 @@ public class LoginActivity extends AppCompatActivity{
                    // Toast.makeText(LoginActivity.this, "Respuesta: " + resObj.geterror(), Toast.LENGTH_SHORT).show();
 
                     if(resObj.geterror().equals("false")){
-
-                       // insertSqLite(resObj.getMessage());
-                        ArrayList<Usuario> latLngData = new ArrayList<Usuario>();
-                        latLngData.addAll(Arrays.asList(resObj.getuser()));
-                        ArrayList<String> list = new ArrayList<String>();
+                        Toast.makeText(LoginActivity.this, "Bienvenido! " , Toast.LENGTH_SHORT).show();
 
 
-                        for (int i = 0; i < latLngData.size(); i++) {
-                            String lat = latLngData.get(i).getnombre();
-                            list.add(lat);
-                        }
-                        StringBuilder builder = new StringBuilder();
-                        for (String value : list) {
-                            builder.append(value);
-                        }
-                        String text = builder.toString();
-                        ArrayList<String> listRol = new ArrayList<String>();
+                        if (resObj.getAdmin().equals("true")){
 
-                        for (int i = 0; i < latLngData.size(); i++) {
-                            String lat = latLngData.get(i).getrol();
-                            listRol.add(lat);
-                        }
-                        StringBuilder builderRol = new StringBuilder();
-                        for (String value : listRol) {
-                            builderRol.append(value);
-                        }
-                        String textRol = builderRol.toString();
-
-                       // Toast.makeText(LoginActivity.this, "Bienvenido!" + resObj.getuser(), Toast.LENGTH_SHORT).show();
-                       // Toast.makeText(LoginActivity.this, "Bienvenido!" + latLngData, Toast.LENGTH_SHORT).show();
-                       // Toast.makeText(LoginActivity.this, "Bienvenido! " + text, Toast.LENGTH_SHORT).show();
-
-                        Sessions sess = new Sessions();
-                        //sess.setsesUsuarioRol(textRol);
-                        ((Sessions)getApplicationContext()).setsesUsuarioRol(textRol);
-
-                        if (textRol.equals("Administrador")){
-
-                            Toast.makeText(LoginActivity.this, "Bienvenido! " + ((Sessions)getApplicationContext()).getsesUsuarioRol(), Toast.LENGTH_SHORT).show();
-
+                            ((Sessions)getApplication()).setsesUsuarioRol("Admin");
                             Intent intent = new Intent(LoginActivity.this, Configuracion.class);
                             intent.putExtra("username", pusername);
                             startActivity(intent);
 
                         }
 
-                        if (textRol.equals("Operador")){
-
+                        if (resObj.getAdmin().equals("false")){
+                            ((Sessions)getApplication()).setsesUsuarioRol("Operador");
                             Intent intent = new Intent(LoginActivity.this, Escaner.class);
                             intent.putExtra("username", pusername);
                             startActivity(intent);

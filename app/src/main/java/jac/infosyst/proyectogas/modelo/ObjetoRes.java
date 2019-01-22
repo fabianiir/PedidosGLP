@@ -30,6 +30,16 @@ public class ObjetoRes {
     }
 
 
+    private String Admin;
+
+    public String getAdmin() {
+        return Admin;
+    }
+
+    public void setAdmin(String Admin) {
+        this.Admin = Admin;
+    }
+
 
     public Usuario[] user;
 
@@ -37,7 +47,11 @@ public class ObjetoRes {
         return user;
     }
 
+    private Pedido[] pedido;
 
+    public Pedido[] getpedido() {
+        return pedido;
+    }
 
 
 }

@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import jac.infosyst.proyectogas.Configuracion;
+import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
 
 
@@ -24,10 +26,13 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Pedido;
+import jac.infosyst.proyectogas.modelo.Spinners;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.ApiUtils;
@@ -35,6 +40,7 @@ import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.modelo.Pedidos;
 
 import jac.infosyst.proyectogas.utils.Sessions;
+import jac.infosyst.proyectogas.vista.Escaner;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -66,6 +72,7 @@ public class PedidosFragment extends Fragment{
     private String DB_NAME = "proyectogas.db";
     private int DB_VERSION = 1;
     private String TABLE_NAME = "usuarios";
+    ServicioUsuario userService;
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -82,7 +89,7 @@ public class PedidosFragment extends Fragment{
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         Sessions strSess = new Sessions();
-
+        userService = ApiUtils.getUserService();
 
 
         recyclerViewPedidos = (RecyclerView) rootView.findViewById(R.id.recyclerViewPedidos);
@@ -180,43 +187,54 @@ public class PedidosFragment extends Fragment{
 
         }
 
-
-
-
-
-        actualizarPedidos(tipoPedidos);
+        actualizarPedidos();
+      //  actualizarPedidos2();
         obtenerDatosUsuario();
 
 
         return rootView;
     }
 
-    public void actualizarPedidos(int tipoPedidos){
+    public void actualizarPedidos(){
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call<Pedidos> call = service.getPedidos(tipoPedidos);
-
-        call.enqueue(new Callback<Pedidos>() {
+        Call call = userService.getPedidos("Yo", "Pendiente", "c6861e99-0069-4ced-b8dd-549a124f87d5");
+        call.enqueue(new Callback() {
             @Override
-            public void onResponse(Call<Pedidos> call, Response<Pedidos> response) {
-                Toast.makeText(getActivity(), "call: "  + response.body().getPedidos(), Toast.LENGTH_SHORT).show();
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
 
-                adapter = new PedidoAdapter(response.body().getPedidos(), getActivity(), getFragmentManager() );
-                recyclerViewPedidos.setAdapter(adapter);
+                        if(resObj.geterror().equals("false")) {
+
+
+                            Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+                                adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
+                                recyclerViewPedidos.setAdapter(adapter);
+
+                    } else {
+                            Toast.makeText(getActivity(), "no datos! " , Toast.LENGTH_SHORT).show();
+
+                        }
+                }
+
+                else {
+                    Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
+
+                }
+
+
             }
 
             @Override
-            public void onFailure(Call<Pedidos> call, Throwable t) {
-
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
         });
+
+
+
+
 
 
     }
@@ -277,6 +295,48 @@ public class PedidosFragment extends Fragment{
 
 
     }
+
+
+/*
+    public void actualizarPedidos2(){
+
+        Call call = userService.getPedidos("Yo", "Pendiente", "c6861e99-0069-4ced-b8dd-549a124f87d5");
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    // Toast.makeText(LoginActivity.this, "Respuesta: " + resObj.geterror(), Toast.LENGTH_SHORT).show();
+
+                    if(resObj.geterror().equals("false")){
+
+                        Toast.makeText(getActivity(), "Respuesta: " +  resObj.getMessage(), Toast.LENGTH_SHORT).show();
+
+
+                    } else {
+                        Toast.makeText(getActivity(), "Respuesta: " +  resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                else {
+                    Toast.makeText(getActivity(), "Error: ", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), "onFailure: " , Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+    }
+
+    */
+
 
     @Override
     public void onAttach(Activity activity) {

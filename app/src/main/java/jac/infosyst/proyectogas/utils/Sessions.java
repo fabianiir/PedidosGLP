@@ -14,13 +14,13 @@ public class Sessions  extends Application {
     }
 
 
-    private int idPedido;
+    private String idPedido;
 
-    public int getSesIdPedido() {
+    public String getSesIdPedido() {
         return idPedido;
     }
 
-    public void setSesIdPedido(int idPedido) {
+    public void setSesIdPedido(String idPedido) {
         this.idPedido = idPedido;
     }
 
@@ -123,6 +123,66 @@ public class Sessions  extends Application {
     public void setsesUsuarioRol(String sesUsuarioRol) {
         this.sesUsuarioRol = sesUsuarioRol;
     }
+
+/*nuevas*/
+
+    private String sesNombre;
+    public String getsessesNombrell() {
+        return sesNombre;
+    }
+    public void setSesNombre(String sesUsuarioRol) {
+        this.sesNombre = sesNombre;
+    }
+
+    private String Placas;
+    public String getsesPlacas() {
+        return Placas;
+    }
+    public void setsesPlacas(String sesUsuarioRol) {
+        this.Placas = Placas;
+    }
+    private String sesfechaprogramada;
+    public String getsesfechaprogramada() {
+        return sesfechaprogramada;
+    }
+    public void setsesfechaprogramada(String sesfechaprogramada) {
+        this.sesfechaprogramada = sesfechaprogramada;
+    }
+
+
+    private String setsescp;
+    public String getsetsescp() {
+        return setsescp;
+    }
+    public void setsetsescp(String setsescp) {
+        this.setsescp = setsescp;
+    }
+
+    private String sestelefono;
+    public String getsestelefono() {
+        return sestelefono;
+    }
+    public void setsestelefono(String sestelefono) {
+        this.sestelefono = sestelefono;
+    }
+    private String sescomentarioscliente;
+    public String getsescomentarioscliente() {
+        return sescomentarioscliente;
+    }
+    public void setsescomentarioscliente(String sescomentarioscliente) {
+        this.sescomentarioscliente = sescomentarioscliente;
+    }
+    private String sessumaiva;
+    public String getsessumaiva() {
+        return sessumaiva;
+    }
+    public void setsessumaiva(String sessumaiva) {
+        this.sessumaiva = sessumaiva;
+    }
+
+
+
+
 
 
 

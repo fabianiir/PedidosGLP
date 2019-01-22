@@ -51,7 +51,7 @@ public class CancelarPedidoFragment  extends Fragment {
     TextView tvCanNombreOperador, tvCanDireccion, tvCanDescripcion;
     EditText textViewObservaciones;
     Button btnAceptarCancelarPedido;
-    int idPedido;
+    String idPedido;
     private Context mCtx;
 
     ModeloSpinner spinnerMod;
@@ -172,7 +172,7 @@ Spinner spinner;
 
     }
 
-    public void cancelarPedido(int idPedido){
+    public void cancelarPedido(String idPedido){
 
         Toast.makeText(getActivity(), "Cancelando Pedido: " + idPedido , Toast.LENGTH_SHORT).show();
 

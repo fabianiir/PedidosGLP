@@ -28,21 +28,28 @@ import retrofit2.http.Path;
 public interface ServicioUsuario {
 
 
-    @FormUrlEncoded
-    @POST("login.php/{username}/{password}")
-    Call<ObjetoRes>login(@Field("username") String username, @Field("password") String password);
+  //  @FormUrlEncoded
+  //  @POST("login.php/{username}/{password}")
+ //   Call<ObjetoRes>login(@Field("username") String username, @Field("password") String password);
   // Call<Usuario>login(@Field("username") String username, @Field("password") String password);
 
 
-/*
+
 
   @FormUrlEncoded
   //@Headers("Content-Type:application/x-www-form-urlencoded")
-  @POST("log/")
-  Call<ObjetoRes>login(@Field("user") String username, @Field("passw") String password);
+  @POST("login/")
+  Call<ObjetoRes>login(@Field("username") String username, @Field("password") String password);
 
 
-  */
+  @FormUrlEncoded
+  @POST("pedido/")
+  Call<ObjetoRes> getPedidos(
+            @Field("chofer") String chofer,
+            @Field("estatus") String estatus,
+          @Field("token") String token
+  );
+
 
 
 
@@ -59,9 +66,11 @@ public interface ServicioUsuario {
 
   //  @GET("obtenerPedidos.php")
   //  Call<Pedidos> getPedidos();
-    @FormUrlEncoded
-    @POST("obtenerPedidos.php/{tipoPedidos}")
-    Call<Pedidos> getPedidos(@Field("tipoPedidos") int tipoPedidos);
+
+
+//    @FormUrlEncoded
+ //   @POST("obtenerPedidos.php/{tipoPedidos}")
+ //   Call<Pedidos> getPedidos(@Field("tipoPedidos") int tipoPedidos);
 
 
 
@@ -85,7 +94,7 @@ public interface ServicioUsuario {
 
     @FormUrlEncoded
     @POST("obtenerProductos.php/{idPedido}")
-    Call<Productos> getProductos(@Field("idPedido") int idPedido);
+    Call<Productos> getProductos(@Field("idPedido") String idPedido);
 
 
     @FormUrlEncoded

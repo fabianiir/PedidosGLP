@@ -64,13 +64,14 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
     public void onBindViewHolder(final PedidoAdapter.ViewHolder holder, final int position) {
         Pedido pedido = pedidos.get(position);
         holder.textViewCliente.setText(pedido.getcliente());
-        holder.textViewDescripcion.setText(pedido.getdescripcion());
-        holder.textViewEstatus.setText(pedido.getestatus());
+        holder.textViewDescripcion.setText(pedido.getplacas());
+        holder.textViewEstatus.setText(pedido.getcp());
         holder.textViewDireccion.setText(pedido.getdireccion());
 
-        holder.textViewdetalleproducto.setText(pedido.getdetalleproducto());
-        holder.textViewfirmaurl.setText(pedido.getfirmaurl());
-        holder.textViewtotal.setText(Double.toString(pedido.gettotal()));
+        holder.textViewdetalleproducto.setText(pedido.getnombre());
+        holder.textViewfirmaurl.setText(pedido.gettelefono());
+       // holder.textViewtotal.setText(pedido.gettotal());
+
 
         //holder.parentLayout.setBackgroundColor(Color.parseColor("#567845"));
         if (!selected.contains(position)){
@@ -93,19 +94,21 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 Log.d(TAG, "onClick: textViewCliente: " + pedidos.get(position));
 
 
-
-                ((Sessions)mCtx.getApplicationContext()).setSesIdPedido(pedidos.get(position).getId());
+                ((Sessions)mCtx.getApplicationContext()).setSesIdPedido(pedidos.get(position).getOid());
                 String strIdPedido = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido());
 
                 Toast.makeText(mCtx, "Se selecciono: " + strIdPedido, Toast.LENGTH_SHORT).show();
 
-                ((Sessions)mCtx.getApplicationContext()).setSesCliente(pedidos.get(position).getcliente());
+                ((Sessions)mCtx.getApplicationContext()).setSesNombre(pedidos.get(position).getnombre());
+                ((Sessions)mCtx.getApplicationContext()).setsesPlacas(pedidos.get(position).getplacas());
+                ((Sessions)mCtx.getApplicationContext()).setsesfechaprogramada(pedidos.get(position).getfechaprogramada());
+                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getcliente());
                 ((Sessions)mCtx.getApplicationContext()).setsesDireccion(pedidos.get(position).getdireccion());
-                ((Sessions)mCtx.getApplicationContext()).setsesDescripcion(pedidos.get(position).getdescripcion());
-                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getestatus());
-                ((Sessions)mCtx.getApplicationContext()).setsesDetalleProducto(pedidos.get(position).getdetalleproducto());
-                ((Sessions)mCtx.getApplicationContext()).setsesFirmaURL(pedidos.get(position).getfirmaurl());
-                ((Sessions)mCtx.getApplicationContext()).setsesTotal(Double.toString(pedidos.get(position).gettotal()));
+                ((Sessions)mCtx.getApplicationContext()).setsetsescp(pedidos.get(position).getcp());
+                ((Sessions)mCtx.getApplicationContext()).setsestelefono(pedidos.get(position).gettelefono());
+              //  ((Sessions)mCtx.getApplicationContext()).setsescomentarioscliente(pedidos.get(position).getcomentarios_cliente());
+              //  ((Sessions)mCtx.getApplicationContext()).setsessumaiva(pedidos.get(position).getsuma_iva());
+              //  ((Sessions)mCtx.getApplicationContext()).setsesTotal(pedidos.get(position).gettotal());
 
 
                // view.setBackgroundColor(Color.CYAN);
@@ -125,30 +128,8 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                     notifyItemChanged(oldSelected);
                 }
 
-                //holder.relativeRow.setSelected(selectedItems.get(position, false));
-
-
-//                holder.relativeRow.setSelected(selectedItems.get(((Sessions)mCtx.getApplicationContext()).getSesIdPedido(), false));
-
-
-
-
-/*
-                DetallePedidoFragment dpf = new DetallePedidoFragment(mCtx);
-
-
-                FragmentTransaction transaction = f_manager.beginTransaction();
-                transaction.replace(R.id.container_body, dpf);
-                transaction.commit();
-
-*/
-
-
-
-
             }
         });
-
 
     }
 
