@@ -1,4 +1,4 @@
-package jac.infosyst.proyectogas.Record;
+package jac.infosyst.proyectogas.LectorNFC;
 
 public interface ParsedNdefRecord {
     String str();

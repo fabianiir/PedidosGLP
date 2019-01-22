@@ -1,6 +1,5 @@
-package jac.infosyst.proyectogas.Record;
+package jac.infosyst.proyectogas.LectorNFC;
 
-import android.app.Activity;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 

@@ -1,4 +1,4 @@
-package jac.infosyst.proyectogas.Record;
+package jac.infosyst.proyectogas.LectorNFC;
 
 import android.app.PendingIntent;
 import android.content.Intent;

@@ -1,12 +1,6 @@
-package jac.infosyst.proyectogas.Record;
-import android.app.Activity;
+package jac.infosyst.proyectogas.LectorNFC;
 import android.net.Uri;
 import android.nfc.NdefRecord;
-import android.text.util.Linkify;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;

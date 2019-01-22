@@ -1,8 +1,9 @@
 package jac.infosyst.proyectogas;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,12 +11,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Api;
-
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
-import jac.infosyst.proyectogas.vista.Escaner;
+import jac.infosyst.proyectogas.LectorQR.Escaner;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,12 +26,7 @@ import  jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-
-
 
 
 public class Configuracion extends AppCompatActivity{
@@ -134,5 +128,25 @@ public class Configuracion extends AppCompatActivity{
             return false;
         }
         return true;
+    }
+
+    public static class SplashActivity extends Activity {
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_splash);
+
+            new Handler().postDelayed(new Runnable()
+            {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(SplashActivity.this, Escaner.class);
+                    startActivity(intent);
+                }
+
+
+            }, 4000);
+        }
     }
 }
