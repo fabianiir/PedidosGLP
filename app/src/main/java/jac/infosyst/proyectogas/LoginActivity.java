@@ -180,6 +180,7 @@ public class LoginActivity extends AppCompatActivity{
                         Toast.makeText(LoginActivity.this, "Bienvenido! " , Toast.LENGTH_SHORT).show();
 
                        // insertBitacora();
+                        
 
                         if (resObj.getAdmin().equals("true")){
 
