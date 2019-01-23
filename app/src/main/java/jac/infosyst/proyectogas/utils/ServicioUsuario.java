@@ -73,12 +73,21 @@ public interface ServicioUsuario {
  //   Call<Pedidos> getPedidos(@Field("tipoPedidos") int tipoPedidos);
 
 
-
+/*php*//*
     @FormUrlEncoded
     @POST("registroConfiguracion.php")
     Call<Result> registroConfiguracion(
             @Field("ip") String ip,
             @Field("celular") String celular);
+
+*/
+  @FormUrlEncoded
+  @POST("config")
+  Call<Result> registroConfiguracion(
+          @Field("public_ip") String ip,
+          @Field("phone") String celular);
+
+
 
 
     @FormUrlEncoded
@@ -106,9 +115,23 @@ public interface ServicioUsuario {
   @POST("obtenerProductos.php/{idPedido}")
   Call<Spinners> getProductos2(@Field("idPedido") int idPedido);
 
+/*php*/
+   // @GET("obtenerMotivosCancelacion.php")
+   //  Call<Spinners> obtenerMotivosCancelacion();
 
-    @GET("obtenerMotivosCancelacion.php")
-     Call<Spinners> obtenerMotivosCancelacion();
+  @FormUrlEncoded
+  @POST("cat_motcanc")
+  Call<ObjetoRes> obtenerMotivosCancelacion(@Field("token") String token);
+
+  @FormUrlEncoded
+  @POST("bitacora")
+  Call<ObjetoRes> bitacora(
+          @Field("evento") String evento,
+          @Field("emai") String emai,
+                  @Field("chofer_id") String chofer_id,
+                  @Field("camion_id") String camion_id,
+                  @Field("token") String token
+  );
 
 
 

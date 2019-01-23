@@ -40,6 +40,16 @@ public class ObjetoRes {
         this.Admin = Admin;
     }
 
+    private String token;
+
+    public String gettoken() {
+        return token;
+    }
+
+    public void settoken(String token) {
+        this.token = token;
+    }
+
 
     public Usuario[] user;
 
@@ -52,6 +62,13 @@ public class ObjetoRes {
     public Pedido[] getpedido() {
         return pedido;
     }
+    private Spinner[] catalogo;
+
+    public Spinner[] getmotivoscancelacion() {
+        return catalogo;
+    }
+
+
 
 
 }

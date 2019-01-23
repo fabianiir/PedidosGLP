@@ -54,8 +54,6 @@ public class Configuracion extends AppCompatActivity{
                 //validate form
                 if(validateConfig(ipDominio, telefono)){
                     insertarConfiguracion();
-                    Intent intent = new Intent(Configuracion.this, Escaner.class);
-                    startActivity(intent);
 
                 }
             }
@@ -100,11 +98,8 @@ public class Configuracion extends AppCompatActivity{
             public void onResponse(Call<Result> call, Response<Result> response) {
                 progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
-
-                //finish();
-                //startActivity(new Intent(getApplicationContext(), MainActivity.class));
-               // startActivity(new Intent(getApplicationContext(), LectoresActivity.class));
-
+                Intent intent = new Intent(Configuracion.this, Escaner.class);
+                startActivity(intent);
 
             }
 

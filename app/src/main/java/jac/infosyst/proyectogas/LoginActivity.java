@@ -89,10 +89,13 @@ public class LoginActivity extends AppCompatActivity{
             Toast.makeText(this, "Ingresar Usuario", Toast.LENGTH_SHORT).show();
             return false;
         }
+        /*
         if(password == null || password.trim().length() == 0){
             Toast.makeText(this, "Ingresar Contraseña", Toast.LENGTH_SHORT).show();
             return false;
         }
+        */
+
         return true;
     }
 
@@ -176,6 +179,7 @@ public class LoginActivity extends AppCompatActivity{
                     if(resObj.geterror().equals("false")){
                         Toast.makeText(LoginActivity.this, "Bienvenido! " , Toast.LENGTH_SHORT).show();
 
+                       // insertBitacora();
 
                         if (resObj.getAdmin().equals("true")){
 
@@ -193,6 +197,7 @@ public class LoginActivity extends AppCompatActivity{
                             startActivity(intent);
 
                         }
+
 
 
 
@@ -279,6 +284,44 @@ public class LoginActivity extends AppCompatActivity{
         {
             Toast.makeText(getApplicationContext(), "Please create database first.", Toast.LENGTH_LONG).show();
         }
+
+
+    }
+
+    public void insertBitacora(){
+        Call call = userService.bitacora("True", "abc123", "255asdasdasdasd" , "b61wqertyui", "Null");
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    if(resObj.geterror().equals("false")){
+
+                        if (resObj.geterror().equals("false")) {
+                            Toast.makeText(LoginActivity.this, "mensaje! " + resObj.getMessage() +
+                                    "token: " + resObj.gettoken(), Toast.LENGTH_SHORT).show();
+
+                        }
+
+
+                    } else {
+                        Toast.makeText(LoginActivity.this, resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                else {
+                    Toast.makeText(LoginActivity.this, "Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
     }

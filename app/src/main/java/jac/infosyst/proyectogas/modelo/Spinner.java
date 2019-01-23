@@ -5,30 +5,36 @@ import java.util.List;
 
 public class Spinner {
 
-        private int oid;
+        private String Oid;
         private String nombre;
+        private String OptimisticLockField;
+        private String GCRecord;
+
         //private List<String> mAvailabilityTimes;
 
-        public Spinner(int oid , String nombre) {
-            this.oid = oid;
+        public Spinner(String Oid , String nombre, String OptimisticLockField, String GCRecord) {
+            this.Oid = Oid;
             this.nombre = nombre;
+            this.OptimisticLockField = OptimisticLockField;
+            this.GCRecord = GCRecord;
 
         }
 
 
 
-        public int getoid() {
-            return oid;
+        public String getoid() {
+            return Oid;
         }
 
         public String getnombre() {
             return nombre;
         }
-
-   /* public List<String> getAvailabilityTimes() {
-        return mAvailabilityTimes;
-    }*/
-
+    public String getGCRecord() {
+        return GCRecord;
+    }
+    public String getOptimisticLockField() {
+        return OptimisticLockField;
+    }
 
 
 

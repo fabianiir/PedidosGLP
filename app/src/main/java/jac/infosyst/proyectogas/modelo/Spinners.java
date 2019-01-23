@@ -23,10 +23,10 @@ public class Spinners {
         this.spinners = spinners;
     }*/
 
-    private Spinner[] motivoscancelacion;
+    private Spinner[] catalogo;
 
     public Spinner[] getmotivoscancelacion() {
-        return motivoscancelacion;
+        return catalogo;
     }
 
 

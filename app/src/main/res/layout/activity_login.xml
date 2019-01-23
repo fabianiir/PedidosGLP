@@ -38,7 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Usuario"
-                    android:text="Pentatox"
+                    android:text=""
                     android:inputType="textEmailAddress" />
             </android.support.design.widget.TextInputLayout>
 
@@ -54,7 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Contraseña"
-                    android:text="PolloX117"
+                    android:text=""
                     android:inputType="textPassword" />
             </android.support.design.widget.TextInputLayout>
 

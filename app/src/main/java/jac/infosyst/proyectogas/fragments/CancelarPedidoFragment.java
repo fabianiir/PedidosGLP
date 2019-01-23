@@ -3,6 +3,7 @@ package jac.infosyst.proyectogas.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import jac.infosyst.proyectogas.Configuracion;
+import jac.infosyst.proyectogas.LectorQR.Escaner;
 import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
@@ -56,6 +59,7 @@ public class CancelarPedidoFragment  extends Fragment {
 
     ModeloSpinner spinnerMod;
 Spinner spinner;
+    ServicioUsuario userService;
 
     public CancelarPedidoFragment(Context mCtx) {
         this.mCtx = mCtx;
@@ -65,7 +69,7 @@ Spinner spinner;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        userService = ApiUtils.getUserService();
     }
 
 
@@ -186,67 +190,66 @@ Spinner spinner;
         final String[] letra = {"Cliente Ausente","Datos erroneos","Servicio realziado por otro proveedor"};
        // spinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, letra));
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call<Spinners> call = service.obtenerMotivosCancelacion();
-
-       // Toast.makeText(getActivity(), "Pedido por producto" + strIdPedido, Toast.LENGTH_SHORT).show();
-
-        final List<String> formatedTimes = new ArrayList<>();
-
-
-        call.enqueue(new Callback<Spinners>() {
-
+        Call call = userService.obtenerMotivosCancelacion("c6861e99-0069-4ced-b8dd-549a124f87d5");
+        call.enqueue(new Callback() {
             @Override
-            public void onResponse(Call<Spinners> call, Response<Spinners> response) {
-                if(response.isSuccessful()) {
-                    Spinners resSpinners = (Spinners) response.body();
-                    Toast.makeText(getActivity(), "resSpinners! " + resSpinners.getmotivoscancelacion(), Toast.LENGTH_SHORT).show();
-                    ArrayList<jac.infosyst.proyectogas.modelo.Spinner> latLngData = new ArrayList<jac.infosyst.proyectogas.modelo.Spinner>();
-                    latLngData.addAll(Arrays.asList(resSpinners.getmotivoscancelacion()));
-                    ArrayList<String> list = new ArrayList<String>();
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    // Toast.makeText(LoginActivity.this, "Respuesta: " + resObj.geterror(), Toast.LENGTH_SHORT).show();
+
+                    if(resObj.geterror().equals("false")){
+                        ArrayList<jac.infosyst.proyectogas.modelo.Spinner> latLngData = new ArrayList<jac.infosyst.proyectogas.modelo.Spinner>();
+                        latLngData.addAll(Arrays.asList(resObj.getmotivoscancelacion()));
+                        ArrayList<String> list = new ArrayList<String>();
 
 
-                    for (int i = 0; i < latLngData.size(); i++) {
-                        String lat = latLngData.get(i).getnombre();
-                        list.add(lat);
+                        for (int i = 0; i < latLngData.size(); i++) {
+                            String lat = latLngData.get(i).getnombre();
+                            list.add(lat);
+                        }
+                        StringBuilder builder = new StringBuilder();
+                        for (String value : list) {
+                            builder.append(value);
+                        }
+                        String text = builder.toString();
+
+                        // Toast.makeText(LoginActivity.this, "Bienvenido!" + resObj.getuser(), Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(LoginActivity.this, "Bienvenido!" + latLngData, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getActivity(), "Motivo! " + text, Toast.LENGTH_SHORT).show();
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, list);
+                        spinner.setAdapter(adapter);
+
+                        Toast.makeText(getActivity(), "Respuesta: " + resObj.getmotivoscancelacion(), Toast.LENGTH_SHORT).show();
+
+
+                    } else {
+                        Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                    StringBuilder builder = new StringBuilder();
-                    for (String value : list) {
-                        builder.append(value);
-                    }
-                    String text = builder.toString();
-
-                    // Toast.makeText(LoginActivity.this, "Bienvenido!" + resObj.getuser(), Toast.LENGTH_SHORT).show();
-                    // Toast.makeText(LoginActivity.this, "Bienvenido!" + latLngData, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "Motivo! " + text, Toast.LENGTH_SHORT).show();
-
-
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, list);
-                    spinner.setAdapter(adapter);
                 }
 
                 else {
-                    Toast.makeText(getActivity(), "error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
-
-
-               // adapter = new ProductoAdapter(response.body().getspinners(), getActivity(),  getFragmentManager());
 
 
             }
 
             @Override
-            public void onFailure(Call<Spinners> call, Throwable t) {
-
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
+
+
+
+
+
 
 
 
