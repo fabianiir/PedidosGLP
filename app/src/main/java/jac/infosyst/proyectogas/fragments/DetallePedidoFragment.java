@@ -1,6 +1,8 @@
 package jac.infosyst.proyectogas.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -38,7 +40,7 @@ public class DetallePedidoFragment  extends Fragment{
 
     /*firma*/
     RelativeLayout mContent;
-    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido;
+    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar;
 
     Button mClear, mGetSign, mCancel;
     File file;
@@ -136,6 +138,16 @@ public class DetallePedidoFragment  extends Fragment{
             @Override
             public void onClick(View v) {
                 iraSurtirPedido();
+            }
+        });
+
+        btnComoLlegar = (Button) rootView.findViewById(R.id.btnComoLlegar);
+        btnComoLlegar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri intentUri = Uri.parse("geo:41.382,2.170?z=16&q=41.382,2.170(Esta+Es+La+Etiqueta)");
+                Intent intent = new Intent(Intent.ACTION_VIEW, intentUri);
+                startActivity(intent);
             }
         });
 
