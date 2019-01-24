@@ -136,7 +136,7 @@ public class Configuracion extends AppCompatActivity{
             {
                 @Override
                 public void run() {
-                    Intent intent = new Intent(SplashActivity.this, Escaner.class);
+                    Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
 

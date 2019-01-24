@@ -1,111 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:orientation="vertical"
-        android:paddingLeft="24dp"
+
         android:paddingTop="10dp"
-        android:paddingRight="24dp"
-        >
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:text="Cancelación"
+            android:textColor="@color/colorAccent"
+            android:textSize="25dp"
+            android:layout_marginTop="16dp"
+
+            android:textStyle="bold"
+            app:fontFamily="@font/roboto"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="140dp" />
 
 
         <TextView
             android:id="@+id/tvDatosCliente"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
             android:text="Datos Cliente:"
-            android:layout_marginLeft="50dp"
+            android:textSize="20dp"
+            android:layout_marginTop="16dp"
 
-            />
+
+            app:fontFamily="@font/roboto" />
 
         <TextView
             android:id="@+id/tvCanNombreOperador"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             android:text="Nombre: Pedro Flores"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            />
+            android:textSize="20dp"
+
+            app:fontFamily="@font/roboto" />
+
         <TextView
             android:id="@+id/tvCanDireccion"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             android:text="Direccion: "
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="15dp"
-            />
+            android:textSize="20dp"
+            app:fontFamily="@font/roboto" />
+
         <TextView
             android:id="@+id/tvCanDescripcion"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             android:text="Descripcion: "
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="20dp"
+            android:textSize="20dp"
 
-            />
+            app:fontFamily="@font/roboto" />
+
         <TextView
             android:id="@+id/tvCanMotivoCancelacion"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             android:text="Motivo Cancelacion: "
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="25dp"
+            android:textSize="20dp"
 
-            />
+            app:fontFamily="@font/roboto" />
 
 
         <Spinner
             android:id="@+id/spinnerMotivoCancelacion"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             />
-
-
 
 
         <TextView
             android:id="@+id/tvCanObservaciones"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             android:text="Observaciones: "
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
+            android:textSize="20dp"
 
-            />
+            app:fontFamily="@font/roboto" />
 
         <EditText
             android:id="@+id/textViewObservaciones"
-            android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorBlanco"
+            android:hint="Observaciones:"
             android:inputType="textMultiLine"
             android:lines="4"
             android:maxLines="10"
-            android:hint="Observaciones:"
-            android:layout_marginTop="15dp"
-            android:background="@color/colorBlanco"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical" />
 
 
+        <Button
+            android:id="@+id/btnAceptarCancelarPedido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
 
-        <Button android:layout_height="50dp"
-            android:text="Aceptar" android:layout_width="150dp" android:id="@+id/btnAceptarCancelarPedido"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="80dp"
-            />
-
-
-
+            android:layout_marginTop="16dp"
+            android:background="@color/BotonGris"
+            android:text="Aceptar"
+            android:textColor="@color/colorAccent" />
 
 
     </LinearLayout>

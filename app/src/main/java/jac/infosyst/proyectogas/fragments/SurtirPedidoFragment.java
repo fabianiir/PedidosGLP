@@ -1,7 +1,6 @@
 package jac.infosyst.proyectogas.fragments;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,12 +11,10 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,16 +38,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-import jac.infosyst.proyectogas.ImpresoraBluetooth.Impresora;
-import jac.infosyst.proyectogas.ImpresoraBluetooth.Print_Bluetooth;
 import jac.infosyst.proyectogas.R;
-import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
-import jac.infosyst.proyectogas.modelo.Pedido;
-import jac.infosyst.proyectogas.modelo.Pedidos;
-import jac.infosyst.proyectogas.modelo.Producto;
 import jac.infosyst.proyectogas.modelo.Productos;
 
 import jac.infosyst.proyectogas.utils.ApiUtils;
@@ -161,12 +151,7 @@ public class SurtirPedidoFragment  extends Fragment {
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
 
 
-                    Impresora impresora = new Impresora();
 
-                    impresora.FindBluetoothDevice();
-                    impresora.openBluetoothPrinter();
-                    impresora.printData("Prueba de Impresion");
-                    Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
                 }
                 catch (Exception ex)
                 {

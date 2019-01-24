@@ -122,6 +122,10 @@ public class NFC extends AppCompatActivity {
         }
 
         text.setText(builder.toString());
+
+
+        Intent intent = new Intent(NFC.this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void showWirelessSettings() {
