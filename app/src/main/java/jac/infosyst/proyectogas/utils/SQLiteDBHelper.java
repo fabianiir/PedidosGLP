@@ -11,8 +11,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
 
     private Context ctx;
     private String crearTablaUsuarios = "";
+    private String crearTablaconfsqlite = "";
     private boolean isUpgrade = false;
     public static final String USUARIOS_TABLE_NAME = "usuarios";
+    public static final String CONFSQLITE_TABLE_NAME = "confsqlite";
     public static final String LOG_TAG_SQLITE_DB = "LOG_TAG_SQLITE_DB";
 
     public SQLiteDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -24,8 +26,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         this.buildCreateTableSql();
         sqLiteDatabase.execSQL(crearTablaUsuarios);
+        sqLiteDatabase.execSQL(crearTablaconfsqlite);
 
-        Toast.makeText(ctx, "Table " + USUARIOS_TABLE_NAME + " is created successfully. ", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(ctx, "Table " + USUARIOS_TABLE_NAME + " is created successfully. ", Toast.LENGTH_SHORT).show();
 
 
     }
@@ -52,6 +55,17 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
         bookSqlBuf.append(" sexo text )");
 
         crearTablaUsuarios = bookSqlBuf.toString();
+
+        StringBuffer confsqliteSqlBuf = new StringBuffer();
+
+
+        confsqliteSqlBuf.append("create table ");
+        confsqliteSqlBuf.append(CONFSQLITE_TABLE_NAME);
+        confsqliteSqlBuf.append("( id integer primary key autoincrement,");
+        confsqliteSqlBuf.append(" status integer )");
+
+
+        crearTablaconfsqlite = confsqliteSqlBuf.toString();
 
 
     }

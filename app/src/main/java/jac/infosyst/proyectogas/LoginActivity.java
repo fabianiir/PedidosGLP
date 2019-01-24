@@ -52,8 +52,8 @@ public class LoginActivity extends AppCompatActivity{
     Button btnLogin;
     ServicioUsuario userService;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas.db";
-    private int DB_VERSION = 1;
+    private String DB_NAME = "proyectogas2.db";
+    private int DB_VERSION = 3;
     private String TABLE_NAME = "usuarios";
 
     private ArrayList<UsuarioInfo> dataUsuario;
@@ -180,7 +180,7 @@ public class LoginActivity extends AppCompatActivity{
                         Toast.makeText(LoginActivity.this, "Bienvenido! " , Toast.LENGTH_SHORT).show();
 
                        // insertBitacora();
-                        
+
 
                         if (resObj.getAdmin().equals("true")){
 
