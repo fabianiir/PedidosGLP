@@ -49,12 +49,15 @@ public class LoginActivity extends AppCompatActivity{
 
     EditText edtUsername;
     EditText edtPassword;
-    Button btnLogin;
+    Button btnLogin, btnConfiguracion;
     ServicioUsuario userService;
     private SQLiteDBHelper sqLiteDBHelper = null;
     private String DB_NAME = "proyectogas2.db";
     private int DB_VERSION = 3;
     private String TABLE_NAME = "usuarios";
+    private String BASEURL = "";
+
+
 
     private ArrayList<UsuarioInfo> dataUsuario;
 
@@ -81,6 +84,17 @@ public class LoginActivity extends AppCompatActivity{
                 }
             }
         });
+        btnConfiguracion = (Button) findViewById(R.id.btn_configuracionLogin);
+
+
+        btnConfiguracion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, Configuracion.class);
+                startActivity(intent);
+            }
+        });
+
 
     }
 
@@ -166,8 +180,52 @@ public class LoginActivity extends AppCompatActivity{
 
 */
 
+        http://189.208.163.83:8060/glpservices/webresources/glpservices/
 
-        Call call = userService.login(pusername,ppassword);
+
+        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+
+        String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
+
+        final int recordCount = db.rawQuery(sql, null).getCount();
+      //  Toast.makeText(getApplicationContext(), "contador: " + recordCount, Toast.LENGTH_LONG).show();
+
+        SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
+
+        Cursor cursor = dbConn.rawQuery(sql, null);
+        String email="";
+        String checkEmpty = "";
+        if (cursor.moveToFirst()) {
+
+            int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
+            String firstname = cursor.getString(cursor.getColumnIndex("status"));
+            email = cursor.getString(cursor.getColumnIndex("ip"));
+           // Toast.makeText(getApplicationContext(), "datos: " + email, Toast.LENGTH_LONG).show();
+
+        }
+
+        cursor.close();
+
+
+        BASEURL = "http://"+ email+ ":8060/glpservices/webresources/glpservices/";
+
+                                 //  ((Sessions)getApplication()).setsesUsuarioRol("Admin");
+
+
+       // Toast.makeText(LoginActivity.this, "dany: " + BASEURL, Toast.LENGTH_SHORT).show();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+
+        Call call = service.login(pusername,ppassword);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -185,7 +243,8 @@ public class LoginActivity extends AppCompatActivity{
                         if (resObj.getAdmin().equals("true")){
 
                             ((Sessions)getApplication()).setsesUsuarioRol("Admin");
-                            Intent intent = new Intent(LoginActivity.this, Configuracion.class);
+                           // Intent intent = new Intent(LoginActivity.this, Configuracion.class);
+                            Intent intent = new Intent(LoginActivity.this, Escaner.class);
                             intent.putExtra("username", pusername);
                             startActivity(intent);
 
@@ -193,7 +252,7 @@ public class LoginActivity extends AppCompatActivity{
 
                         if (resObj.getAdmin().equals("false")){
                             ((Sessions)getApplication()).setsesUsuarioRol("Operador");
-                            Intent intent = new Intent(LoginActivity.this, Escaner.class);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("username", pusername);
                             startActivity(intent);
 
@@ -216,7 +275,13 @@ public class LoginActivity extends AppCompatActivity{
 
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Conexion No alcanza un servidor!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, Configuracion.class);
+               // intent.putExtra("username", pusername);
+                startActivity(intent);
+
+                //Toast.makeText(LoginActivity.this, "ir a conf" + t.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         });
 

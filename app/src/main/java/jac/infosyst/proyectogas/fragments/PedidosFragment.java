@@ -74,6 +74,9 @@ public class PedidosFragment extends Fragment{
     private String TABLE_NAME = "usuarios";
     ServicioUsuario userService;
 
+    private String BASEURL = "";
+
+
     public PedidosFragment() {
         // Required empty public constructor
     }
@@ -189,7 +192,7 @@ public class PedidosFragment extends Fragment{
 
         actualizarPedidos();
       //  actualizarPedidos2();
-        obtenerDatosUsuario();
+       // obtenerDatosUsuario();
 
 
         return rootView;
@@ -197,6 +200,41 @@ public class PedidosFragment extends Fragment{
 
     public void actualizarPedidos(){
 
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+
+        String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
+
+        final int recordCount = db.rawQuery(sql, null).getCount();
+        //  Toast.makeText(getApplicationContext(), "contador: " + recordCount, Toast.LENGTH_LONG).show();
+
+        SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
+
+        Cursor cursor = dbConn.rawQuery(sql, null);
+        String email="";
+        String checkEmpty = "";
+        if (cursor.moveToFirst()) {
+
+            int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
+            String firstname = cursor.getString(cursor.getColumnIndex("status"));
+            email = cursor.getString(cursor.getColumnIndex("ip"));
+            // Toast.makeText(getApplicationContext(), "datos: " + email, Toast.LENGTH_LONG).show();
+
+        }
+
+        cursor.close();
+
+
+        BASEURL = "http://"+ email+ ":8060/glpservices/webresources/glpservices/";
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
         Call call = userService.getPedidos("Yo", "Pendiente", "c6861e99-0069-4ced-b8dd-549a124f87d5");
         call.enqueue(new Callback() {

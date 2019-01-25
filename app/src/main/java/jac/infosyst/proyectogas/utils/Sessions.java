@@ -185,5 +185,16 @@ public class Sessions  extends Application {
 
 
 
+    private String strIpServidor;
+
+    public String getSesstrIpServidor() {
+        return strIpServidor;
+    }
+
+    public void setSesstrIpServidor(String strIpServidor) { this.strIpServidor = strIpServidor; }
+
+
+
+
 
 }
