@@ -1,90 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:orientation="vertical"
         android:paddingLeft="24dp"
         android:paddingTop="10dp"
         android:paddingRight="24dp"
-        >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:text="Reimpresión Ticket"
+            android:textColor="@color/colorAccent"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            app:fontFamily="@font/roboto"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="140dp" />
 
 
         <TextView
             android:id="@+id/tvDatosCliente"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
             android:text="Datos Cliente:"
-            android:layout_marginLeft="50dp"
+            android:textSize="20dp"
 
-            />
+            app:fontFamily="@font/roboto" />
 
         <TextView
             android:id="@+id/tvCanNombreOperador"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text="Nombre: Pedro Flores"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="10dp"
-            />
+            android:text="Nombre: Pedro Flores"
+            android:textSize="20dp"
+            app:fontFamily="@font/roboto" />
+
         <TextView
             android:id="@+id/tvCanDireccion"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text="Direccion: "
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="15dp"
-            />
+            android:text="Direccion: "
+            android:textSize="20dp"
+            app:fontFamily="@font/roboto" />
+
         <TextView
             android:id="@+id/tvCanDescripcion"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text="Descripcion: "
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="20dp"
+            android:text="Descripcion: "
+            android:textSize="20dp"
 
-            />
+            app:fontFamily="@font/roboto" />
 
         <TextView
             android:id="@+id/tvCanEstatus"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text="Estatus: "
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="20dp"
+            android:text="Estatus: "
+            android:textSize="20dp"
 
-            />
+            app:fontFamily="@font/roboto" />
+
         <TextView
             android:id="@+id/tvCanTotal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="20dp"
             android:text="Total: "
-            android:layout_marginLeft="50dp"
+            android:textSize="20dp"
+
+            app:fontFamily="@font/roboto" />
+
+
+        <Button
+            android:id="@+id/btnReimprimirPedido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="20dp"
-
-            />
-
-
-
-
-
-        <Button android:layout_height="50dp"
-            android:text="Reimprimir" android:layout_width="150dp" android:id="@+id/btnReimprimirPedido"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="80dp"
-            />
-
-
-
+            android:background="@color/BotonGris"
+            android:text="Reimprimir"
+            android:textColor="@color/colorAccent" />
 
 
     </LinearLayout>

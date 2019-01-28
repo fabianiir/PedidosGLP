@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorBlanco">
 
 
     <LinearLayout
@@ -72,16 +73,19 @@
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_configuracionLogin"
-                android:layout_width="39dp"
-                android:layout_height="29dp"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
                 android:background="@drawable/ic_ajustes"
                 android:padding="12dp"
                 android:textColor="@android:color/background_light"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+
+
+                />
         </android.support.constraint.ConstraintLayout>
 
     </LinearLayout>

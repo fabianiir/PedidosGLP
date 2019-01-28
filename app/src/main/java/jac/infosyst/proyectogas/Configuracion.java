@@ -1,13 +1,17 @@
 package jac.infosyst.proyectogas;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -59,6 +63,14 @@ public class Configuracion extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracion);
 
+        int permissionCheck = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_PHONE_STATE );
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
+        }
 
         edtIP = (EditText) findViewById(R.id.input_IP);
         edtTelefono = (EditText) findViewById(R.id.input_telefono);
@@ -167,6 +179,38 @@ public class Configuracion extends AppCompatActivity{
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_splash);
+//Permisos
+
+
+            int PermisoAlmacenamiento = ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+
+
+
+            if (PermisoAlmacenamiento != PackageManager.PERMISSION_GRANTED) {
+                Log.i("Mensaje", "No se tiene permiso.");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 225);
+            } else {
+                Log.i("Mensaje", "Se tiene permiso!");
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
 
             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();

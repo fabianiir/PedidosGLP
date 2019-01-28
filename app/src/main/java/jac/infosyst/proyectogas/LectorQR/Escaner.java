@@ -1,6 +1,10 @@
 package jac.infosyst.proyectogas.LectorQR;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +29,19 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escaner);
+
+        //Permiso
+
+        int PermisoCamara = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.CAMERA);
+        if (PermisoCamara != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
+        }
+
+
         btnNFC = (Button) findViewById(R.id.btn_NFC);
 
         btnNFC.setOnClickListener(new View.OnClickListener() {
@@ -37,6 +54,8 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
     }
 
     public void btnEscanear(View v){
+
+
     mScannerView = new ZXingScannerView(this);
     setContentView(mScannerView);
     mScannerView.setResultHandler(this);
