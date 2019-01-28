@@ -29,6 +29,19 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escaner);
+
+        //Permiso
+
+        int PermisoCamara = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.CAMERA);
+        if (PermisoCamara != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
+        }
+
+
         btnNFC = (Button) findViewById(R.id.btn_NFC);
 
         btnNFC.setOnClickListener(new View.OnClickListener() {
@@ -42,14 +55,7 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
 
     public void btnEscanear(View v){
 
-        int permissionCheck = ContextCompat.checkSelfPermission(
-                this, Manifest.permission.CAMERA);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            Log.i("Mensaje", "No se tiene permiso.");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA }, 225);
-        } else {
-            Log.i("Mensaje", "Se tiene permiso!");
-        }
+
     mScannerView = new ZXingScannerView(this);
     setContentView(mScannerView);
     mScannerView.setResultHandler(this);

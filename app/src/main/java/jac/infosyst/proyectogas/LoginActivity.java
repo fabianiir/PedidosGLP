@@ -4,7 +4,11 @@ package jac.infosyst.proyectogas;
  * Created by jorgeaguilar on 12/27/18.
  */
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -65,6 +69,18 @@ public class LoginActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+
+
+        int PermisoLocalizacion = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (PermisoLocalizacion != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION }, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
+        }
 
         edtUsername = (EditText) findViewById(R.id.input_email);
         edtPassword = (EditText) findViewById(R.id.input_password);
