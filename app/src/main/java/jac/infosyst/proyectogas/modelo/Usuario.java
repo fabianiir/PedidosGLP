@@ -7,16 +7,20 @@ public class Usuario {
 
   //  private ArrayList<UsuarioInfo> UsuarioList = new ArrayList<UsuarioInfo>();
 
-    private int id;
+    private String Oid;
     private String nombre;
+    private String UserName;
     private String rol;
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return Oid;
     }
 
     public String getnombre() {
         return nombre;
+    }
+    public String getUserName() {
+        return UserName;
     }
 
     public String getrol() {

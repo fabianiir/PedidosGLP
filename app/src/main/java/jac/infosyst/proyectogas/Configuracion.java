@@ -47,7 +47,7 @@ public class Configuracion extends AppCompatActivity{
 
     static int checkConfiguracionSqLite = 0;
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas8.db";
+    private static String DB_NAME = "proyectogas9.db";
     private static int DB_VERSION = 1;
 
     private static int  statusConf ;
@@ -173,12 +173,14 @@ public class Configuracion extends AppCompatActivity{
 
 
 
-            int studentId = 19;
+            int studentId = 1 ;
 
-            String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
+           // String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
+
+            String sql = "SELECT * FROM config where id = " + studentId;
 
             final int recordCount = db.rawQuery(sql, null).getCount();
-          //  Toast.makeText(getApplicationContext(), "contador: " + recordCount, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "contador: " + recordCount, Toast.LENGTH_LONG).show();
 
             SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
 

@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,7 +24,14 @@ import jac.infosyst.proyectogas.FragmentDrawer;
 
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
+import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
      //   implements NavigationView.OnNavigationItemSelectedListener {
@@ -39,14 +47,19 @@ public class MainActivity extends AppCompatActivity
     PedidosFragment pedidoObj;
 
     String strRolUsuario;
+    private String BASEURL = "";
+    Sessions objSessions;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        objSessions = new Sessions();
+
         strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
-        Toast.makeText(this, "Main! " +strRolUsuario, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "Main! " +strRolUsuario, Toast.LENGTH_SHORT).show();
 
 
 /*
@@ -165,8 +178,18 @@ public class MainActivity extends AppCompatActivity
 */
 
     @Override
-    public void onDrawerItemSelected(View view, int position) {
+    public void onDrawerItemSelected(View view, int position)
+    {
+
+       // if(position == 5){
+            // Toast.makeText(MainActivity.this, "cerrar: " , Toast.LENGTH_SHORT).show();
+        //    insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
+        //    Log.v(TAG,"token: " + position);
+
+        //}
         displayView(position);
+
+
     }
 
     private void displayView(int position) {
@@ -176,12 +199,12 @@ public class MainActivity extends AppCompatActivity
 
         switch (position) {
 
-
             case 0:
                 title = getString(R.string.title_pedidos);
                 fragment = new PedidosFragment();
                 break;
             case 1:
+                Log.d(TAG,"OperadorFragment: ");
                 fragment = new OperadorFragment();
                 title = getString(R.string.title_operador);
                 break;
@@ -209,6 +232,9 @@ public class MainActivity extends AppCompatActivity
                     fragment = new PedidosFragment();
                 }
                 if(strRolUsuario.equals("Operador")){
+                    Log.v(TAG,"token: " + position);
+                    insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
+
                     Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(i2);
                     ((Activity) MainActivity.this).overridePendingTransition(0,0);
@@ -219,6 +245,9 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case 5:
+                Log.v(TAG,"token: " + position);
+                insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
+
                 Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(i2);
                 ((Activity) MainActivity.this).overridePendingTransition(0,0);
@@ -243,5 +272,58 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
+
+
+
+    public void insertBitacora(boolean evento, String emai, String chofer_id, String camion_id , String token){
+
+        Toast.makeText(getApplicationContext(), "cerrar: " , Toast.LENGTH_SHORT).show();
+
+
+        BASEURL = "http://"+ objSessions.getSesstrIpServidor() + ":8060/glpservices/webresources/glpservices/";
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.bitacora(evento, emai, chofer_id , camion_id , token);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    if(resObj.geterror().equals("false")){
+
+
+                        Toast.makeText(getApplicationContext(), "token: " + resObj.gettoken(), Toast.LENGTH_SHORT).show();
+
+                        Log.d(TAG,"token: " + resObj.gettoken());
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                else {
+                    Toast.makeText(getApplicationContext(), "Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+
 
 }

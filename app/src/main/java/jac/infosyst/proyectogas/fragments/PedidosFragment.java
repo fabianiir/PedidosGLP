@@ -75,7 +75,7 @@ public class PedidosFragment extends Fragment{
     ServicioUsuario userService;
 
     private String BASEURL = "";
-
+    Sessions objSessions;
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -92,6 +92,7 @@ public class PedidosFragment extends Fragment{
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         Sessions strSess = new Sessions();
+        objSessions = new Sessions();
         userService = ApiUtils.getUserService();
 
 
@@ -227,7 +228,7 @@ public class PedidosFragment extends Fragment{
         cursor.close();
 
 
-        BASEURL = "http://"+ email+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = "http://"+ objSessions.getSesstrIpServidor()+ ":8060/glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)

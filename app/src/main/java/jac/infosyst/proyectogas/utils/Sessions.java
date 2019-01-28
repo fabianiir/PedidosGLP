@@ -195,6 +195,39 @@ public class Sessions  extends Application {
 
 
 
+    private String sesscamion_id;
+
+    public String getsesscamion_id() {
+        return sesscamion_id;
+    }
+
+    public void setsesscamion_id(String sesscamion_id) { this.sesscamion_id = sesscamion_id; }
+
+
+    private String sessToken;
+
+    public String getsessToken() {
+        return sessToken;
+    }
+
+    public void setsessToken(String sessToken) { this.sessToken = sessToken; }
+
+
+    private String sessIDuser;
+
+    public String getsessIDuser() {
+        return sessIDuser;
+    }
+
+    public void setsessIDuser(String sessIDuser) { this.sessIDuser = sessIDuser; }
+
+    private String sessIDcamion;
+
+    public String getsessIDcamion() {
+        return sessIDcamion;
+    }
+
+    public void setsessIDcamion(String sessIDcamion) { this.sessIDcamion = sessIDcamion; }
 
 
 }

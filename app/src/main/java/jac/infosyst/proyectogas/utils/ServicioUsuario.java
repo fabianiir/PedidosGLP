@@ -126,7 +126,7 @@ public interface ServicioUsuario {
   @FormUrlEncoded
   @POST("bitacora")
   Call<ObjetoRes> bitacora(
-          @Field("evento") String evento,
+          @Field("evento") boolean evento,
           @Field("emai") String emai,
                   @Field("chofer_id") String chofer_id,
                   @Field("camion_id") String camion_id,
