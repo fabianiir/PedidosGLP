@@ -2,6 +2,8 @@ package jac.infosyst.proyectogas;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,6 +27,7 @@ import jac.infosyst.proyectogas.FragmentDrawer;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
 import retrofit2.Call;
@@ -49,6 +52,10 @@ public class MainActivity extends AppCompatActivity
     String strRolUsuario;
     private String BASEURL = "";
     Sessions objSessions;
+    private SQLiteDBHelper sqLiteDBHelper = null;
+    private String DB_NAME = "proyectogas2.db";
+    private int DB_VERSION = 3;
+    String strIP = "";
 
 
     @Override
@@ -58,7 +65,30 @@ public class MainActivity extends AppCompatActivity
 
         objSessions = new Sessions();
 
+
         strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
+
+        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+
+        final int recordCount = db.rawQuery(sql, null).getCount();
+
+        final Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+
+            strIP = record.getString(record.getColumnIndex("ip"));
+
+            objSessions.setSesstrIpServidor(strIP);
+
+
+        }
+
+
+
        // Toast.makeText(this, "Main! " +strRolUsuario, Toast.LENGTH_SHORT).show();
 
 
@@ -280,7 +310,7 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(getApplicationContext(), "cerrar: " , Toast.LENGTH_SHORT).show();
 
 
-        BASEURL = "http://"+ objSessions.getSesstrIpServidor() + ":8060/glpservices/webresources/glpservices/";
+        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)

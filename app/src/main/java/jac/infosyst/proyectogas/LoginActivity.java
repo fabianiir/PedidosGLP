@@ -62,6 +62,7 @@ public class LoginActivity extends AppCompatActivity{
     private String BASEURL = "";
     String ipServidor="";
     Sessions objSessions;
+    String strIP = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +144,7 @@ public class LoginActivity extends AppCompatActivity{
         final int recordCount = db.rawQuery(sql, null).getCount();
 
         final Cursor record = db.rawQuery(sql, null);
-        String strIP = "";
+
         if (record.moveToFirst()) {
 
             strIP = record.getString(record.getColumnIndex("ip"));
@@ -159,7 +160,7 @@ public class LoginActivity extends AppCompatActivity{
 
 
 
-       Toast.makeText(getApplicationContext(), "RESULTADO L: " + strIP, Toast.LENGTH_LONG).show();
+       //Toast.makeText(getApplicationContext(), "RESULTADO L: " + strIP, Toast.LENGTH_LONG).show();
 
         SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
 
@@ -179,7 +180,7 @@ public class LoginActivity extends AppCompatActivity{
         cursor.close();
         objSessions.setSesstrIpServidor("189.208.163.83");
 
-        BASEURL = "http://"+ objSessions.getSesstrIpServidor()+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -317,7 +318,7 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     public void insertBitacora(boolean evento, String emai, String chofer_id, String camion_id , String token){
-          BASEURL = "http://"+ objSessions.getSesstrIpServidor()+ ":8060/glpservices/webresources/glpservices/";
+          BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)

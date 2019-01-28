@@ -133,14 +133,37 @@ public class Configuracion extends AppCompatActivity{
             public void onResponse(Call<Result> call, Response<Result> response) {
                 progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
-               // insertSqLite("x", strIP);
+
+                sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
+
+                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+                ContentValues cv = new ContentValues();
+                cv.put("ip",strIP); //These Fields should be your String values of actual column names
+
+                db.update("config", cv, "id="+1, null);
+
+
+              //  Toast.makeText(getApplicationContext(), "RESULTADO CONFIG: " + strIP, Toast.LENGTH_LONG).show();
+
+
+
+
+                // insertSqLite("x", strIP);
+
+                /*
                 ContentValues values = new ContentValues();
 
                 values.put("status", "1");
                 values.put("ip", strIP);
 
                 boolean createSuccessful = db.insert("config", null, values) > 0;
-                db.close();
+                */
+
+
+
+               // db.close();
               //  Toast.makeText(getApplicationContext(), "geo: " + createSuccessful, Toast.LENGTH_LONG).show();
 
 
@@ -219,12 +242,17 @@ public class Configuracion extends AppCompatActivity{
 
             int studentId = 1 ;
 
-           // String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
+            String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
 
-            String sql = "SELECT * FROM config where id = " + studentId;
+            //String sql = "SELECT * FROM config where id = " + studentId;
+
+         //   String sql = "UPDATE config SET ip = " +  + " WHERE  id = 1";
+
+
+         //   SELECT * FROM config WHERE id = 1
 
             final int recordCount = db.rawQuery(sql, null).getCount();
-            Toast.makeText(getApplicationContext(), "contador: " + recordCount, Toast.LENGTH_LONG).show();
+          // Toast.makeText(getApplicationContext(), "UPDATE IP: " + recordCount, Toast.LENGTH_LONG).show();
 
             SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
 
