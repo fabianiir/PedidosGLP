@@ -136,6 +136,8 @@ public class LoginActivity extends AppCompatActivity{
 
         }
 
+        
+
         /*admin va al main , operador al de escaner */
 
 
