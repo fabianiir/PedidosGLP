@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
+
 public class LoginActivity extends AppCompatActivity{
 
     EditText edtUsername;
@@ -136,7 +137,7 @@ public class LoginActivity extends AppCompatActivity{
 
         }
 
-        
+
 
         /*admin va al main , operador al de escaner */
 
