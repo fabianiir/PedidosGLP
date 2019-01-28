@@ -57,7 +57,7 @@ public class SurtirPedidoFragment  extends Fragment {
     private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle
             , textViewFirma, textViewTotal;
 
-    Button btnFirmar, btnGuardar, btnReimpresionTicket;
+    Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     View layout;
     LayoutInflater layoutInflater;
@@ -239,10 +239,14 @@ public class SurtirPedidoFragment  extends Fragment {
 
 
         btnFirmar = (Button) rootView.findViewById(R.id.btnFirmar);
+        btnLimpiar = (Button) rootView.findViewById(R.id.btnLimpiarFirmar);
 
+        btnLimpiar.setEnabled(true);
         signaturePad = (SignaturePad) rootView.findViewById(R.id.signaturePad);
         signaturePad.setEnabled(true);
         signaturePad.setOnSignedListener(new SignaturePad.OnSignedListener() {
+
+
 
             @Override
             public void onStartSigning() {
@@ -254,15 +258,27 @@ public class SurtirPedidoFragment  extends Fragment {
             public void onSigned() {
                 //Event triggered when the pad is signed
                 btnFirmar.setEnabled(true);
+                btnLimpiar.setEnabled(true);
             }
 
             @Override
             public void onClear() {
                 //Event triggered when the pad is cleared
                 btnFirmar.setEnabled(false);
+                btnLimpiar.setEnabled(false);
+
+
 
             }
         });
+
+btnLimpiar.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        signaturePad.clear();
+    }
+});
+
 
         try {
             File f=new File(directory , "firma.jpg");
