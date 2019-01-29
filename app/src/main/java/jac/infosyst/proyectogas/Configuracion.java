@@ -154,7 +154,7 @@ public class Configuracion extends AppCompatActivity{
 
 
                 db.update("config", cv, "id="+1, null);
-                Toast.makeText(Configuracion.this, "config java:" + strIP, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(Configuracion.this, "config java:" + strIP, Toast.LENGTH_SHORT).show();
 
                 /*poner if de la primera vezz*/
 
