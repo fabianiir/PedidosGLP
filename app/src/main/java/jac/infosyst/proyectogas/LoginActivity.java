@@ -57,8 +57,8 @@ public class LoginActivity extends AppCompatActivity{
     Button btnLogin, btnConfiguracion;
     ServicioUsuario userService;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas2.db";
-    private int DB_VERSION = 3;
+    private String DB_NAME = "proyectogas10.db";
+    private int DB_VERSION = 1;
     private String BASEURL = "";
     String ipServidor="";
     Sessions objSessions;
@@ -71,9 +71,6 @@ public class LoginActivity extends AppCompatActivity{
 
 
         Log.v("TAG","chyno");
-
-
-
 
 
         int PermisoLocalizacion = ContextCompat.checkSelfPermission(
@@ -148,6 +145,8 @@ public class LoginActivity extends AppCompatActivity{
         if (record.moveToFirst()) {
 
             strIP = record.getString(record.getColumnIndex("ip"));
+           // Toast.makeText(LoginActivity.this, "sqlite:" + strIP, Toast.LENGTH_SHORT).show();
+
 
             objSessions.setSesstrIpServidor(strIP);
 
@@ -159,8 +158,7 @@ public class LoginActivity extends AppCompatActivity{
         /*admin va al main , operador al de escaner */
 
 
-
-       //Toast.makeText(getApplicationContext(), "RESULTADO L: " + strIP, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "RESULTADO L: " + strIP, Toast.LENGTH_LONG).show();
 
         SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
 
@@ -180,80 +178,114 @@ public class LoginActivity extends AppCompatActivity{
         cursor.close();
         objSessions.setSesstrIpServidor("189.208.163.83");
 
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call call = service.login(pusername,ppassword);
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()){
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                    if(resObj.geterror().equals("false")){
-                        Toast.makeText(LoginActivity.this, "Bienvenido! " , Toast.LENGTH_SHORT).show();
-
-                       // insertBitacora();
-                        List<Usuario> arrayListUsuario = Arrays.asList(resObj.getuser());
-
-                      //  insertSqLiteUsuario(arrayListUsuario.get(0).getUserName(), resObj.gettoken());
-
-                        objSessions.setsessIDuser(arrayListUsuario.get(0).getId());
-                        objSessions.setsessIDcamion("idcamion1");
+ //       if (strIP.startsWith("http://")) {
 
 
-                        // objSessions.setsessIDuser(objSessions.getsessIDuser());
+            BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+//BASEURL = "http://"+ strIP+ ":8060
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(BASEURL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+            Call call = service.login(pusername, ppassword);
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if (response.isSuccessful()) {
+                        ObjetoRes resObj = (ObjetoRes) response.body();
+                        if (resObj.geterror().equals("false")) {
+                            Toast.makeText(LoginActivity.this, "Bienvenido! ", Toast.LENGTH_SHORT).show();
+
+                            // insertBitacora();
+                            List<Usuario> arrayListUsuario = Arrays.asList(resObj.getuser());
+
+                            //  insertSqLiteUsuario(arrayListUsuario.get(0).getUserName(), resObj.gettoken());
+
+                            objSessions.setsessIDuser(arrayListUsuario.get(0).getId());
+                            objSessions.setsessIDcamion("idcamion1");
 
 
-                        Toast.makeText(LoginActivity.this, "USUARIO:" + objSessions.getsessIDuser()
-                                + "CAMION:" +  objSessions.getsessIDcamion() , Toast.LENGTH_SHORT).show();
+                            // objSessions.setsessIDuser(objSessions.getsessIDuser());
 
-                     insertBitacora(true, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , resObj.gettoken() );
 
-                        if (resObj.getAdmin().equals("true")){
+                            //    Toast.makeText(LoginActivity.this, "USUARIO:" + objSessions.getsessIDuser()
+                              //      + "CAMION:" + objSessions.getsessIDcamion(), Toast.LENGTH_SHORT).show();
 
-                            ((Sessions)getApplication()).setsesUsuarioRol("Admin");
-                            Intent intent = new Intent(LoginActivity.this, Escaner.class);
-                            intent.putExtra("username", pusername);
-                            startActivity(intent);
+                            insertBitacora(true, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion(), resObj.gettoken());
 
+
+                            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
+
+                            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+                            ContentValues cv = new ContentValues();
+                            cv.put("ip",strIP);
+
+                            db.update("config", cv, "id="+1, null);
+
+
+                            ContentValues values2 = new ContentValues();
+
+                            values2.put("Oid", arrayListUsuario.get(0).getId());
+                            values2.put("token", ((ObjetoRes) response.body()).gettoken());
+
+                            db.insert("usuario", null, values2);
+
+
+
+                            if (resObj.getAdmin().equals("true")) {
+
+                                ((Sessions) getApplication()).setsesUsuarioRol("Admin");
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("username", pusername);
+                                startActivity(intent);
+
+                            }
+
+                            if (resObj.getAdmin().equals("false")) {
+                                ((Sessions) getApplication()).setsesUsuarioRol("Operador");
+                                Intent intent = new Intent(LoginActivity.this, Escaner.class);
+                                intent.putExtra("username", pusername);
+                                startActivity(intent);
+
+                            }
+
+
+                        } else {
+                            Toast.makeText(LoginActivity.this, resObj.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-
-                        if (resObj.getAdmin().equals("false")){
-                            ((Sessions)getApplication()).setsesUsuarioRol("Operador");
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("username", pusername);
-                            startActivity(intent);
-
-                        }
-
-
-
                     } else {
-                        Toast.makeText(LoginActivity.this, resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Login Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                     }
+
+
                 }
 
-                else {
-                    Toast.makeText(LoginActivity.this, "Login Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    Toast.makeText(LoginActivity.this, "Conexion No alcanza un servidor!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, Configuracion.class);
+                    startActivity(intent);
+
                 }
+            });
+
+ /*
+       }//end if valid url
+
+        else{
+            Toast.makeText(LoginActivity.this, "Url de Configuracion Invalida, Intente Nuevamente!", Toast.LENGTH_SHORT).show();
 
 
-            }
+        }
+*/
 
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(LoginActivity.this, "Conexion No alcanza un servidor!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, Configuracion.class);
-                startActivity(intent);
-
-            }
-        });
 
     }
 
@@ -333,8 +365,8 @@ public class LoginActivity extends AppCompatActivity{
 
         }
         Call call = service.bitacora(evento, emai, chofer_id , camion_id , token);
-        Toast.makeText(LoginActivity.this, "e:" + evento + "emai:" + emai + "chofer_id:" + chofer_id + "camion_id:"+ camion_id
-                + "token:" +  token , Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(LoginActivity.this, "e:" + evento + "emai:" + emai + "chofer_id:" + chofer_id + "camion_id:"+ camion_id
+      //          + "token:" +  token , Toast.LENGTH_SHORT).show();
 
         call.enqueue(new Callback() {
             @Override
@@ -356,7 +388,7 @@ public class LoginActivity extends AppCompatActivity{
                 }
 
                 else {
-                    Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
 
 

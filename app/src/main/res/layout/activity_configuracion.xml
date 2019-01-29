@@ -55,7 +55,9 @@
                     android:layout_height="wrap_content"
                     android:hint="IP Pública o Dominio"
                     android:inputType="text"
-                    android:maxLength="255" />
+                    android:maxLength="255"/>
+                    <!--android:text="http://189.208.163.83:8060/"-->
+
             </android.support.design.widget.TextInputLayout>
 
             <!-- Password Label -->

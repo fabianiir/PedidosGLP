@@ -69,13 +69,16 @@ public class PedidosFragment extends Fragment{
     FragmentManager f_manager;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas.db";
+    private String DB_NAME = "proyectogas10.db";
     private int DB_VERSION = 1;
     private String TABLE_NAME = "usuarios";
     ServicioUsuario userService;
 
     private String BASEURL = "";
     Sessions objSessions;
+    String strIP = "";
+    String strchofer = "";
+    String strtoken = "";
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -92,6 +95,62 @@ public class PedidosFragment extends Fragment{
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         Sessions strSess = new Sessions();
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+
+        final int recordCount = db.rawQuery(sql, null).getCount();
+      //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
+
+
+        final Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+
+        }
+
+
+
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+
+        final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
+
+
+        String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
+
+
+        final int recordCount3 = db.rawQuery(sql3, null).getCount();
+      //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
+
+        SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
+
+        Cursor cursor3 = dbConn3.rawQuery(sql3, null);
+
+       if (cursor3.moveToFirst()) {
+            strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
+            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
+         //  Toast.makeText(getActivity(), "usuario: " + strchofer + strtoken , Toast.LENGTH_LONG).show();
+
+
+       }
+
+
+
+
+      /*
+        if (record2.moveToFirst()) {
+
+            strchofer = record2.getString(record.getColumnIndex("Oid"));
+            strtoken = record2.getString(record.getColumnIndex("token"));
+        }
+        */
+
+
+
+
         objSessions = new Sessions();
         userService = ApiUtils.getUserService();
 
@@ -200,11 +259,9 @@ public class PedidosFragment extends Fragment{
     }
 
     public void actualizarPedidos(){
-
+/*
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-
 
         String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
 
@@ -224,11 +281,11 @@ public class PedidosFragment extends Fragment{
             // Toast.makeText(getApplicationContext(), "datos: " + email, Toast.LENGTH_LONG).show();
 
         }
-
         cursor.close();
+*/
 
 
-        BASEURL = "http://"+ objSessions.getSesstrIpServidor()+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -237,7 +294,8 @@ public class PedidosFragment extends Fragment{
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = userService.getPedidos("Yo", "Pendiente", "c6861e99-0069-4ced-b8dd-549a124f87d5");
+        Call call = userService.getPedidos(strchofer, "Cancelado", strtoken);
+      //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -247,7 +305,7 @@ public class PedidosFragment extends Fragment{
                         if(resObj.geterror().equals("false")) {
 
 
-                            Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
                                 adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
                                 recyclerViewPedidos.setAdapter(adapter);
 

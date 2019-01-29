@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
@@ -51,7 +52,7 @@ public class Configuracion extends AppCompatActivity{
 
     static int checkConfiguracionSqLite = 0;
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas9.db";
+    private static String DB_NAME = "proyectogas10.db";
     private static int DB_VERSION = 1;
 
     private static int  statusConf ;
@@ -139,13 +140,30 @@ public class Configuracion extends AppCompatActivity{
                 final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
 
+/*primera vez */
+                ContentValues values2 = new ContentValues();
+
+                values2.put("ip", strIP);
+
+                db.insert("config", null, values2);
+
+
+
                 ContentValues cv = new ContentValues();
-                cv.put("ip",strIP); //These Fields should be your String values of actual column names
+                cv.put("ip",strIP);
+
 
                 db.update("config", cv, "id="+1, null);
+                Toast.makeText(Configuracion.this, "config java:" + strIP, Toast.LENGTH_SHORT).show();
+
+                /*poner if de la primera vezz*/
 
 
-              //  Toast.makeText(getApplicationContext(), "RESULTADO CONFIG: " + strIP, Toast.LENGTH_LONG).show();
+
+
+
+
+                //  Toast.makeText(getApplicationContext(), "RESULTADO CONFIG: " + strIP, Toast.LENGTH_LONG).show();
 
 
 
@@ -177,7 +195,7 @@ public class Configuracion extends AppCompatActivity{
             @Override
             public void onFailure(Call<Result> call, Throwable t) {
                 progressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "nnn:" +  t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -221,38 +239,16 @@ public class Configuracion extends AppCompatActivity{
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
 
             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
 
-
-            int studentId = 1 ;
-
             String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
 
-            //String sql = "SELECT * FROM config where id = " + studentId;
-
-         //   String sql = "UPDATE config SET ip = " +  + " WHERE  id = 1";
-
-
-         //   SELECT * FROM config WHERE id = 1
 
             final int recordCount = db.rawQuery(sql, null).getCount();
-          // Toast.makeText(getApplicationContext(), "UPDATE IP: " + recordCount, Toast.LENGTH_LONG).show();
+          //  Toast.makeText(getApplicationContext(), "CONTADOR: " + recordCount, Toast.LENGTH_LONG).show();
 
             SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
 
@@ -269,11 +265,6 @@ public class Configuracion extends AppCompatActivity{
             }
 
             cursor.close();
-
-            //db.close();
-//
-
-
 
 
             /*

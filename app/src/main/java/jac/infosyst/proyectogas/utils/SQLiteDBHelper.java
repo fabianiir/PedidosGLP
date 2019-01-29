@@ -19,7 +19,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     public static final String CONFSQLITE2_TABLE_NAME = "confsqlite3";
     public static final String LOG_TAG_SQLITE_DB = "LOG_TAG_SQLITE_DB";
     private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "glppedidos";
+    //protected static final String DATABASE_NAME = "glppedidos2";
+
+    protected static final String DATABASE_NAME = "proyectogas10";
 
     /*
     public SQLiteDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -42,6 +44,14 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
                 "ip TEXT ) ";
 
         db.execSQL(sql);
+
+        String sqlUsuario = "CREATE TABLE usuario " +
+                "( id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "Oid TEXT, " +
+                "token TEXT ) ";
+
+        db.execSQL(sqlUsuario);
+
 
     }
 
