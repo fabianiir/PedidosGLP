@@ -272,14 +272,13 @@ public class SurtirPedidoFragment  extends Fragment {
             }
         });
 
-        /*
-btnLimpiar.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        signaturePad.clear();
-    }
-});
-*/
+        btnLimpiar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signaturePad.clear();
+            }
+        });
+
 
 
         try {
