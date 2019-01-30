@@ -133,6 +133,16 @@ public interface ServicioUsuario {
                   @Field("token") String token
   );
 
+  @FormUrlEncoded
+  @POST("bitacora")
+  Call<ObjetoRes> bitacoraOperador(
+          @Field("evento") boolean evento,
+          @Field("emai") String emai,
+          @Field("chofer_id") String chofer_id,
+          @Field("token") String token
+  );
+
+
 
 
 

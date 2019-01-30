@@ -5,12 +5,14 @@ package jac.infosyst.proyectogas;
  */
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -64,6 +66,8 @@ public class LoginActivity extends AppCompatActivity{
     Sessions objSessions;
     String strIP = "";
     String strEmai = "";
+    String strEmaiBitacora = "";
+
 
     private ProgressDialog dialog;
 
@@ -72,7 +76,7 @@ public class LoginActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
+        ObtenerIMEI();
         Log.v("TAG","chyno");
         dialog = new ProgressDialog(LoginActivity.this);
 
@@ -233,7 +237,7 @@ public class LoginActivity extends AppCompatActivity{
                                // Toast.makeText(LoginActivity.this, "camion:" + objSessions.getsessIDuser()
                                  //   + "CAMION:" + objSessions.getsessIDcamion(), Toast.LENGTH_SHORT).show();
 
-
+/*
                             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
                             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
@@ -256,13 +260,16 @@ public class LoginActivity extends AppCompatActivity{
                                 Toast.makeText(LoginActivity.this, "strEmai:" + strEmai, Toast.LENGTH_SHORT).show();
 
                             }
+*/
 
 
-                            insertBitacora(true, strEmai, objSessions.getsessIDuser(), objSessions.getsessIDcamion(), resObj.gettoken());
 
                             Toast.makeText(LoginActivity.this, "token:" + resObj.gettoken(), Toast.LENGTH_SHORT).show();
 
-
+/*
+* camion_id
+* b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9
+* */
 
                             ContentValues cv = new ContentValues();
                             cv.put("ip",strIP);
@@ -285,6 +292,24 @@ public class LoginActivity extends AppCompatActivity{
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("username", pusername);
                                 startActivity(intent);
+                                String sqlEmai = "SELECT * FROM dispositivo WHERE id = 1 ORDER BY id DESC limit 1";
+
+                                final Cursor recordEmai = db.rawQuery(sqlEmai, null);
+
+                                if (recordEmai.moveToFirst()) {
+
+                                    strEmai = recordEmai.getString(recordEmai.getColumnIndex("emai"));
+                                    Toast.makeText(LoginActivity.this, "Sqlite strEmai:" + strEmai, Toast.LENGTH_SHORT).show();
+
+                                }
+
+
+
+                               // Toast.makeText(LoginActivity.this, "token:" + resObj.gettoken(), Toast.LENGTH_SHORT).show();
+
+
+                                insertBitacora("admin" , true, strEmaiBitacora, objSessions.getsessIDuser(), "", resObj.gettoken());
+
 
                             }
 
@@ -295,6 +320,8 @@ public class LoginActivity extends AppCompatActivity{
                                 Intent intent = new Intent(LoginActivity.this, Escaner.class);
                                 intent.putExtra("username", pusername);
                                 startActivity(intent);
+                                insertBitacora("operador", true, strEmaiBitacora, objSessions.getsessIDuser(), "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", resObj.gettoken());
+
 
                             }
 
@@ -403,7 +430,7 @@ public class LoginActivity extends AppCompatActivity{
         }
     }
 
-    public void insertBitacora(boolean evento, String emai, String chofer_id, String camion_id , String token){
+    public void insertBitacora(String tipoInicio, boolean evento, String emai, String chofer_id, String camion_id , String token){
           BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -418,9 +445,22 @@ public class LoginActivity extends AppCompatActivity{
             token = "null";
 
         }
-        Call call = service.bitacora(evento, emai, chofer_id , camion_id , token);
+        Call call = null;
+
+        if(tipoInicio.equals("operador")){
+
+             call = service.bitacora(evento, emai, chofer_id , camion_id , token);
+        }
+        if (tipoInicio.equals("admin")){
+
+             call = service.bitacoraOperador(evento, emai, chofer_id ,  token);
+        }
+
+
       //  Toast.makeText(LoginActivity.this, "e:" + evento + "emai:" + emai + "chofer_id:" + chofer_id + "camion_id:"+ camion_id
       //          + "token:" +  token , Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(LoginActivity.this, "emai:" + camion_id , Toast.LENGTH_SHORT).show();
 
         call.enqueue(new Callback() {
             @Override
@@ -442,7 +482,7 @@ public class LoginActivity extends AppCompatActivity{
                 }
 
                 else {
-                 //   Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                   Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -457,6 +497,48 @@ public class LoginActivity extends AppCompatActivity{
 
     }
 
+
+
+
+
+
+    public void ObtenerIMEI()
+    {
+        int permissionCheck = ContextCompat.checkSelfPermission( this, Manifest.permission.READ_PHONE_STATE );
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
+        }
+
+
+        String myIMEI = "";
+
+        TelephonyManager mTelephony = (TelephonyManager) getApplication().getSystemService(Context.TELEPHONY_SERVICE);
+        if (mTelephony.getDeviceId() != null){
+            myIMEI = mTelephony.getDeviceId();
+
+            insertaImeiSqLite(myIMEI);
+        }
+
+    }
+
+    public void insertaImeiSqLite(String emai){
+        sqLiteDBHelper = new SQLiteDBHelper(LoginActivity.this, DB_NAME, null, DB_VERSION);
+
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+        ContentValues values2 = new ContentValues();
+
+        values2.put("emai", emai);
+
+        db.insert("dispositivo", null, values2);
+        strEmaiBitacora = emai;
+        //Toast.makeText(LoginActivity.this, "Login emai:" + emai, Toast.LENGTH_SHORT).show();
+
+    }
 
 
 

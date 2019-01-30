@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,10 +15,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
@@ -72,6 +75,9 @@ public class Configuracion extends AppCompatActivity{
         } else {
             Log.i("Mensaje", "Se tiene permiso!");
         }
+
+
+
 
         edtIP = (EditText) findViewById(R.id.input_IP);
         edtTelefono = (EditText) findViewById(R.id.input_telefono);
@@ -214,7 +220,8 @@ public class Configuracion extends AppCompatActivity{
         return true;
     }
 
-    public static class SplashActivity extends Activity {
+    public static  class SplashActivity extends Activity {
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -235,8 +242,6 @@ public class Configuracion extends AppCompatActivity{
             } else {
                 Log.i("Mensaje", "Se tiene permiso!");
             }
-
-
 
 
             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
@@ -298,12 +303,17 @@ public class Configuracion extends AppCompatActivity{
 
 */
 
+
+
+
             new Handler().postDelayed(new Runnable()
             {
                 @Override
                 public void run() {
                     //email.equals("null");
                     if(recordCount == 0) {
+
+
 
                         /*cuando se le agrega un campo nuevo (sqlite sin valor)a una tabla ya existente, por default se le asigna un -1 */
                         Intent intent = new Intent(SplashActivity.this, Configuracion.class);
@@ -316,6 +326,8 @@ public class Configuracion extends AppCompatActivity{
 
                     else{
 
+
+
                         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                         startActivity(intent);
 
@@ -325,10 +337,53 @@ public class Configuracion extends AppCompatActivity{
 
             }, 4000);
 
+
         }
+
+
     }
 
-    /*
+/*
+    ObtenerIMEI();
+    public void ObtenerIMEI()
+    {
+        int permissionCheck = ContextCompat.checkSelfPermission( this, Manifest.permission.READ_PHONE_STATE );
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
+        }
+
+
+        String myIMEI = "";
+
+        TelephonyManager mTelephony = (TelephonyManager) getApplication().getSystemService(Context.TELEPHONY_SERVICE);
+        if (mTelephony.getDeviceId() != null){
+            myIMEI = mTelephony.getDeviceId();
+
+            insertaImeiSqLite(myIMEI);
+        }
+
+    }
+
+    public void insertaImeiSqLite(String emai){
+        sqLiteDBHelper = new SQLiteDBHelper(Configuracion.this, DB_NAME, null, DB_VERSION);
+
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+        ContentValues values2 = new ContentValues();
+
+        values2.put("emai", emai);
+
+        db.insert("dispositivo", null, values2);
+        Toast.makeText(Configuracion.this, "SqlITE emai:" + emai, Toast.LENGTH_SHORT).show();
+
+    }
+
+ */
+
     public void insertSqLite(String message, String ip) {
         sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
 
@@ -339,6 +394,7 @@ public class Configuracion extends AppCompatActivity{
            // selectConf(statusConf);
         }
     }
+
 
 
 
@@ -393,6 +449,5 @@ public class Configuracion extends AppCompatActivity{
         return idStatus;
 
     }
-    */
 
 }
