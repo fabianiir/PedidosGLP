@@ -57,12 +57,15 @@ public class LoginActivity extends AppCompatActivity{
     Button btnLogin, btnConfiguracion;
     ServicioUsuario userService;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas10.db";
+    private String DB_NAME = "proyectogas11.db";
     private int DB_VERSION = 1;
     private String BASEURL = "";
     String ipServidor="";
     Sessions objSessions;
     String strIP = "";
+    String strEmai = "";
+
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,8 @@ public class LoginActivity extends AppCompatActivity{
 
 
         Log.v("TAG","chyno");
+        dialog = new ProgressDialog(LoginActivity.this);
+
 
 
         int PermisoLocalizacion = ContextCompat.checkSelfPermission(
@@ -193,9 +198,21 @@ public class LoginActivity extends AppCompatActivity{
             ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
             Call call = service.login(pusername, ppassword);
+        dialog.setMax(100);
+        dialog.setMessage("Iniciando Sesion....");
+      //  dialog.setTitle("ProgressDialog bar example");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        // show it
+        dialog.show();
+       // btnLogin.setEnabled(false);
+
+
             call.enqueue(new Callback() {
+
                 @Override
                 public void onResponse(Call call, Response response) {
+
+
                     if (response.isSuccessful()) {
                         ObjetoRes resObj = (ObjetoRes) response.body();
                         if (resObj.geterror().equals("false")) {
@@ -213,15 +230,38 @@ public class LoginActivity extends AppCompatActivity{
                             // objSessions.setsessIDuser(objSessions.getsessIDuser());
 
 
-                            //    Toast.makeText(LoginActivity.this, "USUARIO:" + objSessions.getsessIDuser()
-                              //      + "CAMION:" + objSessions.getsessIDcamion(), Toast.LENGTH_SHORT).show();
-
-                            insertBitacora(true, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion(), resObj.gettoken());
+                               // Toast.makeText(LoginActivity.this, "camion:" + objSessions.getsessIDuser()
+                                 //   + "CAMION:" + objSessions.getsessIDcamion(), Toast.LENGTH_SHORT).show();
 
 
                             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
-
                             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                            ContentValues val = new ContentValues();
+
+                            val.put("emai", "emai2");
+
+                            db.insert("dispositivo", null, val);
+
+
+                            String sql = "SELECT * FROM dispositivo WHERE id = 1 ORDER BY id DESC limit 1";
+
+                            final int recordCount = db.rawQuery(sql, null).getCount();
+
+                            final Cursor record = db.rawQuery(sql, null);
+
+                            if (record.moveToFirst()) {
+
+                                strEmai = record.getString(record.getColumnIndex("emai"));
+                                Toast.makeText(LoginActivity.this, "strEmai:" + strEmai, Toast.LENGTH_SHORT).show();
+
+                            }
+
+
+                            insertBitacora(true, strEmai, objSessions.getsessIDuser(), objSessions.getsessIDcamion(), resObj.gettoken());
+
+                            Toast.makeText(LoginActivity.this, "token:" + resObj.gettoken(), Toast.LENGTH_SHORT).show();
+
 
 
                             ContentValues cv = new ContentValues();
@@ -248,6 +288,8 @@ public class LoginActivity extends AppCompatActivity{
 
                             }
 
+
+
                             if (resObj.getAdmin().equals("false")) {
                                 ((Sessions) getApplication()).setsesUsuarioRol("Operador");
                                 Intent intent = new Intent(LoginActivity.this, Escaner.class);
@@ -264,16 +306,28 @@ public class LoginActivity extends AppCompatActivity{
                         Toast.makeText(LoginActivity.this, "Login Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                     }
 
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    btnLogin.setEnabled(true);
 
                 }
 
                 @Override
                 public void onFailure(Call call, Throwable t) {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+
                     Toast.makeText(LoginActivity.this, "Conexion No alcanza un servidor!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, Configuracion.class);
                     startActivity(intent);
 
                 }
+
+
+
+
             });
 
  /*
@@ -388,7 +442,7 @@ public class LoginActivity extends AppCompatActivity{
                 }
 
                 else {
-                   // Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
 
 

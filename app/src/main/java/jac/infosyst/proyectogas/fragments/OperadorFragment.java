@@ -2,8 +2,10 @@ package jac.infosyst.proyectogas.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -15,9 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import me.dm7.barcodescanner.core.ViewFinderView;
 
 public class OperadorFragment  extends Fragment {
+    private static SQLiteDBHelper sqLiteDBHelper = null;
+    private static String DB_NAME = "proyectogas11.db";
+    private static int DB_VERSION = 1;
 
 
     public OperadorFragment() {
@@ -66,8 +72,25 @@ public class OperadorFragment  extends Fragment {
 
             final TextView textView= (TextView) rootView.findViewById(R.id.tvIMEIOperador2);
             textView.setText(myIMEI);
+            insertaImeiSqLite(myIMEI);
         }
 
         return rootView;
     }
+
+    public void insertaImeiSqLite(String emai){
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+        ContentValues values2 = new ContentValues();
+
+        values2.put("emai", emai);
+
+        db.insert("dispositivo", null, values2);
+
+    }
+
+
 }

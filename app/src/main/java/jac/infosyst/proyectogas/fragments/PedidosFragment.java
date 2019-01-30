@@ -69,7 +69,7 @@ public class PedidosFragment extends Fragment{
     FragmentManager f_manager;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas10.db";
+    private String DB_NAME = "proyectogas11.db";
     private int DB_VERSION = 1;
     private String TABLE_NAME = "usuarios";
     ServicioUsuario userService;

@@ -52,7 +52,7 @@ public class Configuracion extends AppCompatActivity{
 
     static int checkConfiguracionSqLite = 0;
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas10.db";
+    private static String DB_NAME = "proyectogas11.db";
     private static int DB_VERSION = 1;
 
     private static int  statusConf ;
