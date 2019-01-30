@@ -1,12 +1,23 @@
 package jac.infosyst.proyectogas.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +30,22 @@ import jac.infosyst.proyectogas.utils.Sessions;
 
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.Locale;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
 
+import android.content.ContentValues;
 
 @SuppressLint("ValidFragment")
 public class DetallePedidoFragment  extends Fragment{
@@ -47,6 +62,7 @@ public class DetallePedidoFragment  extends Fragment{
     View view;
 
     Bitmap bitmap;
+
 
     // Creating Separate Directory for saving Generated Images
     String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/firmas/";
@@ -68,6 +84,17 @@ public class DetallePedidoFragment  extends Fragment{
 
     private static final String TAG = "DetallePedidoFragment";
 
+    /*foto incidencia*/
+    private static final int PICTURE_RESULT = 122 ;
+    private ContentValues values;
+    private Uri imageUri;
+    private Bitmap thumbnail;
+
+
+    File directory,directoryIncidencia;
+    ImageView imgFirma;
+    String imageurl;
+
     public DetallePedidoFragment(Context mCtx) {
         // Required empty public constructor
         this.mCtx = mCtx;
@@ -85,6 +112,10 @@ public class DetallePedidoFragment  extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detalle_pedido, container, false);
+// path to /data/data/yourapp/app_data/imageDir
+        ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
+        directory = cw.getDir("firmas", Context.MODE_PRIVATE);
+        directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
 
 
         final String strIdPedido = ((Sessions) getActivity().getApplication()).getSesIdPedido();
@@ -129,8 +160,8 @@ public class DetallePedidoFragment  extends Fragment{
         textViewTotal.setText("Total: " + strTotal);
 
 
-        btnFirmar = (Button) rootView.findViewById(R.id.btnFirmar);
-        btnFirmar.setEnabled(false);
+      //  btnFirmar = (Button) rootView.findViewById(R.id.btnFirmar);
+        //btnFirmar.setEnabled(false);
 
 
         btnSurtirPedido = (Button) rootView.findViewById(R.id.btnSurtirPedido);
@@ -155,7 +186,53 @@ public class DetallePedidoFragment  extends Fragment{
         signaturePad = (SignaturePad) rootView.findViewById(R.id.signaturePad);
         signaturePad.setEnabled(false);
 
+        final String strDescripcion2 = ((Sessions) getActivity().getApplication()).getsesDescripcion();
+        final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
 
+        imageViewIncidencia = (ImageView) rootView.findViewById(R.id.imageViewIncidencia);
+        imageViewIncidencia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "dentro de toma de foto" + strDescripcion2, Toast.LENGTH_SHORT).show();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    //Check permissions for Android 6.0+
+                    if (!checkExternalStoragePermission()) {
+                        return;
+                    }
+                }
+
+                values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "incidencia" + "123");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "tomada en: " + System.currentTimeMillis());
+                imageUri = getActivity().getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+
+
+               // imageUri = Uri.fromFile(directoryIncidencia);
+
+              //  Toast.makeText(getActivity(), "Foto guardada en: " + imageUri, Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent, PICTURE_RESULT);
+                Toast.makeText(getActivity(), "PICTURE_RESULT" + PICTURE_RESULT, Toast.LENGTH_SHORT).show();
+
+
+
+            }
+        });
+
+        try {
+            File f=new File(directory , "firma.jpg");
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+            imgFirma=(ImageView)rootView.findViewById(R.id.imgFirma);
+            imgFirma.setImageBitmap(b);
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
 
 
         return rootView;
@@ -244,6 +321,54 @@ public class DetallePedidoFragment  extends Fragment{
             fragmentTransaction.commit();
 
         }
+
+
+
+
+
+    /*foto incidencia*/
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case PICTURE_RESULT:
+                if (requestCode == PICTURE_RESULT)
+                    if (resultCode == Activity.RESULT_OK) {
+                        try {
+                            thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+                            imageViewIncidencia.setImageBitmap(thumbnail);
+                            imageurl = getRealPathFromURI(imageUri);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+        }
+    }
+
+
+
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getActivity().managedQuery(contentUri, proj, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+
+    private boolean checkExternalStoragePermission() {
+        int permissionCheck = ContextCompat.checkSelfPermission(
+                getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission not granted.");
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 225);
+        } else {
+            Log.i(TAG, "You already have permission!");
+            return true;
+        }
+
+        return false;
+    }
+
+
+
 
 
     }

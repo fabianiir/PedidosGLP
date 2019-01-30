@@ -225,7 +225,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
+<!--
             <Button
                 android:id="@+id/btnFirmar"
                 android:layout_width="103dp"
@@ -237,6 +237,9 @@
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnComoLlegar" />
+                -->
+
+
             <!--
             <Button
                 android:id="@+id/btnLimpiarFirmar"

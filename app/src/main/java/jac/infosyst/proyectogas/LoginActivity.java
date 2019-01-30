@@ -442,7 +442,7 @@ public class LoginActivity extends AppCompatActivity{
                 }
 
                 else {
-                    Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
 
 

@@ -238,7 +238,7 @@ public class SurtirPedidoFragment  extends Fragment {
         */
 
 
-        btnFirmar = (Button) rootView.findViewById(R.id.btnFirmar);
+  //      btnFirmar = (Button) rootView.findViewById(R.id.btnFirmar);
         btnLimpiar = (Button) rootView.findViewById(R.id.btnLimpiarFirmar);
 
         btnLimpiar.setEnabled(true);
@@ -257,14 +257,14 @@ public class SurtirPedidoFragment  extends Fragment {
             @Override
             public void onSigned() {
                 //Event triggered when the pad is signed
-                btnFirmar.setEnabled(true);
+               // btnFirmar.setEnabled(true);
                 btnLimpiar.setEnabled(true);
             }
 
             @Override
             public void onClear() {
                 //Event triggered when the pad is cleared
-                btnFirmar.setEnabled(false);
+               // btnFirmar.setEnabled(false);
                 btnLimpiar.setEnabled(false);
 
 
@@ -272,12 +272,14 @@ public class SurtirPedidoFragment  extends Fragment {
             }
         });
 
+        /*
 btnLimpiar.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
         signaturePad.clear();
     }
 });
+*/
 
 
         try {
@@ -296,6 +298,7 @@ btnLimpiar.setOnClickListener(new View.OnClickListener() {
         return rootView;
 
     }
+
 
     public void mostrarConfirmacion(String mensaje){
         Toast.makeText(getActivity(), "Pedido guardado!", Toast.LENGTH_SHORT).show();
