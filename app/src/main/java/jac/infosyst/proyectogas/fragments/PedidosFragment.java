@@ -195,12 +195,17 @@ public class PedidosFragment extends Fragment{
         btnAtenderPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
+
                 DetallePedidoFragment dpf = new DetallePedidoFragment(getActivity().getBaseContext());
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.container_body, dpf);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
+
+
             }
         });
         btnCancelarPedido = (Button) rootView.findViewById(R.id.btnCancelarPedido);

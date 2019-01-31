@@ -143,7 +143,17 @@ public interface ServicioUsuario {
   );
 
 
+  @FormUrlEncoded
+  @POST("up_pedido")
+  Call<ObjetoRes> up_pedido(
+          @Field("ID") String ID,
+          @Field("Time") String Time,
+          @Field("Date") String Date,
+          @Field("EstatusID") String EstatusID,
+          @Field("token") String token,
+          @Field("Clave") String Clave
 
+          );
 
 
 }

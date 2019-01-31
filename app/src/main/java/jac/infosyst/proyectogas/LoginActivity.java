@@ -264,7 +264,7 @@ public class LoginActivity extends AppCompatActivity{
 
 
 
-                            Toast.makeText(LoginActivity.this, "token:" + resObj.gettoken(), Toast.LENGTH_SHORT).show();
+                       //     Toast.makeText(LoginActivity.this, "token:" + resObj.gettoken(), Toast.LENGTH_SHORT).show();
 
 /*
 * camion_id
@@ -421,7 +421,7 @@ public class LoginActivity extends AppCompatActivity{
             contentValues.put("contrasena", "Jerry");
             contentValues.put("sexo", "FEM");
             sqLiteDatabase.insert(SQLiteDBHelper.USUARIOS_TABLE_NAME, null, contentValues);
-            Toast.makeText(getApplicationContext(), "Add Sqlite: " + mensaje + "token:" + token , Toast.LENGTH_LONG).show();
+           // Toast.makeText(getApplicationContext(), "Add Sqlite: " + mensaje + "token:" + token , Toast.LENGTH_LONG).show();
 
 
         }else
@@ -460,7 +460,7 @@ public class LoginActivity extends AppCompatActivity{
       //  Toast.makeText(LoginActivity.this, "e:" + evento + "emai:" + emai + "chofer_id:" + chofer_id + "camion_id:"+ camion_id
       //          + "token:" +  token , Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(LoginActivity.this, "emai:" + camion_id , Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(LoginActivity.this, "emai:" + camion_id , Toast.LENGTH_SHORT).show();
 
         call.enqueue(new Callback() {
             @Override
@@ -470,19 +470,19 @@ public class LoginActivity extends AppCompatActivity{
                     ObjetoRes resObj = (ObjetoRes) response.body();
 
                     if(resObj.geterror().equals("false")){
-                        Toast.makeText(LoginActivity.this, "inicio:insertBitacora: " + resObj.gettoken(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(LoginActivity.this, "inicio:insertBitacora: " + resObj.gettoken(), Toast.LENGTH_SHORT).show();
 
 
                         objSessions.setsessToken(resObj.gettoken());
 
 
                     } else {
-                        Toast.makeText(LoginActivity.this, "inicio:" + resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(LoginActivity.this, "inicio:" + resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 else {
-                   Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
+                   //Toast.makeText(LoginActivity.this, "Bitacora Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -490,7 +490,7 @@ public class LoginActivity extends AppCompatActivity{
 
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

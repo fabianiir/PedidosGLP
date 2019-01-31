@@ -260,10 +260,14 @@ public class MainActivity extends AppCompatActivity
                 if (strRolUsuario.equals("Administrador")) {
                     title = getString(R.string.title_pedidosrealizados);
                     fragment = new PedidosFragment();
+
+                    Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(i2);
+                    ((Activity) MainActivity.this).overridePendingTransition(0,0);
                 }
                 if(strRolUsuario.equals("Operador")){
                     Log.v(TAG,"token: " + position);
-                    insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
+                   // insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
 
                     Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(i2);
@@ -276,7 +280,7 @@ public class MainActivity extends AppCompatActivity
 
             case 5:
                 Log.v(TAG,"token: " + position);
-                insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
+              //  insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
 
                 Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(i2);
@@ -307,7 +311,7 @@ public class MainActivity extends AppCompatActivity
 
     public void insertBitacora(boolean evento, String emai, String chofer_id, String camion_id , String token){
 
-        Toast.makeText(getApplicationContext(), "cerrar: " , Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(getApplicationContext(), "cerrar: " , Toast.LENGTH_SHORT).show();
 
 
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
@@ -329,7 +333,7 @@ public class MainActivity extends AppCompatActivity
                     if(resObj.geterror().equals("false")){
 
 
-                        Toast.makeText(getApplicationContext(), "token: " + resObj.gettoken(), Toast.LENGTH_SHORT).show();
+                     //   Toast.makeText(getApplicationContext(), "token: " + resObj.gettoken(), Toast.LENGTH_SHORT).show();
 
                         Log.d(TAG,"token: " + resObj.gettoken());
 

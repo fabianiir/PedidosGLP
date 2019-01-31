@@ -193,7 +193,7 @@ public class DetallePedidoFragment  extends Fragment{
         imageViewIncidencia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "dentro de toma de foto" + strDescripcion2, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getActivity(), "dentro de toma de foto" + strDescripcion2, Toast.LENGTH_SHORT).show();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     //Check permissions for Android 6.0+
                     if (!checkExternalStoragePermission()) {
@@ -216,7 +216,7 @@ public class DetallePedidoFragment  extends Fragment{
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(intent, PICTURE_RESULT);
-                Toast.makeText(getActivity(), "PICTURE_RESULT" + PICTURE_RESULT, Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(getActivity(), "PICTURE_RESULT" + PICTURE_RESULT, Toast.LENGTH_SHORT).show();
 
 
 

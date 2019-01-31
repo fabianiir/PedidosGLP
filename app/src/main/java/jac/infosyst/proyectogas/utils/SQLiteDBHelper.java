@@ -54,7 +54,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
 
         String sqlDispositivo = "CREATE TABLE dispositivo " +
                 "( id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                " email TEXT) ";
+                " emai TEXT) ";
 
 
         db.execSQL(sqlDispositivo);

@@ -2,12 +2,14 @@ package jac.infosyst.proyectogas.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -39,11 +41,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import jac.infosyst.proyectogas.Configuracion;
+import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
+import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Productos;
 
 import jac.infosyst.proyectogas.utils.ApiUtils;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
 import retrofit2.Call;
@@ -82,6 +88,13 @@ public class SurtirPedidoFragment  extends Fragment {
     ImageView imgFirma;
     ImageView firmaImage, imageViewIncidencia;
 
+    private ProgressDialog dialog;
+
+    private String BASEURL = "";
+    String strIP = "";
+    private SQLiteDBHelper sqLiteDBHelper = null;
+    private String DB_NAME = "proyectogas11.db";
+    private int DB_VERSION = 1;
 
 
     private static final String TAG = "SurtirPedidoFragment";
@@ -133,7 +146,8 @@ public class SurtirPedidoFragment  extends Fragment {
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mostrarConfirmacion("Confirmacion "+ strDetalle.toString()+ " Confirmar?");
+                mostrarConfirmacion("Confirmar?");
+
 
 
             }
@@ -183,7 +197,7 @@ public class SurtirPedidoFragment  extends Fragment {
 
         Call<Productos> call = service.getProductos(strIdPedido);
 
-        Toast.makeText(getActivity(), "Pedido por producto" + strIdPedido, Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(getActivity(), "Pedido por producto" + strIdPedido, Toast.LENGTH_SHORT).show();
 
 
         call.enqueue(new Callback<Productos>() {
@@ -300,7 +314,7 @@ public class SurtirPedidoFragment  extends Fragment {
 
 
     public void mostrarConfirmacion(String mensaje){
-        Toast.makeText(getActivity(), "Pedido guardado!", Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(getActivity(), "Pedido guardado!", Toast.LENGTH_SHORT).show();
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
@@ -333,8 +347,8 @@ public class SurtirPedidoFragment  extends Fragment {
         btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pedidoConfirmado(strIdPedido);
-                Toast.makeText(getActivity(), "SI guardado!", Toast.LENGTH_SHORT).show();
+               // pedidoConfirmado("d9da86d7-0fee-43c9-b969-94779d106231");
+                Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
             }
         });
@@ -344,6 +358,65 @@ public class SurtirPedidoFragment  extends Fragment {
 
     public void pedidoConfirmado(String idPedido){
         btnReimpresionTicket.setVisibility(View.VISIBLE);
+        dialog.setMax(100);
+        dialog.setMessage("Acutalizando Pedido....");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.show();
+
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+
+        final Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+
+            strIP = record.getString(record.getColumnIndex("ip"));
+
+        }
+
+        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.up_pedido("255abae2-a6ed-43de-8aa3-b637f3490b8a", "22:00", "2019",
+                "1", "f91febf8-a892-49e5-af8a-b104007feff2", "Up_1");
+
+        call.enqueue(new Callback() {
+
+            @Override
+            public void onResponse(Call call, Response response) {
+
+
+                if (response.isSuccessful()) {
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if (resObj.geterror().equals("false")) {
+                        Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    if (resObj.geterror().equals("true")) {
+                        Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+
+            }
+
+        });
+
 
 
 
