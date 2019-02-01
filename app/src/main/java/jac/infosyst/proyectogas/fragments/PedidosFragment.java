@@ -2,7 +2,10 @@ package jac.infosyst.proyectogas.fragments;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -53,8 +56,12 @@ import android.database.sqlite.SQLiteException;
 import android.database.Cursor;
 import android.util.Log;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 
-public class PedidosFragment extends Fragment{
+
+public class PedidosFragment extends Fragment implements LocationListener {
     private RecyclerView recyclerViewPedidos;
     private RecyclerView.Adapter adapter;
 
@@ -79,6 +86,12 @@ public class PedidosFragment extends Fragment{
     String strIP = "";
     String strchofer = "";
     String strtoken = "";
+    LocationManager locationManager;
+    String strLatitude = "";
+    String strLongitude = "";
+    int tiempoSeguimiento = 10000;
+    Location location;
+
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -94,6 +107,19 @@ public class PedidosFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
+        final Handler handler = new Handler();
+
+        final Runnable r = new Runnable() {
+            public void run() {
+                seguimiento();
+                handler.postDelayed(this, tiempoSeguimiento);
+            }
+        };
+
+        handler.postDelayed(r, tiempoSeguimiento);
+
+
+
         Sessions strSess = new Sessions();
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -102,7 +128,7 @@ public class PedidosFragment extends Fragment{
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
         final int recordCount = db.rawQuery(sql, null).getCount();
-      //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
+        //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
 
 
         final Cursor record = db.rawQuery(sql, null);
@@ -123,19 +149,19 @@ public class PedidosFragment extends Fragment{
 
 
         final int recordCount3 = db.rawQuery(sql3, null).getCount();
-      //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
+        //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
 
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
 
         Cursor cursor3 = dbConn3.rawQuery(sql3, null);
 
-       if (cursor3.moveToFirst()) {
+        if (cursor3.moveToFirst()) {
             strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
-         //  Toast.makeText(getActivity(), "usuario: " + strchofer + strtoken , Toast.LENGTH_LONG).show();
+            //  Toast.makeText(getActivity(), "usuario: " + strchofer + strtoken , Toast.LENGTH_LONG).show();
 
 
-       }
+        }
 
 
 
@@ -174,7 +200,7 @@ public class PedidosFragment extends Fragment{
         */
 
         //((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Home");
-       // getActivity().setTitle("your title");
+        // getActivity().setTitle("your title");
 /*
         Bundle bundle = getActivity().getIntent().getExtras();
         if (bundle != null)
@@ -183,7 +209,7 @@ public class PedidosFragment extends Fragment{
         }
         */
 
-       // String strtext = this.getArguments().getString("tipoPedidos");
+        // String strtext = this.getArguments().getString("tipoPedidos");
 
         //Toast.makeText(getActivity(),  strNameTittle , Toast.LENGTH_SHORT).show();
 
@@ -256,8 +282,8 @@ public class PedidosFragment extends Fragment{
         }
 
         actualizarPedidos();
-      //  actualizarPedidos2();
-       // obtenerDatosUsuario();
+        //  actualizarPedidos2();
+        // obtenerDatosUsuario();
 
 
         return rootView;
@@ -300,24 +326,24 @@ public class PedidosFragment extends Fragment{
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
         Call call = userService.getPedidos(strchofer, "Cancelado", strtoken);
-      //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
+        //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
                 if(response.isSuccessful()){
                     ObjetoRes resObj = (ObjetoRes) response.body();
 
-                        if(resObj.geterror().equals("false")) {
+                    if(resObj.geterror().equals("false")) {
 
 
-                          //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
-                                adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
-                                recyclerViewPedidos.setAdapter(adapter);
+                        //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+                        adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
+                        recyclerViewPedidos.setAdapter(adapter);
 
                     } else {
-                            Toast.makeText(getActivity(), "no datos! " , Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "no datos! " , Toast.LENGTH_SHORT).show();
 
-                        }
+                    }
                 }
 
                 else {
@@ -363,7 +389,7 @@ public class PedidosFragment extends Fragment{
                     bookInfoBuf.append(" , Nombre : ");
                     bookInfoBuf.append(nombre);
 
-                   // Log.d(SQLiteDBHelper.LOG_TAG_SQLITE_DB, bookInfoBuf.toString());
+                    // Log.d(SQLiteDBHelper.LOG_TAG_SQLITE_DB, bookInfoBuf.toString());
 
                 }while(cursor.moveToNext());
             }
@@ -439,6 +465,79 @@ public class PedidosFragment extends Fragment{
 
     */
 
+    public void seguimiento(){
+        getLocation();
+
+    }
+
+
+    public void getLocation(){
+
+        try {
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            if (location != null){
+                callSeguimiento();
+            }else{
+                Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+            }
+
+
+            //   isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            // strLatitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude());
+            // strLongitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude());
+
+
+
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+        }
+
+
+    }
+
+
+
+
+    public void callSeguimiento(){
+        Toast.makeText(getActivity(), "Latitude: " + strLongitude + " Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
+
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
+        strLatitude = String.valueOf(location.getLatitude());
+        strLongitude = String.valueOf(location.getLongitude());
+
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(getActivity(), "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -452,4 +551,5 @@ public class PedidosFragment extends Fragment{
 
 
 }
+
 
