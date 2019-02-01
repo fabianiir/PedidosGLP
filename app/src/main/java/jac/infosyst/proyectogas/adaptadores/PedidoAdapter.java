@@ -99,10 +99,10 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
                 Toast.makeText(mCtx, "Se selecciono: " + strIdPedido, Toast.LENGTH_SHORT).show();
 
-                ((Sessions)mCtx.getApplicationContext()).setSesNombre(pedidos.get(position).getnombre());
+                ((Sessions)mCtx.getApplicationContext()).setSesNombre(pedidos.get(position).getcliente());
                 ((Sessions)mCtx.getApplicationContext()).setsesPlacas(pedidos.get(position).getplacas());
                 ((Sessions)mCtx.getApplicationContext()).setsesfechaprogramada(pedidos.get(position).getfechaprogramada());
-                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getcliente());
+                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getestatus());
                 ((Sessions)mCtx.getApplicationContext()).setsesDireccion(pedidos.get(position).getdireccion());
                 ((Sessions)mCtx.getApplicationContext()).setsetsescp(pedidos.get(position).getcp());
                 ((Sessions)mCtx.getApplicationContext()).setsestelefono(pedidos.get(position).gettelefono());

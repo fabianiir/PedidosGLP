@@ -15,11 +15,12 @@ public class Pedido {
     private String comentarios_cliente;
     private String suma_iva;
     private String total;
+    private String estatus;
 
 
 
     public Pedido(String Oid, String nombre, String placas, String fecha_hora_programada, String cliente, String direccion,
-            String cp, String telefono, String comentarios_cliente, String suma_iva, String total) {
+            String cp, String telefono, String comentarios_cliente, String suma_iva, String total, String estatus) {
         this.Oid = Oid;
         this.nombre = nombre;
         this.placas = placas;
@@ -31,7 +32,7 @@ public class Pedido {
         this.comentarios_cliente = comentarios_cliente;
         this.suma_iva = suma_iva;
         this.total = total;
-
+        this.estatus = estatus;
     }
 
 
@@ -78,7 +79,7 @@ public class Pedido {
         return fecha_hora_programada;
     }
 
-
+    public  String getestatus () { return  estatus; }
 
 
 
