@@ -124,7 +124,7 @@ public interface ServicioUsuario {
   Call<ObjetoRes> obtenerMotivosCancelacion(@Field("token") String token);
 
   @FormUrlEncoded
-  @POST("bitacora")
+  @POST("bitacora/")
   Call<ObjetoRes> bitacora(
           @Field("evento") boolean evento,
           @Field("emai") String emai,

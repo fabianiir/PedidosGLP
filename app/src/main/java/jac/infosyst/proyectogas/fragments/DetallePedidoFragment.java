@@ -118,10 +118,10 @@ public class DetallePedidoFragment  extends Fragment{
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
 
 
-        final String strIdPedido = ((Sessions) getActivity().getApplication()).getSesIdPedido();
+        String strIdPedido = ((Sessions) getActivity().getApplication()).getSesIdPedido();
         String strCliente = ((Sessions) getActivity().getApplication()).getSesCliente();
         String strDireccion = ((Sessions) getActivity().getApplication()).getsesDireccion();
-        final String strDescripcion = ((Sessions) getActivity().getApplication()).getsesDescripcion();
+        String strDescripcion = ((Sessions) getActivity().getApplication()).getsescomentarioscliente();
         String strEstatus = ((Sessions) getActivity().getApplication()).getsesEstatus();
         String strDetalle = ((Sessions) getActivity().getApplication()).getsesDetalleProducto();
         String strFirma = ((Sessions) getActivity().getApplication()).getsesFirmaURL();
@@ -142,7 +142,27 @@ public class DetallePedidoFragment  extends Fragment{
 
         }
 */
-
+        if(strCliente == null){
+            strCliente = "N/A";
+        }
+        if(strDireccion == null){
+            strDireccion = "N/A";
+        }
+        if(strDescripcion == null){
+            strDescripcion = "N/A";
+        }
+        if(strEstatus == null){
+            strEstatus = "N/A";
+        }
+        if(strDetalle == null){
+            strDetalle = "N/A";
+        }
+        if(strFirma == null){
+            strFirma = "N/A";
+        }
+        if(strTotal == null){
+            strTotal = "N/A";
+        }
 
         textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
         textViewCliente.setText("Nombre: " + strCliente);

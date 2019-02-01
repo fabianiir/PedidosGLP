@@ -62,7 +62,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
     @Override
     public void onBindViewHolder(final PedidoAdapter.ViewHolder holder, final int position) {
-        Pedido pedido = pedidos.get(position);
+        final Pedido pedido = pedidos.get(position);
         holder.textViewCliente.setText(pedido.getcliente());
         holder.textViewDescripcion.setText(pedido.getplacas());
         holder.textViewEstatus.setText(pedido.getcp());
@@ -99,16 +99,17 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
                 Toast.makeText(mCtx, "Se selecciono: " + strIdPedido, Toast.LENGTH_SHORT).show();
 
-                ((Sessions)mCtx.getApplicationContext()).setSesNombre(pedidos.get(position).getnombre());
+                ((Sessions)mCtx.getApplicationContext()).setSesNombre(pedidos.get(position).getcliente());
+                ((Sessions)mCtx.getApplicationContext()).setSesCliente(pedidos.get(position).getcliente());
                 ((Sessions)mCtx.getApplicationContext()).setsesPlacas(pedidos.get(position).getplacas());
                 ((Sessions)mCtx.getApplicationContext()).setsesfechaprogramada(pedidos.get(position).getfechaprogramada());
-                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getcliente());
+                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getestatus());
                 ((Sessions)mCtx.getApplicationContext()).setsesDireccion(pedidos.get(position).getdireccion());
                 ((Sessions)mCtx.getApplicationContext()).setsetsescp(pedidos.get(position).getcp());
                 ((Sessions)mCtx.getApplicationContext()).setsestelefono(pedidos.get(position).gettelefono());
-              //  ((Sessions)mCtx.getApplicationContext()).setsescomentarioscliente(pedidos.get(position).getcomentarios_cliente());
+                ((Sessions)mCtx.getApplicationContext()).setsescomentarioscliente(pedidos.get(position).getcomentarios_cliente());
               //  ((Sessions)mCtx.getApplicationContext()).setsessumaiva(pedidos.get(position).getsuma_iva());
-              //  ((Sessions)mCtx.getApplicationContext()).setsesTotal(pedidos.get(position).gettotal());
+                ((Sessions)mCtx.getApplicationContext()).setsesTotal(pedidos.get(position).gettotal());
 
 
                // view.setBackgroundColor(Color.CYAN);
