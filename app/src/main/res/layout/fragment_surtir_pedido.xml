@@ -47,7 +47,8 @@
                     app:fontFamily="@font/roboto"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:layout_editor_absoluteX="140dp" />
+                    tools:layout_editor_absoluteX="140dp"
+                    tools:ignore="MissingConstraints" />
             </android.support.constraint.ConstraintLayout>
 
             <TextView
@@ -112,7 +113,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    tools:layout_editor_absoluteY="298dp">
+                    tools:layout_editor_absoluteY="298dp"
+                    tools:ignore="MissingConstraints">
 
 
                     <android.support.v7.widget.RecyclerView
