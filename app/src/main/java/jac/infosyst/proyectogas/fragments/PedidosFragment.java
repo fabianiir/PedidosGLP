@@ -317,7 +317,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
 
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
-
+        final String[] strReturnToken = new String[1];
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -325,48 +325,78 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = userService.getPedidos(strchofer, "Cancelado", strtoken);
-        //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-        call.enqueue(new Callback() {
+        Call call = service.bitacora(true, "abc123d4", strchofer, "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", null);
+
+        if (strtoken == null){
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if(response.isSuccessful()){
+                        ObjetoRes obj_bitacora = (ObjetoRes) response.body();
+                        if(obj_bitacora.geterror().equals("false")) {
+                            if (strtoken == null){
+                                call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
+                            }else {
+                                call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+                            }
+                            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
+                            call.enqueue(new Callback() {
+                                @Override
+                                public void onResponse(Call call, Response response) {
+                                    if(response.isSuccessful()){
+                                        ObjetoRes resObj = (ObjetoRes) response.body();
+
+                                        if(resObj.geterror().equals("false")) {
+                                            //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+                                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
+                                            recyclerViewPedidos.setAdapter(adapter);
+                                        } else {
+                                            Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call call, Throwable t) {
+                                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
+                @Override
+                public void onFailure(Call call, Throwable t) {
+
+                }
+            });
+        }else {
+            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
+            call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
                 if(response.isSuccessful()){
                     ObjetoRes resObj = (ObjetoRes) response.body();
 
                     if(resObj.geterror().equals("false")) {
-
-
                         //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
                         adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
                         recyclerViewPedidos.setAdapter(adapter);
-
                     } else {
-                        Toast.makeText(getActivity(), "no datos! " , Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
                     }
-                }
-
-                else {
+                } else {
                     Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
-
                 }
-
-
             }
-
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });
-
-
-
-
-
-
+            });
+        }
     }
-
 
     public void obtenerDatosUsuario(){
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
