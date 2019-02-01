@@ -2,7 +2,10 @@ package jac.infosyst.proyectogas.fragments;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -53,8 +56,12 @@ import android.database.sqlite.SQLiteException;
 import android.database.Cursor;
 import android.util.Log;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 
-public class PedidosFragment extends Fragment{
+
+public class PedidosFragment extends Fragment implements LocationListener {
     private RecyclerView recyclerViewPedidos;
     private RecyclerView.Adapter adapter;
 
@@ -79,6 +86,12 @@ public class PedidosFragment extends Fragment{
     String strIP = "";
     String strchofer = "";
     String strtoken = "";
+    LocationManager locationManager;
+    String strLatitude = "";
+    String strLongitude = "";
+    int tiempoSeguimiento = 10000;
+    Location location;
+
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -94,6 +107,19 @@ public class PedidosFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
+        final Handler handler = new Handler();
+
+        final Runnable r = new Runnable() {
+            public void run() {
+                seguimiento();
+                handler.postDelayed(this, tiempoSeguimiento);
+            }
+        };
+
+        handler.postDelayed(r, tiempoSeguimiento);
+
+
+
         Sessions strSess = new Sessions();
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -438,6 +464,79 @@ public class PedidosFragment extends Fragment{
     }
 
     */
+
+        public void seguimiento(){
+            getLocation();
+
+        }
+
+
+        public void getLocation(){
+
+            try {
+                locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+                if (location != null){
+                    callSeguimiento();
+                }else{
+                    Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+                }
+
+
+             //   isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+               // strLatitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude());
+               // strLongitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude());
+
+
+
+            }
+            catch(SecurityException e) {
+                e.printStackTrace();
+                Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+            }
+
+
+        }
+
+
+
+
+         public void callSeguimiento(){
+             Toast.makeText(getActivity(), "Latitude: " + strLongitude + " Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
+
+         }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+       // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
+        strLatitude = String.valueOf(location.getLatitude());
+        strLongitude = String.valueOf(location.getLongitude());
+
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(getActivity(), "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
 
 
     @Override

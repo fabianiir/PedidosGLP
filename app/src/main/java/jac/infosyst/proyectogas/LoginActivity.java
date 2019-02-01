@@ -519,7 +519,7 @@ public class LoginActivity extends AppCompatActivity{
         if (mTelephony.getDeviceId() != null){
             myIMEI = mTelephony.getDeviceId();
 
-            insertaImeiSqLite(myIMEI);
+           // insertaImeiSqLite(myIMEI);
         }
 
     }
