@@ -221,26 +221,6 @@ public class SurtirPedidoFragment  extends Fragment {
         final String strDescripcion2 = ((Sessions) getActivity().getApplication()).getsesDescripcion();
         final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
 
-/*
-        pedido normal = no mostrar foto tomar
-        fuga si mostrar foto
-
-                poner una lista de productos del catalago de productos
-
-                todo e fljo de surtir pedido este completo
-                viible solo cuando le de click al boton de mas
-                entre la lista de los porductos y el total muestro
-
-                scroll para el nuevo combo de
-
-
-
-
-
-  */
-
-
-
         /*
         imageViewIncidencia = (ImageView) rootView.findViewById(R.id.imageViewIncidencia);
         imageViewIncidencia.setOnClickListener(new View.OnClickListener() {
@@ -368,9 +348,6 @@ public class SurtirPedidoFragment  extends Fragment {
             @Override
             public void onClick(View v) {
                // pedidoConfirmado("d9da86d7-0fee-43c9-b969-94779d106231");
-                //abrir automatiamente la pantalla de reimpresion ticket de fabian
-
-
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
             }

@@ -49,11 +49,5 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.0'
     implementation 'com.google.guava:guava:16+'
 
-// for emulator
-  //  implementation 'com.google.android.gms:play-services:8+'
-   // implementation 'com.google.android.gms:play-services-location:8+'
-
-    // for real device
-  //  implementation 'com.google.android.gms:play-services:10.2.1'
 
 }
