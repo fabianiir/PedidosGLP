@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity{
     Button btnLogin, btnConfiguracion;
     ServicioUsuario userService;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas11.db";
+    private String DB_NAME = "proyectogas12.db";
     private int DB_VERSION = 1;
     private String BASEURL = "";
     String ipServidor="";
@@ -519,7 +519,7 @@ public class LoginActivity extends AppCompatActivity{
         if (mTelephony.getDeviceId() != null){
             myIMEI = mTelephony.getDeviceId();
 
-            insertaImeiSqLite(myIMEI);
+           // insertaImeiSqLite(myIMEI);
         }
 
     }

@@ -76,7 +76,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     FragmentManager f_manager;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas11.db";
+    private String DB_NAME = "proyectogas12.db";
     private int DB_VERSION = 1;
     private String TABLE_NAME = "usuarios";
     ServicioUsuario userService;
@@ -92,6 +92,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     int tiempoSeguimiento = 10000;
     Location location;
 
+    private List<String> hobbies = new ArrayList<String>();
 
     public PedidosFragment() {
         // Required empty public constructor
@@ -107,7 +108,10 @@ public class PedidosFragment extends Fragment implements LocationListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
+
+       /*
         final Handler handler = new Handler();
+
 
         final Runnable r = new Runnable() {
             public void run() {
@@ -117,6 +121,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
         };
 
         handler.postDelayed(r, tiempoSeguimiento);
+        */
 
 
 
@@ -381,8 +386,15 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
                     if(resObj.geterror().equals("false")) {
                         //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+
+
                         adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
                         recyclerViewPedidos.setAdapter(adapter);
+
+
+
+
+
                     } else {
                         Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
                     }

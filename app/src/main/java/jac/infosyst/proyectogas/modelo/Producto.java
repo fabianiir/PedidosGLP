@@ -1,46 +1,55 @@
 package jac.infosyst.proyectogas.modelo;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Producto {
 
-    private int idProducto;
-    private int idPedido;
+    private String Oid;
 
-    private String detalle;
-    private double cantidad;
+
+    private int cantidad;
+private boolean surtido;
     private double precio;
 
+    private String descripcion;
 
+   // private List<Integer> productos = new ArrayList<Integer>();
 
-    public Producto(int idProducto, int idPedido,  String detalle, double cantidad, double precio) {
-        this.idProducto = idProducto;
-        this.idPedido = idPedido;
-        this.detalle = detalle;
+    public Producto(String Oid, int cantidad  , boolean surtido,  double precio,  String descripcion) {
+        this.Oid = Oid;
         this.cantidad = cantidad;
+        this.surtido = surtido;
         this.precio = precio;
+        this.descripcion = descripcion;
+
 
     }
 
 
-    public int getIdProducto() {
-        return idProducto;
+    public String getIdProducto() {
+        return Oid;
     }
 
-    public int getIdPedido() {
-        return idPedido;
+    public String getdescripcion() {
+        return descripcion;
     }
 
-    public String getDetalle() {
-        return detalle;
+    public boolean getsurtido() {
+        return surtido;
     }
 
-    public double getCantidad(){
+
+    public int getCantidad(){
         return cantidad;
     }
 
     public double getPrecio() {
         return precio;
     }
+
+
 
 }
 

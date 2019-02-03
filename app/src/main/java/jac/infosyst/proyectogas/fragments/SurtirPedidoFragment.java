@@ -40,14 +40,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import jac.infosyst.proyectogas.Configuracion;
-import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Productos;
+import jac.infosyst.proyectogas.modelo.Pedido;
 
+import jac.infosyst.proyectogas.modelo.Producto;
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -93,11 +95,22 @@ public class SurtirPedidoFragment  extends Fragment {
     private String BASEURL = "";
     String strIP = "";
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas11.db";
+    private String DB_NAME = "proyectogas12.db";
     private int DB_VERSION = 1;
+    String strchofer = "";
+    String strtoken = "";
+    ServicioUsuario userService;
 
 
     private static final String TAG = "SurtirPedidoFragment";
+
+    private List<Pedido> pedidos;
+ //   private List<Producto> productos;
+ //
+
+   // List<Producto> listAdapter;
+    List<String> listAdapter;
+
 
     public SurtirPedidoFragment() {
 
@@ -119,6 +132,9 @@ public class SurtirPedidoFragment  extends Fragment {
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
+
+        userService = ApiUtils.getUserService();
+
 
         strIdPedido = ((Sessions)getActivity().getApplication()).getSesIdPedido();
         String strCliente = ((Sessions)getActivity().getApplication()).getSesCliente();
@@ -179,45 +195,171 @@ public class SurtirPedidoFragment  extends Fragment {
         layout = layoutInflater.inflate(R.layout.layout_popup, null);
 
 
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+
+        String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
+
+        SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
+
+        Cursor cursor3 = dbConn3.rawQuery(sql3, null);
+
+        if (cursor3.moveToFirst()) {
+            strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
+            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
+        }
 
 
 
         recyclerViewProductos = (RecyclerView) rootView.findViewById(R.id.recyclerViewProductos);
         recyclerViewProductos.setHasFixedSize(true);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+
+        final int recordCount = dbConn3.rawQuery(sql, null).getCount();
+        //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
+
+
+        final Cursor record = dbConn3.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+
+        }
+
+        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        final String[] strReturnToken = new String[1];
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
+                .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
+        Call call = service.bitacora(true, "abc123d4", strchofer, "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", null);
 
-        String strIdPedido = ((Sessions)getActivity().getApplication()).getSesIdPedido();
+        if (strtoken == null){
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if(response.isSuccessful()){
+                        ObjetoRes obj_bitacora = (ObjetoRes) response.body();
+                        if(obj_bitacora.geterror().equals("false")) {
+                            if (strtoken == null){
+                                call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
+                            }else {
+                                call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+                            }
+                            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
+                            call.enqueue(new Callback() {
+                                @Override
+                                public void onResponse(Call call, Response response) {
+                                    if(response.isSuccessful()){
+                                        ObjetoRes resObj = (ObjetoRes) response.body();
 
-        Call<Productos> call = service.getProductos(strIdPedido);
+                                        if(resObj.geterror().equals("false")) {
 
-      //  Toast.makeText(getActivity(), "Pedido por producto" + strIdPedido, Toast.LENGTH_SHORT).show();
+                                          adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()) , getActivity(),  getFragmentManager());
+
+                                          recyclerViewProductos.setAdapter(adapter);
+                                        } else {
+                                            Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call call, Throwable t) {
+                                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
+                @Override
+                public void onFailure(Call call, Throwable t) {
+
+                }
+            });
+        }else {
+            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if(response.isSuccessful()){
+                        ObjetoRes resObj = (ObjetoRes) response.body();
+                        //ObjetoRes resObj = (ObjetoRes) response.body();
+                       // List<Producto> movies = ((ObjetoRes) response.body()).getResults();
 
 
-        call.enqueue(new Callback<Productos>() {
-            @Override
-            public void onResponse(Call<Productos> call, Response<Productos> response) {
-              //  adapter = new PedidoAdapter(response.body().getPedidos(), getActivity(), getFragmentManager() );
-                //Toast.makeText(getActivity(), "CALL" + response.body().getPedidos(), Toast.LENGTH_SHORT).show();
+
+                        if(resObj.geterror().equals("false")) {
+
+                            //final Producto prod = productos.get(resObj.getproductos());
+
+                           // Arrays.asList(ped.getproductos());
 
 
-                //adapter = new ProductoAdapter(response.body().getProductos(), getActivity(),  getFragmentManager());
-                //recyclerViewProductos.setAdapter(adapter);
+                          // Toast.makeText(getActivity(), "productos!"  + Arrays.asList(resObj.getpedido()), Toast.LENGTH_SHORT).show();
 
-            }
+                            //listAdapter = new List<>();
 
-            @Override
-            public void onFailure(Call<Productos> call, Throwable t) {
+                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
-            }
+                            String sql = "SELECT * FROM productos ORDER BY id DESC LIMIT 1";
+                            SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
 
-        });
+                            Cursor cursor = dbConn.rawQuery(sql, null);
+//                            ArrayList<Producto> itemData = new ArrayList<Producto>();
+
+                          //  Producto temProducto = new Producto();
+                            ArrayList<Producto> listItems = new ArrayList<Producto>();
+
+
+
+                            if (cursor.moveToFirst()) {
+
+                                int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
+                                double strprecio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
+                                Toast.makeText(getActivity(), "productos precio: "  + strprecio, Toast.LENGTH_SHORT).show();
+
+                                Producto myCustomProducto=new Producto("",1,true, strprecio,"");
+
+                                listItems.add(myCustomProducto);
+
+                            }
+
+                            cursor.close();
+
+                          //  listAdapter.toArray(new ProductoAdapter[listAdapter.size()]);
+
+                            //  adapter = new ProductoAdapter(Arrays.<Producto>asList((Producto) listAdapter), getActivity(),  getFragmentManager());
+
+                            adapter = new ProductoAdapter(listItems, getActivity(),  getFragmentManager());
+
+
+                            recyclerViewProductos.setAdapter(adapter);
+
+
+
+                        } else {
+                            Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+
+
         final String strDescripcion2 = ((Sessions) getActivity().getApplication()).getsesDescripcion();
         final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
 

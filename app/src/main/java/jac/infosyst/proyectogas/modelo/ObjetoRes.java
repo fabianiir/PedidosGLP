@@ -1,6 +1,9 @@
 package jac.infosyst.proyectogas.modelo;
 
+import android.app.ProgressDialog;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jorgeaguilar on 12/27/18.
@@ -62,6 +65,28 @@ public class ObjetoRes {
     public Pedido[] getpedido() {
         return pedido;
     }
+
+    /*
+    private List<Producto> productos;
+    public List<Producto> getResults() {
+        return productos;
+    }
+    */
+
+
+
+
+ //   private Producto[] productos;
+
+  //  public Producto[] getproductos() {return productos; }
+
+  /*  private Producto[] productos;
+    public Producto[] get2productos(){
+        return productos;
+    }
+*/
+
+
     private Spinner[] catalogo;
 
     public Spinner[] getmotivoscancelacion() {

@@ -1,5 +1,8 @@
 package jac.infosyst.proyectogas.modelo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Pedido {
 
 /*nombres de variables exactos a los valores retorno php*/
@@ -17,10 +20,23 @@ public class Pedido {
     private String total;
     private String estatus;
 
+   // private List<ArrayList> productos = new ArrayList<>();
+
+    private Producto[] productos;
+
+    //private Producto[] productos2;
+
+  //  private List<Producto> productos;
+
+//    private List<Producto> productos = new ArrayList<Producto>();
+
+ //   private List<String> productos = new ArrayList<String>();
 
 
     public Pedido(String Oid, String nombre, String placas, String fecha_hora_programada, String cliente, String direccion,
-            String cp, String telefono, String comentarios_cliente, String suma_iva, String total, String estatus) {
+            String cp, String telefono, String comentarios_cliente, String suma_iva, String total, String estatus
+           , Producto[] productos
+                ) {
         this.Oid = Oid;
         this.nombre = nombre;
         this.placas = placas;
@@ -33,6 +49,8 @@ public class Pedido {
         this.suma_iva = suma_iva;
         this.total = total;
         this.estatus = estatus;
+        this.productos = productos;
+
     }
 
 
@@ -79,9 +97,48 @@ public class Pedido {
         return fecha_hora_programada;
     }
 
+
     public  String getestatus () { return  estatus; }
 
 
+    public Producto[] getHobbies() {
+        return productos;
+    }
+
+    public void setHobbies(Producto[] productos) {
+        this.productos = productos;
+    }
+
+
+
+
+/*
+    public List<String> getHobbies() {
+        return productos;
+    }
+
+    public void setHobbies(List<String> productos) {
+        this.productos = productos;
+    }
+*/
+
+
+    /*
+
+    public void setProductos(List<Producto> productos) {
+        this.productos = productos;
+    }
+
+    public  List<Producto>getListproductos(){
+        return productos;
+    }
+
+
+    public Producto[] get2productos(){
+        return productos2;
+    }
+
+*/
 
     /*
     private int id;

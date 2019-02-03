@@ -1,7 +1,9 @@
 package jac.infosyst.proyectogas.adaptadores;
 
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,8 +28,11 @@ import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Pedidos;
+import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.Sessions;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -44,6 +49,11 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
     private SparseBooleanArray selectedItems;
     private final ArrayList<Integer> selected = new ArrayList<>();
+
+    private static SQLiteDBHelper sqLiteDBHelper = null;
+    private static String DB_NAME = "proyectogas12.db";
+    private static int DB_VERSION = 1;
+
 
 
    public PedidoAdapter(List<Pedido> pedidos, Context mCtx, FragmentManager f_manager) {
@@ -70,6 +80,39 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
         holder.textViewdetalleproducto.setText(pedido.getnombre());
         holder.textViewfirmaurl.setText(pedido.gettelefono());
+
+/*validar todas las llamadas si son nulas*/
+
+        if (pedido.getHobbies() != null) {
+
+            for (Producto hobby : pedido.getHobbies()) {
+
+                // Do something with hobby here
+                //  Arrays.asList(pedido.getHobbies());
+
+
+                //Toast.makeText(mCtx, " george getHobbies: " + pedido.getHobbies(), Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(mCtx, " george $$$$: " + hobby.getPrecio(), Toast.LENGTH_SHORT).show();
+                storeSqLiteProductos(hobby.getPrecio());
+
+
+            }
+        }
+
+
+
+
+
+       // Toast.makeText(mCtx, "getHobbies: " +  pedido.getHobbies().toString(), Toast.LENGTH_SHORT).show();
+
+
+       // pedido.getHobbies().toString();
+
+       // Toast.makeText(mCtx, "getHobbies: " +  pedido.getHobbies().toString(), Toast.LENGTH_SHORT).show();
+
+
+
        // holder.textViewtotal.setText(pedido.gettotal());
 
 
@@ -181,6 +224,28 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         final RelativeLayout relativeRow;
 
     }
+
+    public void storeSqLiteProductos(double price){
+        Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
+
+
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        ContentValues productosVal = new ContentValues();
+
+        productosVal.put("precio", price);
+
+        db.insert("productos", null, productosVal);
+
+
+
+
+
+    }
+
+
+
 
 }
 

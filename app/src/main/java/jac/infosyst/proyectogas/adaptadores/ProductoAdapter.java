@@ -4,6 +4,7 @@ package jac.infosyst.proyectogas.adaptadores;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
@@ -57,6 +58,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
         this.f_manager = f_manager;
     }
 
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
@@ -67,16 +69,16 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     @Override
     public void onBindViewHolder(ProductoAdapter.ViewHolder holder, final int position) {
         Producto producto = productos.get(position);
-        holder.textViewProducto.setText(producto.getDetalle());
+        holder.textViewProducto.setText(""+producto.getPrecio());
         holder.btnRestarProducto.setTag(producto.getIdProducto());
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(mCtx, productos.get(position).getDetalle(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx, ""+ productos.get(position).getPrecio(), Toast.LENGTH_SHORT).show();
 
-                ((Sessions)mCtx.getApplicationContext()).setSesDetalleProductoSurtir(productos.get(position).getDetalle());
+             //   ((Sessions)mCtx.getApplicationContext()).setSesDetalleProductoSurtir(productos.get(position).getDetalle());
 
                // ((Sessions)mCtx.getApplicationContext()).setSesIdPedido(productos.get(position).getIdPedido());
 
@@ -99,8 +101,8 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                 Toast.makeText(mCtx, "Restar producto: " + productos.get(position).getIdProducto(), Toast.LENGTH_SHORT).show();
 
-                ((Sessions)mCtx.getApplicationContext()).setSesidProducto(productos.get(position).getIdProducto());
-                restarProducto(((Sessions)mCtx.getApplicationContext()).getSesidProducto());
+              //  ((Sessions)mCtx.getApplicationContext()).setSesidProducto(productos.get(position).getIdProducto());
+              //  restarProducto(((Sessions)mCtx.getApplicationContext()).getSesidProducto());
 
 
             }
