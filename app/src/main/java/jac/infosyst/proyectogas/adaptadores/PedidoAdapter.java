@@ -51,7 +51,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
     private final ArrayList<Integer> selected = new ArrayList<>();
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas12.db";
+    private static String DB_NAME = "proyectogas16.db";
     private static int DB_VERSION = 1;
 
 
@@ -94,7 +94,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 //Toast.makeText(mCtx, " george getHobbies: " + pedido.getHobbies(), Toast.LENGTH_SHORT).show();
 
                 Toast.makeText(mCtx, " george $$$$: " + hobby.getPrecio(), Toast.LENGTH_SHORT).show();
-                storeSqLiteProductos(hobby.getPrecio());
+                storeSqLiteProductos(pedido.getOid(), hobby.getPrecio());
 
 
             }
@@ -225,7 +225,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
     }
 
-    public void storeSqLiteProductos(double price){
+    public void storeSqLiteProductos(String oid, double price){
         Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
 
 
@@ -234,7 +234,11 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         ContentValues productosVal = new ContentValues();
 
+
         productosVal.put("precio", price);
+        productosVal.put("Oid", oid);
+        productosVal.put("activo", "uno");
+
 
         db.insert("productos", null, productosVal);
 

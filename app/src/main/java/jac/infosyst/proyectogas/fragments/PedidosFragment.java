@@ -76,7 +76,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     FragmentManager f_manager;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas12.db";
+    private String DB_NAME = "proyectogas16.db";
     private int DB_VERSION = 1;
     private String TABLE_NAME = "usuarios";
     ServicioUsuario userService;
@@ -108,6 +108,11 @@ public class PedidosFragment extends Fragment implements LocationListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
+
+        ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
+
+
+
 
        /*
         final Handler handler = new Handler();
@@ -229,12 +234,23 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
 
 
-                DetallePedidoFragment dpf = new DetallePedidoFragment(getActivity().getBaseContext());
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container_body, dpf);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                if(((Sessions)getActivity().getApplicationContext()).getSesIdPedido().equals("null")) {
+
+                    Toast.makeText(getActivity(),  "Debe seleccionar un Pedido!" , Toast.LENGTH_SHORT).show();
+                }
+                else{
+
+                    DetallePedidoFragment dpf = new DetallePedidoFragment(getActivity().getBaseContext());
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.container_body, dpf);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+
+                }
+
+
+
 
 
             }

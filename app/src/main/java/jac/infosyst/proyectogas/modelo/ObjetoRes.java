@@ -66,6 +66,9 @@ public class ObjetoRes {
         return pedido;
     }
 
+
+
+
     /*
     private List<Producto> productos;
     public List<Producto> getResults() {
@@ -92,6 +95,7 @@ public class ObjetoRes {
     public Spinner[] getmotivoscancelacion() {
         return catalogo;
     }
+
 
 
 

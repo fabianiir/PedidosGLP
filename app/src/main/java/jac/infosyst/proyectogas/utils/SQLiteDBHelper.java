@@ -21,7 +21,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     private static final int DATABASE_VERSION = 1;
     //protected static final String DATABASE_NAME = "glppedidos2";
 
-    protected static final String DATABASE_NAME = "proyectogas12";
+    protected static final String DATABASE_NAME = "proyectogas16";
 
     /*
     public SQLiteDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -61,7 +61,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
 
         String sqlproductos = "CREATE TABLE productos " +
                 "( id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                " precio TEXT) ";
+                " precio TEXT," +
+                " Oid TEXT, " +
+                " activo TEXT) ";
 
 
         db.execSQL(sqlproductos);

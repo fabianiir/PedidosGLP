@@ -44,9 +44,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.adaptadores.CatalagoProductosAdapter;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
+import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.modelo.ObjetoRes2;
 import jac.infosyst.proyectogas.modelo.Pedido;
 
 import jac.infosyst.proyectogas.modelo.Producto;
@@ -60,6 +63,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import android.support.design.widget.FloatingActionButton;
+
 
 public class SurtirPedidoFragment  extends Fragment {
     private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle
@@ -67,12 +72,14 @@ public class SurtirPedidoFragment  extends Fragment {
 
     Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
-    View layout;
-    LayoutInflater layoutInflater;
+    private PopupWindow POPUP_WINDOW_CATALAGOPRODUCTOS = null;
+
+    View layout, layoutCatalagoProductos;
+    LayoutInflater layoutInflater, layoutInflaterCatalagoProductos;
     String strIdPedido;
 
-    private RecyclerView recyclerViewProductos;
-    private RecyclerView.Adapter adapter;
+    private RecyclerView recyclerViewProductos, recyclerViewCatalagoProductos;
+    private RecyclerView.Adapter adapter, adapterCatalago;
 
     private ProductoAdapter productoAdapter;
 
@@ -95,7 +102,7 @@ public class SurtirPedidoFragment  extends Fragment {
     private String BASEURL = "";
     String strIP = "";
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas12.db";
+    private String DB_NAME = "proyectogas16.db";
     private int DB_VERSION = 1;
     String strchofer = "";
     String strtoken = "";
@@ -110,6 +117,9 @@ public class SurtirPedidoFragment  extends Fragment {
 
    // List<Producto> listAdapter;
     List<String> listAdapter;
+
+    Producto myCustomProducto;
+    CatalagoProducto myCatalagoProducto;
 
 
     public SurtirPedidoFragment() {
@@ -194,6 +204,11 @@ public class SurtirPedidoFragment  extends Fragment {
         LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layout = layoutInflater.inflate(R.layout.layout_popup, null);
 
+        LayoutInflater layoutInflaterCatalagoProductos = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutCatalagoProductos = layoutInflaterCatalagoProductos.inflate(R.layout.layout_popup_catalago_productos, null);
+
+
+
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
@@ -213,6 +228,10 @@ public class SurtirPedidoFragment  extends Fragment {
         recyclerViewProductos = (RecyclerView) rootView.findViewById(R.id.recyclerViewProductos);
         recyclerViewProductos.setHasFixedSize(true);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
+
+
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
@@ -308,8 +327,21 @@ public class SurtirPedidoFragment  extends Fragment {
 
                             sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
-                            String sql = "SELECT * FROM productos ORDER BY id DESC LIMIT 1";
+                           // String sql = "SELECT * FROM productos WHERE Oid = " + String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()) + " ORDER BY id DESC";
+
+
+                            String sql = "SELECT * FROM productos WHERE activo='uno' AND Oid = '"+String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido())+"' ORDER BY id DESC";
+
+
+
+
                             SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
+                            final int recordCount = dbConn.rawQuery(sql, null).getCount();
+
+
+                            Toast.makeText(getActivity(), "total de precios: "  + recordCount, Toast.LENGTH_SHORT).show();
+
+
 
                             Cursor cursor = dbConn.rawQuery(sql, null);
 //                            ArrayList<Producto> itemData = new ArrayList<Producto>();
@@ -319,19 +351,40 @@ public class SurtirPedidoFragment  extends Fragment {
 
 
 
+                            boolean hasRecord = cursor.moveToFirst();
+
+                            if(hasRecord)
+                            {
+                                do{
+                                    int id = cursor.getInt(cursor.getColumnIndex("id"));
+                                    String Oid = String.valueOf(cursor.getInt(cursor.getColumnIndex("Oid")));
+
+                                    double nombre = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
+                                    Log.d("GEO", String.valueOf(nombre));
+                                    myCustomProducto=new Producto(Oid,1,true, nombre,"");
+                                    listItems.add(myCustomProducto);
+
+                                }while(cursor.moveToNext());
+                            }
+
+
+
+/*
                             if (cursor.moveToFirst()) {
 
                                 int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
                                 double strprecio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
                                 Toast.makeText(getActivity(), "productos precio: "  + strprecio, Toast.LENGTH_SHORT).show();
 
-                                Producto myCustomProducto=new Producto("",1,true, strprecio,"");
+                               // myCustomProducto=new Producto("",1,true, strprecio,"");
 
-                                listItems.add(myCustomProducto);
+                              //  listItems.add(myCustomProducto);
 
                             }
 
                             cursor.close();
+*/
+
 
                           //  listAdapter.toArray(new ProductoAdapter[listAdapter.size()]);
 
@@ -449,6 +502,18 @@ public class SurtirPedidoFragment  extends Fragment {
         }
 
 
+        FloatingActionButton fabAgregarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabAgregarProducto);
+        fabAgregarProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mostrarCatalagoProductos("Productos");
+                Toast.makeText(getActivity(), "fabAgregarProducto!", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+
         // Inflate the layout for this fragment
         return rootView;
 
@@ -495,6 +560,113 @@ public class SurtirPedidoFragment  extends Fragment {
             }
         });
     }
+
+    public void mostrarCatalagoProductos(String mensaje){
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        int width = displayMetrics.widthPixels;
+        int height = displayMetrics.heightPixels;
+
+        layoutCatalagoProductos.setVisibility(View.VISIBLE);
+        POPUP_WINDOW_CATALAGOPRODUCTOS = new PopupWindow(getActivity());
+        POPUP_WINDOW_CATALAGOPRODUCTOS.setContentView(layoutCatalagoProductos);
+        POPUP_WINDOW_CATALAGOPRODUCTOS.setWidth(width);
+        POPUP_WINDOW_CATALAGOPRODUCTOS.setHeight(height);
+        POPUP_WINDOW_CATALAGOPRODUCTOS.setFocusable(true);
+
+
+        POPUP_WINDOW_CATALAGOPRODUCTOS.setBackgroundDrawable(null);
+
+        POPUP_WINDOW_CATALAGOPRODUCTOS.showAtLocation(layoutCatalagoProductos, Gravity.CENTER, 1, 1);
+
+        TextView txtMessage = (TextView) layoutCatalagoProductos.findViewById(R.id.layout_popup_txtMessage);
+        txtMessage.setText(mensaje);
+
+
+
+        recyclerViewCatalagoProductos = (RecyclerView) layoutCatalagoProductos.findViewById(R.id.recyclerViewCatalagoProductos);
+        recyclerViewCatalagoProductos.setHasFixedSize(true);
+        recyclerViewCatalagoProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+/*
+        ArrayList<CatalagoProducto> listItemsCatalagoProducto = new ArrayList<CatalagoProducto>();
+        myCatalagoProducto=new CatalagoProducto("f6674b0d-6265-443d-abfd-5c1b292942b7","Tanque de 40 K",650.0,"Tanque");
+        listItemsCatalagoProducto.add(myCatalagoProducto);
+        adapterCatalago = new CatalagoProductosAdapter(listItemsCatalagoProducto, getActivity(),  getFragmentManager());
+*/
+
+
+        /*section - getCatalagoProductos*/
+        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.getCatalagoProductos(strtoken);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes2 resObj2 = (ObjetoRes2) response.body();
+
+                    if(resObj2.geterror().equals("false")) {
+
+                       /*
+                        ArrayList<CatalagoProducto> listItemsCatalagoProducto = new ArrayList<CatalagoProducto>();
+
+                        myCatalagoProducto=new CatalagoProducto("f6674b0d-6265-443d-abfd-5c1b292942b7","GEORGE de 40 K",650.0,"Tanque");
+
+
+                        listItemsCatalagoProducto.add(myCatalagoProducto);
+                        listItemsCatalagoProducto.add((CatalagoProducto) Arrays.asList(resObj2.getcatalogoProductos()));
+                        adapterCatalago = new CatalagoProductosAdapter(listItemsCatalagoProducto, getActivity(),  getFragmentManager());
+*/
+                        adapterCatalago = new CatalagoProductosAdapter(Arrays.asList(resObj2.getcatalogoProductos()), getActivity(),  getFragmentManager());
+                        recyclerViewCatalagoProductos.setAdapter(adapterCatalago);
+
+                    } else {
+                        Toast.makeText(getActivity(), "no catalago productos!" , Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "error catalago productos! " , Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), "catalago productos" + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
+
+
+        Button btnAgregarProductoNo = (Button) layoutCatalagoProductos.findViewById(R.id.btnAgregarProductoNo);
+        btnAgregarProductoNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
+            }
+        });
+
+/*
+        Button btnAgregarProductoSi = (Button) layoutCatalagoProductos.findViewById(R.id.btnAgregarProductoSi);
+        btnAgregarProductoSi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Producto Agregago Exitosamente!", Toast.LENGTH_SHORT).show();
+                POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
+            }
+        });
+        */
+
+
+    }
+
+
 
 
 

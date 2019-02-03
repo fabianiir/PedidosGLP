@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity{
     Button btnLogin, btnConfiguracion;
     ServicioUsuario userService;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas12.db";
+    private String DB_NAME = "proyectogas16.db";
     private int DB_VERSION = 1;
     private String BASEURL = "";
     String ipServidor="";

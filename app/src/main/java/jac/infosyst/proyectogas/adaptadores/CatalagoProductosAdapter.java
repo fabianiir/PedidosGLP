@@ -1,3 +1,4 @@
+
 package jac.infosyst.proyectogas.adaptadores;
 
 
@@ -26,6 +27,7 @@ import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.FragmentDrawer;
 import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
+import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Pedidos;
@@ -45,24 +47,21 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewHolder> {
+public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProductosAdapter.ViewHolder> {
 
 
-    private List<Producto> productos;
+    private List<CatalagoProducto> catalagoProductos;
     private Context mCtx;
     FragmentManager f_manager;
-    private ArrayList<String> alProductos = new ArrayList<>();
-
-    private static final String TAG = "ProductoAdapter";
+    private static final String TAG = "CatalagoProductosAdapter";
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas16.db";
+    private static String DB_NAME = "proyectogas14.db";
     private static int DB_VERSION = 1;
 
 
-
-    public ProductoAdapter(List<Producto> productos, Context mCtx, FragmentManager f_manager) {
-        this.productos = productos;
+    public CatalagoProductosAdapter(List<CatalagoProducto> catalagoProductos, Context mCtx, FragmentManager f_manager) {
+        this.catalagoProductos = catalagoProductos;
         this.mCtx = mCtx;
         this.f_manager = f_manager;
     }
@@ -71,90 +70,71 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_productos, parent, false);
+                .inflate(R.layout.list_catalago_productos, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ProductoAdapter.ViewHolder holder, final int position) {
-        final Producto producto = productos.get(position);
-        holder.textViewProducto.setText(""+producto.getPrecio());
-        holder.btnRestarProducto.setTag(producto.getIdProducto());
+    public void onBindViewHolder(final CatalagoProductosAdapter.ViewHolder holder, final int position) {
+        CatalagoProducto catalagoProducto = catalagoProductos.get(position);
+        holder.textViewProducto.setText(""+catalagoProducto.getdescripcion());
+        holder.textViewprecio_unitario.setText(""+catalagoProducto.getprecio_unitario());
 
 
+        holder.btnAgregarCatalagoProducto.setTag(catalagoProducto.getIdProducto());
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(mCtx, ""+ productos.get(position).getPrecio(), Toast.LENGTH_SHORT).show();
-
-             //   ((Sessions)mCtx.getApplicationContext()).setSesDetalleProductoSurtir(productos.get(position).getDetalle());
-
-               // ((Sessions)mCtx.getApplicationContext()).setSesIdPedido(productos.get(position).getIdPedido());
-
-                /*
-                ((Sessions)mCtx.getApplicationContext()).setSesCliente(pedidos.get(position).getcliente());
-                ((Sessions)mCtx.getApplicationContext()).setsesDireccion(pedidos.get(position).getdireccion());
-                ((Sessions)mCtx.getApplicationContext()).setsesDescripcion(pedidos.get(position).getdescripcion());
-                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getestatus());
-                ((Sessions)mCtx.getApplicationContext()).setsesDetalleProducto(pedidos.get(position).getdetalleproducto());
-                ((Sessions)mCtx.getApplicationContext()).setsesFirmaURL(pedidos.get(position).getfirmaurl());
-                ((Sessions)mCtx.getApplicationContext()).setsesTotal(Double.toString(pedidos.get(position).gettotal()));
-*/
-
+                Toast.makeText(mCtx, ""+ catalagoProductos.get(position).getdescripcion(), Toast.LENGTH_SHORT).show();
 
             }
         });
-        holder.btnRestarProducto.setOnClickListener(new View.OnClickListener() {
+
+        holder.btnAgregarCatalagoProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(mCtx, "Restar producto: " +  productos.get(position).getPrecio(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getdescripcion(), Toast.LENGTH_SHORT).show();
+                storeSqLiteProductos(catalagoProductos.get(position).getprecio_unitario());
 
-                sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
-
-                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-                ContentValues cv = new ContentValues();
-                cv.put("activo", "cero");
-
-
-                db.update("productos", cv, "id='"+String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido())+"'", null);
-
-              //  ((Sessions)mCtx.getApplicationContext()).setSesidProducto(productos.get(position).getIdProducto());
-              //  restarProducto(((Sessions)mCtx.getApplicationContext()).getSesidProducto());
-
+                //holder.parentLayout.setVisibility(view.GONE);
 
             }
         });
-
-
-
 
     }
 
 
+/*cuando elige que si; desahabilitarlo, unico habilitado el de reimprimir ticket
+* validacion lista pedidos, seleccionar uno*/
+
+
+
+
     @Override
     public int getItemCount() {
-        return productos.size();
+        return catalagoProductos.size();
     }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textViewProducto;
-        public Button btnRestarProducto;
+        public TextView textViewProducto, textViewprecio_unitario;
+        public Button btnAgregarCatalagoProducto;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             textViewProducto = (TextView) itemView.findViewById(R.id.textViewProducto);
-            btnRestarProducto = (Button) itemView.findViewById(R.id.btnRestarProducto);
+            textViewprecio_unitario = (TextView) itemView.findViewById(R.id.textViewprecio_unitario);
+
+            btnAgregarCatalagoProducto = (Button) itemView.findViewById(R.id.btnAgregarCatalagoProducto);
 
 
-            parentLayout = itemView.findViewById(R.id.parent_layout_producto);
+            parentLayout = itemView.findViewById(R.id.parent_layout_catalago_producto);
 
 
 
@@ -162,6 +142,31 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
         LinearLayout parentLayout;
     }
+
+
+    public void storeSqLiteProductos(double price){
+        Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
+
+
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        ContentValues productosVal = new ContentValues();
+
+        productosVal.put("precio", price);
+        productosVal.put("Oid", String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido()));
+        productosVal.put("activo", "uno");
+
+
+        db.insert("productos", null, productosVal);
+
+
+
+
+
+    }
+
+
 
 
 
@@ -194,4 +199,5 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     }
 
 }
+
 
