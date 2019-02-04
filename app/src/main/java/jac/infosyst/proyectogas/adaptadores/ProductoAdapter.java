@@ -78,16 +78,24 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     @Override
     public void onBindViewHolder(ProductoAdapter.ViewHolder holder, final int position) {
         final Producto producto = productos.get(position);
-        holder.textViewProducto.setText(""+producto.getPrecio());
-        holder.btnRestarProducto.setTag(producto.getIdProducto());
+        holder.textViewProducto.setText(""+producto.getdescripcion());
+        holder.textViewPrecio.setText("$"+producto.getPrecio());
+        holder.textViewCantidad.setText("Can:"+producto.getCantidad());
 
-
+        holder.btnRestarProducto.setTag(producto.getOidProducto());
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(mCtx, ""+ productos.get(position).getPrecio(), Toast.LENGTH_SHORT).show();
+
+//                                                                                        catalagoProductos.get(position).getdescripcion()
+                ((Sessions)mCtx.getApplicationContext()).setSesOidProducto(productos.get(position).getOidProducto());
+                String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
+
+
+
+                Toast.makeText(mCtx, "Producto selecciono: " + strIdProducto, Toast.LENGTH_SHORT).show();
 
              //   ((Sessions)mCtx.getApplicationContext()).setSesDetalleProductoSurtir(productos.get(position).getDetalle());
 
@@ -110,7 +118,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(mCtx, "Restar producto: " +  productos.get(position).getPrecio(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx, "Restar producto: " +  String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
 
                 sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
 
@@ -119,8 +127,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                 ContentValues cv = new ContentValues();
                 cv.put("activo", "cero");
 
-
-                db.update("productos", cv, "id='"+String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido())+"'", null);
+                db.update("productos", cv, "OidProducto='"+ String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto())+"'", null);
 
               //  ((Sessions)mCtx.getApplicationContext()).setSesidProducto(productos.get(position).getIdProducto());
               //  restarProducto(((Sessions)mCtx.getApplicationContext()).getSesidProducto());
@@ -128,9 +135,6 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
             }
         });
-
-
-
 
     }
 
@@ -143,7 +147,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textViewProducto;
+        public TextView textViewProducto,textViewPrecio, textViewCantidad ;
         public Button btnRestarProducto;
 
 
@@ -151,6 +155,10 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
             super(itemView);
 
             textViewProducto = (TextView) itemView.findViewById(R.id.textViewProducto);
+            textViewPrecio = (TextView) itemView.findViewById(R.id.textViewPrecio);
+            textViewCantidad = (TextView) itemView.findViewById(R.id.textViewCantidad);
+
+
             btnRestarProducto = (Button) itemView.findViewById(R.id.btnRestarProducto);
 
 

@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Usuario"
                 android:inputType="textEmailAddress"
-                android:text="Sistemas" />
+                android:text="Info" />
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Contraseña"
                 android:inputType="textPassword"
-                android:text="Sistemas" />
+                android:text="Info" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton

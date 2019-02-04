@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     private String BASEURL = "";
     Sessions objSessions;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas16.db";
+    private String DB_NAME = "proyectogas17.db";
     private int DB_VERSION = 1;
     String strIP = "";
 

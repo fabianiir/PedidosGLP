@@ -229,5 +229,16 @@ public class Sessions  extends Application {
 
     public void setsessIDcamion(String sessIDcamion) { this.sessIDcamion = sessIDcamion; }
 
+    private String OidProducto;
+
+    public String getSesOidProducto() {
+        return OidProducto;
+    }
+
+    public void setSesOidProducto(String OidProducto) {
+        this.OidProducto = OidProducto;
+    }
+
+
 
 }

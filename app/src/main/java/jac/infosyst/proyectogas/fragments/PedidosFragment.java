@@ -66,7 +66,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     FragmentManager f_manager;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas16.db";
+    private String DB_NAME = "proyectogas17.db";
     private int DB_VERSION = 1;
     private String TABLE_NAME = "usuarios";
     ServicioUsuario userService;

@@ -32,6 +32,11 @@ private boolean surtido;
         return Oid;
     }
 
+    public String getOidProducto() {
+        return Oid;
+    }
+
+
     public String getdescripcion() {
         return descripcion;
     }

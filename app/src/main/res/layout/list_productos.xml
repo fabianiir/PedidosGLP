@@ -24,7 +24,27 @@
                 android:text="Jorge"
                 android:textSize="24sp"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+            <TextView
+                android:id="@+id/textViewPrecio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="Precio"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/textViewProducto"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
+
+            <TextView
+                android:id="@+id/textViewCantidad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewProducto"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="100dp"
+                android:layout_weight="0"
+                android:text="Can"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
             <Button android:layout_height="50dp" android:layout_weight=".15"
                 android:text="-" android:layout_width="70dp" android:id="@+id/btnRestarProducto"

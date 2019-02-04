@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity{
     Button btnLogin, btnConfiguracion;
     ServicioUsuario userService;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas16.db";
+    private String DB_NAME = "proyectogas17.db";
     private int DB_VERSION = 1;
     private String BASEURL = "";
     String ipServidor="";
@@ -313,7 +313,7 @@ public class LoginActivity extends AppCompatActivity{
 
                             if (resObj.getAdmin().equals("false")) {
                                 ((Sessions) getApplication()).setsesUsuarioRol("Operador");
-                                Intent intent = new Intent(LoginActivity.this, Escaner.class);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("username", pusername);
                                 startActivity(intent);
                                 insertBitacora("operador", true, strEmaiBitacora, objSessions.getsessIDuser(), "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", resObj.gettoken());

@@ -56,7 +56,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
     private static final String TAG = "CatalagoProductosAdapter";
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas14.db";
+    private static String DB_NAME = "proyectogas17.db";
     private static int DB_VERSION = 1;
 
 

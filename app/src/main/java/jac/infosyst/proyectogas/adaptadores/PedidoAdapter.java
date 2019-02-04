@@ -51,7 +51,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
     private final ArrayList<Integer> selected = new ArrayList<>();
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas16.db";
+    private static String DB_NAME = "proyectogas17.db";
     private static int DB_VERSION = 1;
 
 
@@ -81,7 +81,9 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         holder.textViewdetalleproducto.setText(pedido.getnombre());
         holder.textViewfirmaurl.setText(pedido.gettelefono());
 
-/*validar todas las llamadas si son nulas*/
+       // Toast.makeText(mCtx, "pedido oid: " + pedido.getOid(), Toast.LENGTH_SHORT).show();
+
+        /*validar todas las llamadas si son nulas*/
 
         if (pedido.getHobbies() != null) {
 
@@ -93,8 +95,11 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
                 //Toast.makeText(mCtx, " george getHobbies: " + pedido.getHobbies(), Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(mCtx, " george $$$$: " + hobby.getPrecio(), Toast.LENGTH_SHORT).show();
-                storeSqLiteProductos(pedido.getOid(), hobby.getPrecio());
+                Toast.makeText(mCtx, "producto oid: " + hobby.getOidProducto() +
+                        "pedido oid: " + pedido.getOid(), Toast.LENGTH_SHORT).show();
+                storeSqLiteProductos(pedido.getOid(), hobby.getOidProducto(), hobby.getCantidad(), hobby.getsurtido(),
+                        hobby.getPrecio(), hobby.getdescripcion());
+
 
 
             }
@@ -225,25 +230,23 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
     }
 
-    public void storeSqLiteProductos(String oid, double price){
-        Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
+    public void storeSqLiteProductos(String oidPedido, String oidProducto, int cantidad, boolean surtido, double precio, String descripcion){
+        Toast.makeText(mCtx, " storeSqLiteProductos:" + descripcion, Toast.LENGTH_SHORT).show();
 
 
         sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         ContentValues productosVal = new ContentValues();
-
-
-        productosVal.put("precio", price);
-        productosVal.put("Oid", oid);
+        productosVal.put("OidPedido", oidPedido);
+        productosVal.put("OidProducto", oidProducto);
+        productosVal.put("cantidad", cantidad);
+        productosVal.put("surtido", surtido);
+        productosVal.put("precio", precio);
+        productosVal.put("descripcion", descripcion);
         productosVal.put("activo", "uno");
 
-
         db.insert("productos", null, productosVal);
-
-
-
 
 
     }

@@ -113,7 +113,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     private String BASEURL = "";
     String strIP = "";
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas16.db";
+    private String DB_NAME = "proyectogas17.db";
     private int DB_VERSION = 1;
     String strchofer = "";
     String strtoken = "";
@@ -144,6 +144,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     Location location;
     FloatingActionButton fabAgregarProducto;
 
+    String strGettoken = "";
 
     public SurtirPedidoFragment() {
 
@@ -290,8 +291,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         if(obj_bitacora.geterror().equals("false")) {
                             if (strtoken == null){
                                 call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
+                               // Toast.makeText(getActivity(), "token null:" +  obj_bitacora.gettoken(), Toast.LENGTH_SHORT).show();
+                                strGettoken = obj_bitacora.gettoken();
                             }else {
+                                //Toast.makeText(getActivity(), "token not null!" , Toast.LENGTH_SHORT).show();
+
                                 call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+
                             }
                             //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
                             call.enqueue(new Callback() {
@@ -301,10 +307,39 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                         ObjetoRes resObj = (ObjetoRes) response.body();
 
                                         if(resObj.geterror().equals("false")) {
+                                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
-                                          adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()) , getActivity(),  getFragmentManager());
+                                            String sql = "SELECT distinct * FROM productos WHERE activo='uno' AND OidPedido = '"+String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido())+"' ORDER BY id DESC";
 
-                                          recyclerViewProductos.setAdapter(adapter);
+                                            SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
+                                            final int recordCount = dbConn.rawQuery(sql, null).getCount();
+
+                                            Cursor cursor = dbConn.rawQuery(sql, null);
+                                            ArrayList<Producto> listItems = new ArrayList<Producto>();
+
+                                            boolean hasRecord = cursor.moveToFirst();
+
+                                            if(hasRecord)
+                                            {
+                                                do{
+                                                    int id = cursor.getInt(cursor.getColumnIndex("id"));
+                                                    String Oid = cursor.getString(cursor.getColumnIndex("OidProducto"));
+                                                    int cantidad = cursor.getInt(cursor.getColumnIndex("cantidad"));
+                                                    String surtido =  String.valueOf((cursor.getColumnIndex("surtido")));
+                                                    boolean boolSurtido = Boolean.parseBoolean(surtido);
+                                                    double precio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
+                                                    String descripcion = cursor.getString(cursor.getColumnIndex("descripcion"));
+                                                    Log.d("descripcion:", descripcion);
+                                                    myCustomProducto=new Producto(Oid,cantidad,boolSurtido, precio,descripcion);
+                                                    listItems.add(myCustomProducto);
+
+                                                }while(cursor.moveToNext());
+                                            }
+                                            adapter = new ProductoAdapter(listItems, getActivity(),  getFragmentManager());
+
+                                            recyclerViewProductos.setAdapter(adapter);
+
+
                                         } else {
                                             Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
                                         }
@@ -354,9 +389,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                            // String sql = "SELECT * FROM productos WHERE Oid = " + String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()) + " ORDER BY id DESC";
 
 
-                            String sql = "SELECT * FROM productos WHERE activo='uno' AND Oid = '"+String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido())+"' ORDER BY id DESC";
-
-
+                            String sql = "SELECT distinct * FROM productos WHERE activo='uno' AND OidPedido = '"+String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido())+"' ORDER BY id DESC";
 
 
                             SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
@@ -364,8 +397,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
 
                             Toast.makeText(getActivity(), "total de precios: "  + recordCount, Toast.LENGTH_SHORT).show();
-
-
 
                             Cursor cursor = dbConn.rawQuery(sql, null);
 //                            ArrayList<Producto> itemData = new ArrayList<Producto>();
@@ -381,11 +412,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                             {
                                 do{
                                     int id = cursor.getInt(cursor.getColumnIndex("id"));
-                                    String Oid = String.valueOf(cursor.getInt(cursor.getColumnIndex("Oid")));
-
-                                    double nombre = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
-                                    Log.d("GEO", String.valueOf(nombre));
-                                    myCustomProducto=new Producto(Oid,1,true, nombre,"");
+                                    String Oid = cursor.getString(cursor.getColumnIndex("OidProducto"));
+                                    int cantidad = cursor.getInt(cursor.getColumnIndex("cantidad"));
+                                    String surtido =  String.valueOf((cursor.getColumnIndex("surtido")));
+                                    boolean boolSurtido = Boolean.parseBoolean(surtido);
+                                    double precio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
+                                    String descripcion = cursor.getString(cursor.getColumnIndex("descripcion"));
+                                    Log.d("descripcion:", descripcion);
+                                    myCustomProducto=new Producto(Oid,cantidad,boolSurtido, precio,descripcion);
                                     listItems.add(myCustomProducto);
 
                                 }while(cursor.moveToNext());
@@ -629,7 +663,19 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.getCatalagoProductos(strtoken);
+        Call call;
+
+        if (strtoken == null){
+            call = service.getCatalagoProductos(strGettoken);
+
+        }else{
+            call = service.getCatalagoProductos(strtoken);
+
+
+        }
+
+
+
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
