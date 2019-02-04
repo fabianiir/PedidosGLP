@@ -3,11 +3,9 @@ package jac.infosyst.proyectogas.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,8 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import jac.infosyst.proyectogas.Configuracion;
-import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
 
 
@@ -30,17 +26,14 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Pedido;
-import jac.infosyst.proyectogas.modelo.Spinners;
+import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
-import jac.infosyst.proyectogas.modelo.Pedidos;
 
 import jac.infosyst.proyectogas.utils.Sessions;
 //import jac.infosyst.proyectogas.vista.Escaner;
@@ -52,13 +45,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.Cursor;
 import android.util.Log;
 
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 
 
 public class PedidosFragment extends Fragment implements LocationListener {
@@ -86,11 +76,16 @@ public class PedidosFragment extends Fragment implements LocationListener {
     String strIP = "";
     String strchofer = "";
     String strtoken = "";
+    String strcamion= Chofer.getCamion();
+    String strimei=Chofer.getImei();
+
     LocationManager locationManager;
     String strLatitude = "";
     String strLongitude = "";
     int tiempoSeguimiento = 10000;
     Location location;
+
+
 
     private List<String> hobbies = new ArrayList<String>();
 
@@ -346,7 +341,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.bitacora(true, "abc123d4", strchofer, "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", null);
+        Call call = service.bitacora(true, strimei, strchofer,  strcamion, null);
 
         if (strtoken == null){
             call.enqueue(new Callback() {
