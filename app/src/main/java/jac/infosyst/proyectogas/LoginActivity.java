@@ -18,13 +18,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Login;
-import jac.infosyst.proyectogas.modelo.Pedidos;
 import jac.infosyst.proyectogas.modelo.Usuario;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.ApiUtils;
-import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 
 
@@ -37,7 +34,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import android.app.ProgressDialog;
 
-import com.google.android.gms.common.api.Api;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -47,7 +43,7 @@ import android.content.ContentValues;
 import java.util.List;
 
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 
 
@@ -513,11 +509,11 @@ public class LoginActivity extends AppCompatActivity{
         }
 
 
-        String myIMEI = "";
+        Chofer myIMEI = new Chofer();
 
         TelephonyManager mTelephony = (TelephonyManager) getApplication().getSystemService(Context.TELEPHONY_SERVICE);
         if (mTelephony.getDeviceId() != null){
-            myIMEI = mTelephony.getDeviceId();
+            myIMEI.setImei(mTelephony.getDeviceId());
 
            // insertaImeiSqLite(myIMEI);
         }

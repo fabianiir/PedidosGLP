@@ -21,6 +21,7 @@ import java.util.List;
 
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.modelo.Chofer;
 
 public class NFC extends AppCompatActivity {
     private NfcAdapter nfcAdapter;
@@ -118,8 +119,11 @@ public class NFC extends AppCompatActivity {
         for (int i = 0; i < size; i++) {
             ParsedNdefRecord record = records.get(i);
             String str = record.str();
-            builder.append(str).append("\n");
+            builder.append(str);
         }
+
+        Chofer codigoNFC =new Chofer();
+        codigoNFC.setCamion(builder.toString());
 
         text.setText(builder.toString());
 

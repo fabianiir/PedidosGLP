@@ -20,6 +20,7 @@ import java.util.TimerTask;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.LectorNFC.NFC;
+import jac.infosyst.proyectogas.modelo.Chofer;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class Escaner extends AppCompatActivity implements ZXingScannerView.ResultHandler {
@@ -73,6 +74,8 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
         AlertDialog.Builder builder= new AlertDialog.Builder(this);
         builder.setTitle("Resultado del Scan");
         builder.setMessage(result.getText());
+         Chofer codigoQR = new Chofer();
+        codigoQR.setCamion(result.getText());
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
