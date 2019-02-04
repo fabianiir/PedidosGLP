@@ -12,6 +12,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -39,10 +42,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.CatalagoProductosAdapter;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
@@ -65,8 +71,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.support.design.widget.FloatingActionButton;
 
+import java.util.Calendar;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 
-public class SurtirPedidoFragment  extends Fragment {
+
+public class SurtirPedidoFragment  extends Fragment implements LocationListener {
     private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle
             , textViewFirma, textViewTotal;
 
@@ -121,6 +132,18 @@ public class SurtirPedidoFragment  extends Fragment {
     Producto myCustomProducto;
     CatalagoProducto myCatalagoProducto;
 
+    String strHora = "";
+    String strFecha = "";
+
+
+    static SimpleDateFormat simpleDateFormatFecha = new SimpleDateFormat("dd-MM-yyyy");
+    static SimpleDateFormat simpleDateFormatHora = new SimpleDateFormat("HH:mm:ss");
+    LocationManager locationManager;
+    String strLatitude = "";
+    String strLongitude = "";
+    Location location;
+    FloatingActionButton fabAgregarProducto;
+
 
     public SurtirPedidoFragment() {
 
@@ -144,6 +167,7 @@ public class SurtirPedidoFragment  extends Fragment {
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
 
         userService = ApiUtils.getUserService();
+        dialog = new ProgressDialog(getActivity());
 
 
         strIdPedido = ((Sessions)getActivity().getApplication()).getSesIdPedido();
@@ -502,7 +526,7 @@ public class SurtirPedidoFragment  extends Fragment {
         }
 
 
-        FloatingActionButton fabAgregarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabAgregarProducto);
+        fabAgregarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabAgregarProducto);
         fabAgregarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -554,7 +578,8 @@ public class SurtirPedidoFragment  extends Fragment {
         btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // pedidoConfirmado("d9da86d7-0fee-43c9-b969-94779d106231");
+
+                pedidoActualizarSurtido("d9da86d7-0fee-43c9-b969-94779d106231");
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
             }
@@ -670,10 +695,15 @@ public class SurtirPedidoFragment  extends Fragment {
 
 
 
-    public void pedidoConfirmado(String idPedido){
+    public void pedidoActualizarSurtido(String idPedido){
         btnReimpresionTicket.setVisibility(View.VISIBLE);
-        dialog.setMax(100);
-        dialog.setMessage("Acutalizando Pedido....");
+        fabAgregarProducto.setEnabled(false);
+        signaturePad.setEnabled(false);
+        btnLimpiar.setEnabled(false);
+        btnGuardar.setEnabled(false);
+
+        dialog.setMax(10);
+        dialog.setMessage("Actualizando Pedido....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
 
@@ -691,6 +721,10 @@ public class SurtirPedidoFragment  extends Fragment {
 
         }
 
+        getHora();
+        getFecha();
+      //  getUbicacion();
+
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -700,8 +734,11 @@ public class SurtirPedidoFragment  extends Fragment {
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.up_pedido("255abae2-a6ed-43de-8aa3-b637f3490b8a", "22:00", "2019",
-                "1", "f91febf8-a892-49e5-af8a-b104007feff2", "Up_1");
+        Call call = service.up_pedido(String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()), strHora, strFecha,
+                "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
+                19, 21, "b01020c8-4ab1-49b1-9ae1-87b2ec84465d", "null",
+                "1bcd4387-9f14-43cb-84c8-e2fb46ac67f2", "Up_1",
+                "e6fab152-679e-4efb-92d1-e1917a9dac73");
 
         call.enqueue(new Callback() {
 
@@ -712,9 +749,16 @@ public class SurtirPedidoFragment  extends Fragment {
                 if (response.isSuccessful()) {
                     ObjetoRes resObj = (ObjetoRes) response.body();
                     if (resObj.geterror().equals("false")) {
-                        Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                        Toast.makeText(getActivity(), "Hora:"+strHora + "Fecha:"+ strFecha + "Latitude:"+strLatitude + "Longitude"+strLongitude
+                                + resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                     if (resObj.geterror().equals("true")) {
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
                         Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
@@ -818,6 +862,84 @@ public class SurtirPedidoFragment  extends Fragment {
         }
 
         return false;
+    }
+
+    public void getHora(){
+        Calendar calendar = Calendar.getInstance();
+        strHora = String.valueOf(simpleDateFormatHora.format(calendar.getTime()));
+    }
+
+    public void getFecha(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        strFecha = String.valueOf(simpleDateFormatFecha.format(calendar.getTime()));
+    }
+
+
+
+    public void getUbicacion(){
+        getLocation();
+
+    }
+
+
+    public void getLocation(){
+
+        try {
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            if (location != null){
+                callSeguimiento();
+            }else{
+                Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+            }
+
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+        }
+
+
+    }
+
+
+
+
+    public void callSeguimiento(){
+        Toast.makeText(getActivity(), "Latitude: " + strLongitude + " Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
+
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
+        strLatitude = String.valueOf(location.getLatitude());
+        strLongitude = String.valueOf(location.getLongitude());
+
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(getActivity(), "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
     }
 
 

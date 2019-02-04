@@ -147,12 +147,21 @@ public interface ServicioUsuario {
   @FormUrlEncoded
   @POST("up_pedido")
   Call<ObjetoRes> up_pedido(
-          @Field("ID") String ID,
-          @Field("Time") String Time,
-          @Field("Date") String Date,
-          @Field("EstatusID") String EstatusID,
-          @Field("token") String token,
-          @Field("Clave") String Clave
+          @Field("pedido_id") String pedido_id,
+          @Field("hora") String hora,
+          @Field("fecha") String fecha,
+          @Field("comentario_cliente") String comentario_cliente,
+          @Field("comentario_chofer") String comentario_chofer,
+          @Field("latitud") String latitud,
+          @Field("longitud") String longitud,
+          @Field("suma_iva") int suma_iva,
+          @Field("total") int total,
+          @Field("pago_id") String pago_id,
+          @Field("motivo_cancelacion_id") String motivo_cancelacion_id,
+          @Field("estatus_id") String estatus_id,
+          @Field("clave") String clave,
+          @Field("token") String token
+
 
           );
 
