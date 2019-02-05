@@ -7,7 +7,6 @@ public class Productos {
     private ArrayList<Producto> productos;
 
     public Productos() {
-
     }
 
     public ArrayList<Producto> getProductos() {

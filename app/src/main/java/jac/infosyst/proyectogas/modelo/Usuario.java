@@ -1,11 +1,6 @@
 package jac.infosyst.proyectogas.modelo;
 
-
-import java.util.ArrayList;
-
 public class Usuario {
-
-  //  private ArrayList<UsuarioInfo> UsuarioList = new ArrayList<UsuarioInfo>();
 
     private String Oid;
     private String nombre;

@@ -26,6 +26,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.Productos;
 import jac.infosyst.proyectogas.utils.Sessions;
 
 
@@ -40,6 +42,7 @@ import android.os.Environment;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -126,6 +129,7 @@ public class DetallePedidoFragment  extends Fragment{
         String strDetalle = ((Sessions) getActivity().getApplication()).getsesDetalleProducto();
         String strFirma = ((Sessions) getActivity().getApplication()).getsesFirmaURL();
         String strTotal = ((Sessions) getActivity().getApplication()).getsesTotal();
+        Producto[] producto = ((Sessions) getActivity().getApplication()).getSesDetalleProductoSurtir();
 
         textViewObservaciones = (TextView) rootView.findViewById(R.id.textViewObservaciones);
         imageViewIncidencia = (ImageView) rootView.findViewById(R.id.imageViewIncidencia);

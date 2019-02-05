@@ -2,6 +2,11 @@ package jac.infosyst.proyectogas.utils;
 
 import android.app.Application;
 
+import java.util.ArrayList;
+
+import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.Productos;
+
 public class Sessions  extends Application {
 
     public String nameTitle;
@@ -93,13 +98,13 @@ public class Sessions  extends Application {
 
 
 
-    private String sesDetalleProductoSurtir;
+    private Producto[] sesDetalleProductoSurtir;
 
-    public String getSesDetalleProductoSurtir() {
+    public Producto[] getSesDetalleProductoSurtir() {
         return sesDetalleProductoSurtir;
     }
 
-    public void setSesDetalleProductoSurtir(String sesDetalleProductoSurtir) { this.sesDetalleProductoSurtir = sesDetalleProductoSurtir; }
+    public void setSesDetalleProductoSurtir(Producto[] sesDetalleProductoSurtir) { this.sesDetalleProductoSurtir = sesDetalleProductoSurtir; }
 
 
     private int idProducto;

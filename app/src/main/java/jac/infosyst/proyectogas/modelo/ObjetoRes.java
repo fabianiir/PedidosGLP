@@ -73,37 +73,23 @@ public class ObjetoRes {
     }
 
 
+    private Camion[] camion;
 
-    /*
-    private List<Producto> productos;
-    public List<Producto> getResults() {
-        return productos;
+    public Camion[] getcamion() {
+        return camion;
     }
-    */
 
+    private Imagen[] imagen;
 
-
-
- //   private Producto[] productos;
-
-  //  public Producto[] getproductos() {return productos; }
-
-  /*  private Producto[] productos;
-    public Producto[] get2productos(){
-        return productos;
+    public Imagen[] getImagen() {
+        return imagen;
     }
-*/
-
 
     private Spinner[] catalogo;
 
     public Spinner[] getmotivoscancelacion() {
         return catalogo;
     }
-
-
-
-
 
 }
 

@@ -157,7 +157,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 ((Sessions)mCtx.getApplicationContext()).setsetsescp(pedidos.get(position).getcp());
                 ((Sessions)mCtx.getApplicationContext()).setsestelefono(pedidos.get(position).gettelefono());
                 ((Sessions)mCtx.getApplicationContext()).setsescomentarioscliente(pedidos.get(position).getcomentarios_cliente());
-              //  ((Sessions)mCtx.getApplicationContext()).setsessumaiva(pedidos.get(position).getsuma_iva());
+                ((Sessions)mCtx.getApplicationContext()).setSesDetalleProductoSurtir(pedidos.get(position).getHobbies());
                 ((Sessions)mCtx.getApplicationContext()).setsesTotal(pedidos.get(position).gettotal());
 
 

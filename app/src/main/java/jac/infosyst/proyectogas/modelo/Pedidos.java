@@ -31,6 +31,7 @@ public class Pedidos {
     private String comentarios_cliente;
     private String suma_iva;
     private String total;
+    private Productos productos;
 
     public int getOid() {
         return Oid;
@@ -75,12 +76,13 @@ public class Pedidos {
         return fecha_hora_programada;
     }
 
+    public  Productos getProductos() { return  productos; }
+
 
     private Pedido[] pedido;
 
     public Pedido[] getpedido() {
         return pedido;
     }
-
 
 }
