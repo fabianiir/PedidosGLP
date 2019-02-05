@@ -28,10 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import jac.infosyst.proyectogas.modelo.Camion;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Chofer;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.ApiUtils;
@@ -78,8 +76,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
     String strIP = "";
     String strchofer = "";
     String strtoken = "";
-    String strcamion = Chofer.getCamion();
-    String strimei = Chofer.getImei();
+    String strcamion= Chofer.getCamion();
+    String strimei=Chofer.getImei();
 
     LocationManager locationManager;
     String strLatitude = "";
@@ -340,117 +338,52 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.camion(Integer.parseInt(strcamion));
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        call.enqueue(new Callback() {
+        Call call = service.bitacora(true, strimei, strchofer,  strcamion, null);
+
+        if (strtoken == null) call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
+                    ObjetoRes obj_bitacora = (ObjetoRes) response.body();
+                    if (obj_bitacora.geterror().equals("false")) {
 
-                    ObjetoRes obj_camion = (ObjetoRes) response.body();
-                    List<Camion> arrayListCamion = Arrays.asList(obj_camion.getcamion());
+                        if (strtoken == null) {
+                            ((Sessions) getActivity().getApplicationContext()).setsessToken(obj_bitacora.gettoken());
 
-                    UsuarioInfo uss = new UsuarioInfo();
-                    uss.setPlacas(arrayListCamion.get(0).getplacas());
+                            // setSesOidProducto(productos.get(position).getOidProducto());
+                            //  String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
 
-                    call = service.bitacora(true, strimei, strchofer, arrayListCamion.get(0).getId(), null);
+                            call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
+                        } else {
+                            ((Sessions) getActivity().getApplicationContext()).setsessToken(strtoken);
 
-        if (strtoken == null){
-            call.enqueue(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    if(response.isSuccessful()){
-                        ObjetoRes obj_bitacora = (ObjetoRes) response.body();
-                        if(obj_bitacora.geterror().equals("false")) {
-
-                            if (strtoken == null){
-                                ((Sessions)getActivity().getApplicationContext()).setsessToken(obj_bitacora.gettoken());
-
-                                       // setSesOidProducto(productos.get(position).getOidProducto());
-                              //  String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
-
-                                call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
-                            }else {
-                                ((Sessions)getActivity().getApplicationContext()).setsessToken(strtoken);
-
-                                call = userService.getPedidos(strchofer, "Pendiente", strtoken);
-                            }
-                            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-                            call.enqueue(new Callback() {
-                                @Override
-                                public void onResponse(Call call, Response response) {
-                                    if(response.isSuccessful()){
-                                        ObjetoRes resObj = (ObjetoRes) response.body();
-                    if (strtoken == null){
-                        call.enqueue(new Callback() {
-                            @Override
-                            public void onResponse(Call call, Response response) {
-                                if(response.isSuccessful()){
-                                    ObjetoRes obj_bitacora = (ObjetoRes) response.body();
-                                    if(obj_bitacora.geterror().equals("false")) {
-                                        if (strtoken == null){
-                                            call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
-                                        }else {
-                                            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
-                                        }
-                                        //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-                                        call.enqueue(new Callback() {
-                                            @Override
-                                            public void onResponse(Call call, Response response) {
-                                                if(response.isSuccessful()){
-                                                    ObjetoRes resObj = (ObjetoRes) response.body();
-
-                                                    if(resObj.geterror().equals("false")) {
-                                                        //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
-                                                        adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
-                                                        recyclerViewPedidos.setAdapter(adapter);
-                                                    } else {
-                                                        Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
-                                                    }
-                                                } else {
-                                                    Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                            @Override
-                                            public void onFailure(Call call, Throwable t) {
-                                                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                            @Override
-                            public void onFailure(Call call, Throwable t) {
-
-                            }
-                        });
-                    }else {
-                        call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+                            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+                        }
                         //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
                         call.enqueue(new Callback() {
                             @Override
                             public void onResponse(Call call, Response response) {
-                                if(response.isSuccessful()){
+                                if (response.isSuccessful()) {
                                     ObjetoRes resObj = (ObjetoRes) response.body();
 
-                                    if(resObj.geterror().equals("false")) {
-                                        //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+                                    if (resObj.geterror().equals("false")) {
 
+                                        if (resObj.getpedido() != null) {
+                                            Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
+                                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
+                                            recyclerViewPedidos.setAdapter(adapter);
 
-                                        adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
-                                        recyclerViewPedidos.setAdapter(adapter);
-
-
-
-
-
+                                        }else{
+                                            Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                        }
                                     } else {
-                                        Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
                                 }
                             }
                             @Override
@@ -459,15 +392,50 @@ public class PedidosFragment extends Fragment implements LocationListener {
                             }
                         });
                     }
-
                 }
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         });
+        else {
+            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
+            call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    if(resObj.geterror().equals("false")) {
+                        //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+
+                        if(resObj.getpedido() != null) {
+
+                            Toast.makeText(getActivity(), " != null" , Toast.LENGTH_SHORT).show();
+
+                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
+                            recyclerViewPedidos.setAdapter(adapter);
+                        } else{
+                            Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    } else {
+                        Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            });
+        }
     }
 
     public void obtenerDatosUsuario(){

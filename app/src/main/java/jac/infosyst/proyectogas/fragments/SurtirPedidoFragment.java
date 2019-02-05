@@ -604,10 +604,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         Call call;
 
         if (strtoken == null){
-            call = service.getCatalagoProductos(strGettoken);
+            call = service.getCatalagoProductos(((Sessions)getActivity().getApplicationContext()).getsessToken());
 
         }else{
-            call = service.getCatalagoProductos(strtoken);
+            call = service.getCatalagoProductos(((Sessions)getActivity().getApplicationContext()).getsessToken());
 
 
         }
