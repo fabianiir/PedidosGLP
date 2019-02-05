@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import jac.infosyst.proyectogas.ImpresoraBluetooth.Impresora;
 import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.CatalagoProductosAdapter;
@@ -215,6 +216,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 {
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
 
+                    Intent intent = new Intent(getActivity(), Impresora.class);
+
+                    startActivity(intent);
 
 
                 }

@@ -34,11 +34,16 @@
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
 
 
-
-            <Button android:layout_height="50dp" android:layout_weight=".15"
-                android:text="+" android:layout_width="70dp" android:id="@+id/btnAgregarCatalagoProducto"
-                android:layout_marginLeft="170dp"
-                />
+            <Button
+                android:id="@+id/btnAgregarCatalagoProducto"
+                android:layout_width="70dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight=".15"
+                android:text="+" />
 
 
 
