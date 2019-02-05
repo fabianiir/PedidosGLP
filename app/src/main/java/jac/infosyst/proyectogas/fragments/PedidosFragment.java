@@ -350,9 +350,17 @@ public class PedidosFragment extends Fragment implements LocationListener {
                     if(response.isSuccessful()){
                         ObjetoRes obj_bitacora = (ObjetoRes) response.body();
                         if(obj_bitacora.geterror().equals("false")) {
+
                             if (strtoken == null){
+                                ((Sessions)getActivity().getApplicationContext()).setsessToken(obj_bitacora.gettoken());
+
+                                       // setSesOidProducto(productos.get(position).getOidProducto());
+                              //  String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
+
                                 call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
                             }else {
+                                ((Sessions)getActivity().getApplicationContext()).setsessToken(strtoken);
+
                                 call = userService.getPedidos(strchofer, "Pendiente", strtoken);
                             }
                             //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");

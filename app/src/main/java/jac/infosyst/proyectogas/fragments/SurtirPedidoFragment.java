@@ -245,17 +245,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         if (cursor3.moveToFirst()) {
             strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
-            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
+           // strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
-
-
 
         recyclerViewProductos = (RecyclerView) rootView.findViewById(R.id.recyclerViewProductos);
         recyclerViewProductos.setHasFixedSize(true);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-
 
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
@@ -271,8 +266,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         }
 
+
+
+
+        Toast.makeText(getActivity(), "dato:" + ((Sessions)getActivity().getApplicationContext()).getsessToken() , Toast.LENGTH_SHORT).show();
+
+
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
-        final String[] strReturnToken = new String[1];
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -280,8 +280,33 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.bitacora(true, "abc123d4", strchofer, "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", null);
+       Call call = service.getProductos(String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()), ((Sessions)getActivity().getApplicationContext()).getsessToken());
+       call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
 
+                    if(resObj.geterror().equals("false")) {
+                        adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(),  getFragmentManager());
+                        recyclerViewProductos.setAdapter(adapter);
+
+                    } else {
+                        Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+        /*
         if (strtoken == null){
             call.enqueue(new Callback() {
                 @Override
@@ -290,13 +315,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         ObjetoRes obj_bitacora = (ObjetoRes) response.body();
                         if(obj_bitacora.geterror().equals("false")) {
                             if (strtoken == null){
-                                call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
+                                call = userService.getproductos(strchofer, "Pendiente", obj_bitacora.gettoken());
                                // Toast.makeText(getActivity(), "token null:" +  obj_bitacora.gettoken(), Toast.LENGTH_SHORT).show();
                                 strGettoken = obj_bitacora.gettoken();
                             }else {
                                 //Toast.makeText(getActivity(), "token not null!" , Toast.LENGTH_SHORT).show();
 
-                                call = userService.getPedidos(strchofer, "Pendiente", strtoken);
+                                call = userService.getproductos(strchofer, "Pendiente", strtoken);
 
                             }
                             //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
@@ -307,6 +332,15 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                         ObjetoRes resObj = (ObjetoRes) response.body();
 
                                         if(resObj.geterror().equals("false")) {
+
+
+
+                                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
+                                            recyclerViewProductos.setAdapter(adapter);
+
+                                            */
+
+                                            /*
                                             sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
                                             String sql = "SELECT distinct * FROM productos WHERE activo='uno' AND OidPedido = '"+String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido())+"' ORDER BY id DESC";
@@ -338,7 +372,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                             adapter = new ProductoAdapter(listItems, getActivity(),  getFragmentManager());
 
                                             recyclerViewProductos.setAdapter(adapter);
+*/
 
+
+/*
 
                                         } else {
                                             Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
@@ -361,113 +398,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 }
             });
         }else {
-            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
-            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-            call.enqueue(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    if(response.isSuccessful()){
-                        ObjetoRes resObj = (ObjetoRes) response.body();
-                        //ObjetoRes resObj = (ObjetoRes) response.body();
-                       // List<Producto> movies = ((ObjetoRes) response.body()).getResults();
+            */
 
 
-
-                        if(resObj.geterror().equals("false")) {
-
-                            //final Producto prod = productos.get(resObj.getproductos());
-
-                           // Arrays.asList(ped.getproductos());
-
-
-                          // Toast.makeText(getActivity(), "productos!"  + Arrays.asList(resObj.getpedido()), Toast.LENGTH_SHORT).show();
-
-                            //listAdapter = new List<>();
-
-                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
-
-                           // String sql = "SELECT * FROM productos WHERE Oid = " + String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()) + " ORDER BY id DESC";
-
-
-                            String sql = "SELECT distinct * FROM productos WHERE activo='uno' AND OidPedido = '"+String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido())+"' ORDER BY id DESC";
-
-
-                            SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
-                            final int recordCount = dbConn.rawQuery(sql, null).getCount();
-
-
-                            Toast.makeText(getActivity(), "total de precios: "  + recordCount, Toast.LENGTH_SHORT).show();
-
-                            Cursor cursor = dbConn.rawQuery(sql, null);
-//                            ArrayList<Producto> itemData = new ArrayList<Producto>();
-
-                          //  Producto temProducto = new Producto();
-                            ArrayList<Producto> listItems = new ArrayList<Producto>();
-
-
-
-                            boolean hasRecord = cursor.moveToFirst();
-
-                            if(hasRecord)
-                            {
-                                do{
-                                    int id = cursor.getInt(cursor.getColumnIndex("id"));
-                                    String Oid = cursor.getString(cursor.getColumnIndex("OidProducto"));
-                                    int cantidad = cursor.getInt(cursor.getColumnIndex("cantidad"));
-                                    String surtido =  String.valueOf((cursor.getColumnIndex("surtido")));
-                                    boolean boolSurtido = Boolean.parseBoolean(surtido);
-                                    double precio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
-                                    String descripcion = cursor.getString(cursor.getColumnIndex("descripcion"));
-                                    Log.d("descripcion:", descripcion);
-                                    myCustomProducto=new Producto(Oid,cantidad,boolSurtido, precio,descripcion);
-                                    listItems.add(myCustomProducto);
-
-                                }while(cursor.moveToNext());
-                            }
-
-
-
-/*
-                            if (cursor.moveToFirst()) {
-
-                                int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
-                                double strprecio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
-                                Toast.makeText(getActivity(), "productos precio: "  + strprecio, Toast.LENGTH_SHORT).show();
-
-                               // myCustomProducto=new Producto("",1,true, strprecio,"");
-
-                              //  listItems.add(myCustomProducto);
-
-                            }
-
-                            cursor.close();
-*/
-
-
-                          //  listAdapter.toArray(new ProductoAdapter[listAdapter.size()]);
-
-                            //  adapter = new ProductoAdapter(Arrays.<Producto>asList((Producto) listAdapter), getActivity(),  getFragmentManager());
-
-                            adapter = new ProductoAdapter(listItems, getActivity(),  getFragmentManager());
-
-
-                            recyclerViewProductos.setAdapter(adapter);
-
-
-
-                        } else {
-                            Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
-                    }
-                }
-                @Override
-                public void onFailure(Call call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+      //  }
 
 
 

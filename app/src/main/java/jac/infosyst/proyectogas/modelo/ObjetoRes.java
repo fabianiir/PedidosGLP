@@ -66,6 +66,11 @@ public class ObjetoRes {
         return pedido;
     }
 
+    private Producto[] productos;
+
+    public Producto[] getproducto() {
+        return productos;
+    }
 
 
 

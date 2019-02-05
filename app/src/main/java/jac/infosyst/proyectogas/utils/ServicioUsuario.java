@@ -171,6 +171,14 @@ public interface ServicioUsuario {
   Call<ObjetoRes2> getCatalagoProductos(@Field("token") String token);
 
 
+    @FormUrlEncoded
+    @POST("productos")
+    Call<ObjetoRes> getProductos(
+            @Field("pedido_id") String pedido_id,
+            @Field("token") String token
+    );
+
+
 
 
 }

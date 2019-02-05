@@ -239,6 +239,20 @@ public class Sessions  extends Application {
         this.OidProducto = OidProducto;
     }
 
+/*
+    private String sessToken;
+
+    public String getsessToken() {
+        return sessToken;
+    }
+
+    public void setsessToken(String sessToken) {
+        this.sessToken = sessToken;
+    }
+
+*/
+
+
 
 
 }

@@ -120,6 +120,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                 Toast.makeText(mCtx, "Restar producto: " +  String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
 
+                /*
                 sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
 
                 final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -128,6 +129,9 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                 cv.put("activo", "cero");
 
                 db.update("productos", cv, "OidProducto='"+ String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto())+"'", null);
+*/
+
+
 
               //  ((Sessions)mCtx.getApplicationContext()).setSesidProducto(productos.get(position).getIdProducto());
               //  restarProducto(((Sessions)mCtx.getApplicationContext()).getSesidProducto());

@@ -97,9 +97,10 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
             public void onClick(View view) {
 
                 Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getdescripcion(), Toast.LENGTH_SHORT).show();
-                storeSqLiteProductos(catalagoProductos.get(position).getprecio_unitario());
-
+                //storeSqLiteProductos(catalagoProductos.get(position).getprecio_unitario());
                 //holder.parentLayout.setVisibility(view.GONE);
+
+
 
             }
         });

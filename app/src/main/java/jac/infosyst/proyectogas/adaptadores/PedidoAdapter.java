@@ -72,7 +72,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
     @Override
     public void onBindViewHolder(final PedidoAdapter.ViewHolder holder, final int position) {
-        final Pedido pedido = pedidos.get(position);
+            final Pedido pedido = pedidos.get(position);
         holder.textViewCliente.setText(pedido.getcliente());
         holder.textViewDescripcion.setText(pedido.getplacas());
         holder.textViewEstatus.setText(pedido.getcp());
@@ -95,17 +95,18 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
                 //Toast.makeText(mCtx, " george getHobbies: " + pedido.getHobbies(), Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(mCtx, "producto oid: " + hobby.getOidProducto() +
-                        "pedido oid: " + pedido.getOid(), Toast.LENGTH_SHORT).show();
-                storeSqLiteProductos(pedido.getOid(), hobby.getOidProducto(), hobby.getCantidad(), hobby.getsurtido(),
-                        hobby.getPrecio(), hobby.getdescripcion());
+
+
+              //  Toast.makeText(mCtx, "producto oid: " + hobby.getOidProducto() +
+                //        "pedido oid: " + pedido.getOid(), Toast.LENGTH_SHORT).show();
+
+               // storeSqLiteProductos(pedido.getOid(), hobby.getOidProducto(), hobby.getCantidad(), hobby.getsurtido(),
+                    //    hobby.getPrecio(), hobby.getdescripcion());
 
 
 
             }
         }
-
-
 
 
 
@@ -219,8 +220,6 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
             parentLayout = itemView.findViewById(R.id.parent_layout);
             relativeRow = itemView.findViewById(R.id.relativeRow);
-
-
 
 
         }
