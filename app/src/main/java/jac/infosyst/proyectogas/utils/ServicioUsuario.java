@@ -178,6 +178,16 @@ public interface ServicioUsuario {
             @Field("token") String token
     );
 
+  @FormUrlEncoded
+  @POST("detalle")
+  Call<ObjetoRes> sumarProducto(
+          @Field("cantidad") int cantidad,
+          @Field("precio") int precio,
+          @Field("pedido_id") String pedido_id,
+          @Field("producto_id") String producto_id,
+          @Field("token") String token
+  );
+
 
 
 

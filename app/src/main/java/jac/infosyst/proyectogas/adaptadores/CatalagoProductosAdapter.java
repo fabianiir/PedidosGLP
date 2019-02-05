@@ -5,6 +5,7 @@ package jac.infosyst.proyectogas.adaptadores;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -29,6 +30,7 @@ import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
+import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Pedidos;
 import jac.infosyst.proyectogas.modelo.Producto;
@@ -43,6 +45,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -58,7 +61,8 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
     private static SQLiteDBHelper sqLiteDBHelper = null;
     private static String DB_NAME = "proyectogas17.db";
     private static int DB_VERSION = 1;
-
+    private String BASEURL = "";
+    String strIP = "";
 
     public CatalagoProductosAdapter(List<CatalagoProducto> catalagoProductos, Context mCtx, FragmentManager f_manager) {
         this.catalagoProductos = catalagoProductos;
@@ -96,9 +100,11 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getdescripcion(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getIdProducto(), Toast.LENGTH_SHORT).show();
                 //storeSqLiteProductos(catalagoProductos.get(position).getprecio_unitario());
                 //holder.parentLayout.setVisibility(view.GONE);
+               sumarProducto(1, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
+                       catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
 
 
 
@@ -169,6 +175,60 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
 
 
+    public void sumarProducto(int cantidad, int precio, String pedidoId, String productoId, String token){
+
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+
+        SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+
+        final Cursor record = dbConn3.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+
+        }
+
+        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.sumarProducto(cantidad, precio, pedidoId, productoId, ((Sessions)mCtx.getApplicationContext()).getsessToken());
+
+        Toast.makeText(mCtx, "/" + cantidad + "/" + precio +  "/" + pedidoId +  "/" + productoId +  "/" + token  , Toast.LENGTH_SHORT).show();
+
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    if(resObj.geterror().equals("false")) {
+                        Toast.makeText(mCtx, resObj.getMessage() , Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+    }
 
 
     public void restarProducto(int idProducto){
