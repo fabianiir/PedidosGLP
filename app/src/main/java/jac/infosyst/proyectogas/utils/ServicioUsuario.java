@@ -42,6 +42,10 @@ public interface ServicioUsuario {
   @POST("login/")
   Call<ObjetoRes>login(@Field("username") String username, @Field("password") String password);
 
+  @FormUrlEncoded
+  @POST("camionqr/")
+  Call<ObjetoRes>camion(@Field("id") int identificador);
+
 
   @FormUrlEncoded
   @POST("pedido/")
@@ -51,6 +55,13 @@ public interface ServicioUsuario {
           @Field("token") String token
   );
 
+  @FormUrlEncoded
+  @POST("fotos/")
+  Call<ObjetoRes> Foto(
+          @Field("id") String id,
+          @Field("tipo") String tipo,
+          @Field("token") String token
+  );
 
 
 

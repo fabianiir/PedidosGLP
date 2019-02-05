@@ -21,6 +21,7 @@ import android.widget.Toast;
 import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Usuario;
+import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 
@@ -226,7 +227,10 @@ public class LoginActivity extends AppCompatActivity{
                             objSessions.setsessIDuser(arrayListUsuario.get(0).getId());
                             objSessions.setsessIDcamion("idcamion1");
 
+                            UsuarioInfo uss = new UsuarioInfo();
 
+                            uss.setNombre(arrayListUsuario.get(0).getnombre());
+                            uss.setOid(arrayListUsuario.get(0).getId());
                             // objSessions.setsessIDuser(objSessions.getsessIDuser());
 
 
@@ -317,8 +321,6 @@ public class LoginActivity extends AppCompatActivity{
                                 intent.putExtra("username", pusername);
                                 startActivity(intent);
                                 insertBitacora("operador", true, strEmaiBitacora, objSessions.getsessIDuser(), "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", resObj.gettoken());
-
-
                             }
 
 
@@ -347,23 +349,7 @@ public class LoginActivity extends AppCompatActivity{
                     startActivity(intent);
 
                 }
-
-
-
-
             });
-
- /*
-       }//end if valid url
-
-        else{
-            Toast.makeText(LoginActivity.this, "Url de Configuracion Invalida, Intente Nuevamente!", Toast.LENGTH_SHORT).show();
-
-
-        }
-*/
-
-
     }
 
 
@@ -535,8 +521,4 @@ public class LoginActivity extends AppCompatActivity{
         //Toast.makeText(LoginActivity.this, "Login emai:" + emai, Toast.LENGTH_SHORT).show();
 
     }
-
-
-
-
 }

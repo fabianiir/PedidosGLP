@@ -660,19 +660,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
             }
         });
-
-/*
-        Button btnAgregarProductoSi = (Button) layoutCatalagoProductos.findViewById(R.id.btnAgregarProductoSi);
-        btnAgregarProductoSi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity(), "Producto Agregago Exitosamente!", Toast.LENGTH_SHORT).show();
-                POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
-            }
-        });
-        */
-
-
     }
 
 
