@@ -8,14 +8,18 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,10 +51,23 @@ public class Impresora extends AppCompatActivity {
         Button btnConnect = (Button) findViewById(R.id.btnConnect);
         Button btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
         Button btnPrint = (Button) findViewById(R.id.btnPrint);
+        Spinner spinner = (Spinner) findViewById(R.id.pin);
 
         textBox = (EditText) findViewById(R.id.txtText);
 
         lblPrinterName = (TextView) findViewById(R.id.lblPrinterName);
+
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        List<String> s = new ArrayList<String>();
+        for(BluetoothDevice bt : pairedDevices){
+            s.add(bt.getName());}
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, s);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
 
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
