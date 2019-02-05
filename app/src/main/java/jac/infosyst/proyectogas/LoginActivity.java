@@ -313,7 +313,7 @@ public class LoginActivity extends AppCompatActivity{
 
                             if (resObj.getAdmin().equals("false")) {
                                 ((Sessions) getApplication()).setsesUsuarioRol("Operador");
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, Escaner.class);
                                 intent.putExtra("username", pusername);
                                 startActivity(intent);
                                 insertBitacora("operador", true, strEmaiBitacora, objSessions.getsessIDuser(), "b61a84eb-9ae6-48a5-8b4a-a8b2dfaf3db9", resObj.gettoken());
