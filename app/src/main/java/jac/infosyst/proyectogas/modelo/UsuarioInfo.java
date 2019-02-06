@@ -1,15 +1,19 @@
 package jac.infosyst.proyectogas.modelo;
 
+import android.graphics.Bitmap;
+
 public class UsuarioInfo {
 
     private static String oid;
     private static String nombre;
     private static String placas;
+    private static Bitmap foto;
 
     public UsuarioInfo() {
         this.oid = oid;
         this.nombre = nombre;
         this.placas = placas;
+        this.foto = foto;
     }
 
     public static String getOid() {
@@ -21,16 +25,24 @@ public class UsuarioInfo {
     }
 
     public static String getNombre() {
-            return nombre;
-        }
+        return nombre;
+    }
 
     public void setNombre(String nombre) {
         UsuarioInfo.nombre = nombre;
     }
 
-    public static String getPlacas() { return placas; }
+    public static String getPlacas() {
+        return placas;
+    }
 
     public void setPlacas(String placas) {
         UsuarioInfo.placas = placas;
     }
+
+    public static Bitmap getFoto() {
+        return foto;
+    }
+
+    public void  setFoto(Bitmap bitmap) { UsuarioInfo.foto = bitmap; }
 }

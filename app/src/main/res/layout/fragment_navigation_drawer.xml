@@ -21,11 +21,11 @@
             android:id="@+id/profile_image"
             android:layout_width="276dp"
             android:layout_height="96dp"
-            android:src="@drawable/pedro"
             app:civ_border_color="@color/colorAccent"
             app:civ_border_width="3dp" />
 
         <TextView
+            android:id="@+id/Nom_Operador"
             android:layout_width="216dp"
             android:layout_height="28dp"
             android:layout_below="@+id/profile_image"
@@ -41,7 +41,6 @@
             android:layout_marginRight="59dp"
             android:layout_marginBottom="21dp"
             android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:text="Pedro Flores"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/colorBlanco"
             android:textSize="18sp"
