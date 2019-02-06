@@ -249,7 +249,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         if (cursor3.moveToFirst()) {
             strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
-           // strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
+            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
 
         recyclerViewProductos = (RecyclerView) rootView.findViewById(R.id.recyclerViewProductos);
@@ -284,7 +284,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-       Call call = service.getProductos(String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()), ((Sessions)getActivity().getApplicationContext()).getsessToken());
+       Call call = service.getProductos(String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()), strtoken);
        call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -605,11 +605,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         if (strtoken == null){
             call = service.getCatalagoProductos(((Sessions)getActivity().getApplicationContext()).getsessToken());
-
         }else{
-            call = service.getCatalagoProductos(((Sessions)getActivity().getApplicationContext()).getsessToken());
-
-
+            call = service.getCatalagoProductos(strtoken);
         }
 
 
@@ -709,7 +706,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
                 19, 21, "b01020c8-4ab1-49b1-9ae1-87b2ec84465d", "null",
                 "1bcd4387-9f14-43cb-84c8-e2fb46ac67f2", "Up_1",
-                "e6fab152-679e-4efb-92d1-e1917a9dac73");
+                strtoken);
 
         call.enqueue(new Callback() {
 

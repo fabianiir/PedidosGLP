@@ -7,17 +7,27 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.List;
+
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.modelo.Imagen;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Usuario;
 import jac.infosyst.proyectogas.modelo.UsuarioInfo;
@@ -33,9 +43,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OperadorFragment  extends Fragment {
     private TextView textViewInterno;
+    private ImageView imageViewPerfil;
     private String BASEURL = "";
     Sessions objSessions;
+    Bitmap decodedByte;
     String strIP = "";
+    String strtoken = "";
+    String archivo = "";
+
     private static SQLiteDBHelper sqLiteDBHelper = null;
     private static String DB_NAME = "proyectogas11.db";
     private static int DB_VERSION = 1;
@@ -55,20 +70,8 @@ public class OperadorFragment  extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_operador, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_operador, container, false);
 
-        textViewInterno = (TextView) rootView.findViewById(R.id.Nom_Operador);
-        textViewInterno.setText(UsuarioInfo.getNombre());
-
-        textViewInterno = (TextView) rootView.findViewById(R.id.Nom_Unidad);
-        textViewInterno.setText(UsuarioInfo.getPlacas());
-        ObtenerIMEI(rootView);
-
-        return rootView;
-    }
-
-    public  String FotoPerfil()
-    {
         Sessions strSess = new Sessions();
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -84,7 +87,25 @@ public class OperadorFragment  extends Fragment {
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
+        }
 
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+
+        final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
+
+
+        String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
+
+
+        final int recordCount3 = db.rawQuery(sql3, null).getCount();
+        //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
+
+        SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
+
+        Cursor cursor3 = dbConn3.rawQuery(sql3, null);
+
+        if (cursor3.moveToFirst()) {
+            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
 
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
@@ -94,15 +115,28 @@ public class OperadorFragment  extends Fragment {
                 .build();
         final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.camion(Integer.parseInt(UsuarioInfo.getOid()));
-
+        //Call call = service.Foto(UsuarioInfo.getOid(),"2", strtoken);
+        Call call = service.Foto(UsuarioInfo.getOid(),"2", "2bd65cb6-fea1-4c74-9add-f6ff31f50ca5");
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
                 if (response.isSuccessful()) {
                     ObjetoRes resObj = (ObjetoRes) response.body();
                     if (resObj.geterror().equals("false")) {
+                        List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
 
+                        archivo = arrayListImagen.get(0).getArchivo();
+                        decodedByte  = decodeBase64(archivo);
+
+                        textViewInterno = (TextView) rootView.findViewById(R.id.Nom_Operador);
+                        textViewInterno.setText(UsuarioInfo.getNombre());
+
+                        textViewInterno = (TextView) rootView.findViewById(R.id.Nom_Unidad);
+                        textViewInterno.setText(UsuarioInfo.getPlacas());
+
+                        imageViewPerfil = (ImageView) rootView.findViewById(R.id.profile_image) ;
+                        imageViewPerfil.setImageBitmap(decodedByte);
+                        ObtenerIMEI(rootView);
                     }
                 }
             }
@@ -111,7 +145,8 @@ public class OperadorFragment  extends Fragment {
 
             }
         });
-        return "Hola";
+
+        return rootView;
     }
 
     public View ObtenerIMEI(View rootView)
@@ -154,5 +189,25 @@ public class OperadorFragment  extends Fragment {
 
     }
 
+    public static Bitmap decodeBase64(String input)
+    {
+        byte[] decodedBytes = Base64.decode(input.getBytes(), Base64.DEFAULT);
+        BitmapFactory.Options options;
 
+        try {
+            options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length, options);
+            return bitmap;
+        } catch (OutOfMemoryError e) {
+            try {
+                options = new BitmapFactory.Options();
+                options.inSampleSize = 2;
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length, options);
+                return bitmap;
+            } catch(Exception excepetion) {
+                return null;
+            }
+        }
+    }
 }

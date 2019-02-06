@@ -2,6 +2,7 @@ package jac.infosyst.proyectogas.fragments;
 
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -343,97 +344,95 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         Call call = service.bitacora(true, strimei, strchofer,  strcamion, null);
 
-        if (strtoken == null) call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) {
-                    ObjetoRes obj_bitacora = (ObjetoRes) response.body();
-                    if (obj_bitacora.geterror().equals("false")) {
+        if (strtoken == null) {
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if (response.isSuccessful()) {
+                        ObjetoRes obj_bitacora = (ObjetoRes) response.body();
+                        if (obj_bitacora.geterror().equals("false")) {
 
-                        if (strtoken == null) {
-                            ((Sessions) getActivity().getApplicationContext()).setsessToken(obj_bitacora.gettoken());
+                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+                            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-                            // setSesOidProducto(productos.get(position).getOidProducto());
-                            //  String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
+                            ContentValues values1 = new ContentValues();
+
+                            values1.put("Oid", strchofer);
+                            values1.put("token", obj_bitacora.gettoken());
+
+                            db.insert("usuario", null, values1);
 
                             call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
-                        } else {
-                            ((Sessions) getActivity().getApplicationContext()).setsessToken(strtoken);
 
-                            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
-                        }
-                        //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-                        call.enqueue(new Callback() {
-                            @Override
-                            public void onResponse(Call call, Response response) {
-                                if (response.isSuccessful()) {
-                                    ObjetoRes resObj = (ObjetoRes) response.body();
+                            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
+                            call.enqueue(new Callback() {
+                                @Override
+                                public void onResponse(Call call, Response response) {
+                                    if (response.isSuccessful()) {
+                                        ObjetoRes resObj = (ObjetoRes) response.body();
 
-                                    if (resObj.geterror().equals("false")) {
+                                        if (resObj.geterror().equals("false")) {
 
-                                        if (resObj.getpedido() != null) {
-                                            Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
-                                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
-                                            recyclerViewPedidos.setAdapter(adapter);
+                                            if (resObj.getpedido() != null) {
+                                                Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
+                                                adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
+                                                recyclerViewPedidos.setAdapter(adapter);
 
-                                        }else{
-                                            Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
                                         }
                                     } else {
-                                        Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
                                 }
-                            }
-                            @Override
-                            public void onFailure(Call call, Throwable t) {
-                                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+
+                                @Override
+                                public void onFailure(Call call, Throwable t) {
+                                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call call, Throwable t) {
+                @Override
+                public void onFailure(Call call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
         else {
             call = userService.getPedidos(strchofer, "Pendiente", strtoken);
-            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
             call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()){
-                    ObjetoRes resObj = (ObjetoRes) response.body();
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if (response.isSuccessful()) {
+                        ObjetoRes resObj = (ObjetoRes) response.body();
 
-                    if(resObj.geterror().equals("false")) {
-                        //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
+                        if (resObj.geterror().equals("false")) {
 
-                        if(resObj.getpedido() != null) {
+                            if (resObj.getpedido() != null) {
+                                Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
+                                adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
+                                recyclerViewPedidos.setAdapter(adapter);
 
-                            Toast.makeText(getActivity(), " != null" , Toast.LENGTH_SHORT).show();
-
-                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
-                            recyclerViewPedidos.setAdapter(adapter);
-                        } else{
-                            Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
-
+                            } else {
+                                Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
                         }
-
                     } else {
-                        Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
                 }
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }
@@ -621,5 +620,3 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
 
 }
-
-
