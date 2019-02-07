@@ -145,7 +145,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     String strHora = "";
     String strFecha = "";
-
+    String pedidoID = "";
 
     static SimpleDateFormat simpleDateFormatFecha = new SimpleDateFormat("dd-MM-yyyy");
     static SimpleDateFormat simpleDateFormatHora = new SimpleDateFormat("HH:mm:ss");
@@ -285,8 +285,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onClick(View v) {
                 mostrarConfirmacion("Confirmar?");
 
-
-
             }
         });
         btnReimpresionTicket = (Button)rootView.findViewById(R.id.btnReimpresionTicket);
@@ -324,51 +322,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         recyclerViewProductos = (RecyclerView) rootView.findViewById(R.id.recyclerViewProductos);
         recyclerViewProductos.setHasFixedSize(true);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-
-
-/*
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
-
-        String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
-
-        SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
-
-        Cursor cursor3 = dbConn3.rawQuery(sql3, null);
-
-        if (cursor3.moveToFirst()) {
-            strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
-            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
-        }
-
-        recyclerViewProductos = (RecyclerView) rootView.findViewById(R.id.recyclerViewProductos);
-        recyclerViewProductos.setHasFixedSize(true);
-        recyclerViewProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
-
-        final int recordCount = dbConn3.rawQuery(sql, null).getCount();
-        //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
-
-
-        final Cursor record = dbConn3.rawQuery(sql, null);
-
-        if (record.moveToFirst()) {
-            strIP = record.getString(record.getColumnIndex("ip"));
-
-        }
-        */
-
-
-
-
-      /*  recyclerViewPedidosHide = (RecyclerView) rootView.findViewById(R.id.recyclerViewPedidosHide);
-        recyclerViewPedidosHide.setHasFixedSize(true);
-        recyclerViewPedidosHide.setLayoutManager(new LinearLayoutManager(getActivity()));
-*/
-
 
         Toast.makeText(getActivity(), "dato:" + ((Sessions)getActivity().getApplicationContext()).getsessToken() , Toast.LENGTH_SHORT).show();
 
@@ -409,9 +362,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         btnLimpiar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 signaturePad.clear();
-                putImageFirma();
             }
         });
 
@@ -476,25 +427,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-/*george
-*  |  diferentes de pendiente
-*  |  deshabilitar todo y
-*    mandar llamar servicio del a imagen ,
-*    para poner la imagen de la firma en pad signature
-*
-*  ?  restar producto * no resta
-*    precio total actualizar
-*  |   validacion getProducto = null , total  = 0
-*  |  si es fugam no se muestra los productos, se muestra la camara
-*  |  para tomar foto de inceidencia
-*  |  foto arriba de lista de productos
-*
-* */
-
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-       Call call = service.getProductos("3be9b77a-cd03-42b7-9bf0-6beb05d1d363",
-               "f87b5f10-12d2-428d-8bf1-606150f73185");
+        pedidoID = ((Sessions) getActivity().getApplicationContext()).getSesIdPedido();
+
+       Call call = service.getProductos( pedidoID,
+               strtoken);
 
        call.enqueue(new Callback() {
             @Override
@@ -513,11 +451,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                 signaturePad.setEnabled(false);
                                 btnGuardar.setEnabled(false);
                                 btnLimpiar.setEnabled(false);
-
+                                getImageFirma();
                             }
 
                         textViewTotal.setText("" + ((Sessions)getActivity().getApplicationContext()).getSesarrayPriceTotal());
-
 
                             if(resObj.getproducto() != null){
                                 adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager());
@@ -544,138 +481,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
 
-
-
-        /*
-        if (strtoken == null){
-            call.enqueue(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    if(response.isSuccessful()){
-                        ObjetoRes obj_bitacora = (ObjetoRes) response.body();
-                        if(obj_bitacora.geterror().equals("false")) {
-                            if (strtoken == null){
-                                call = userService.getproductos(strchofer, "Pendiente", obj_bitacora.gettoken());
-                               // Toast.makeText(getActivity(), "token null:" +  obj_bitacora.gettoken(), Toast.LENGTH_SHORT).show();
-                                strGettoken = obj_bitacora.gettoken();
-                            }else {
-                                //Toast.makeText(getActivity(), "token not null!" , Toast.LENGTH_SHORT).show();
-
-                                call = userService.getproductos(strchofer, "Pendiente", strtoken);
-
-                            }
-                            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-                            call.enqueue(new Callback() {
-                                @Override
-                                public void onResponse(Call call, Response response) {
-                                    if(response.isSuccessful()){
-                                        ObjetoRes resObj = (ObjetoRes) response.body();
-
-                                        if(resObj.geterror().equals("false")) {
-
-
-
-                                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(),  getFragmentManager());
-                                            recyclerViewProductos.setAdapter(adapter);
-
-                                            */
-
-                                            /*
-                                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
-
-                                            String sql = "SELECT distinct * FROM productos WHERE activo='uno' AND OidPedido = '"+String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido())+"' ORDER BY id DESC";
-
-                                            SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
-                                            final int recordCount = dbConn.rawQuery(sql, null).getCount();
-
-                                            Cursor cursor = dbConn.rawQuery(sql, null);
-                                            ArrayList<Producto> listItems = new ArrayList<Producto>();
-
-                                            boolean hasRecord = cursor.moveToFirst();
-
-                                            if(hasRecord)
-                                            {
-                                                do{
-                                                    int id = cursor.getInt(cursor.getColumnIndex("id"));
-                                                    String Oid = cursor.getString(cursor.getColumnIndex("OidProducto"));
-                                                    int cantidad = cursor.getInt(cursor.getColumnIndex("cantidad"));
-                                                    String surtido =  String.valueOf((cursor.getColumnIndex("surtido")));
-                                                    boolean boolSurtido = Boolean.parseBoolean(surtido);
-                                                    double precio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
-                                                    String descripcion = cursor.getString(cursor.getColumnIndex("descripcion"));
-                                                    Log.d("descripcion:", descripcion);
-                                                    myCustomProducto=new Producto(Oid,cantidad,boolSurtido, precio,descripcion);
-                                                    listItems.add(myCustomProducto);
-
-                                                }while(cursor.moveToNext());
-                                            }
-                                            adapter = new ProductoAdapter(listItems, getActivity(),  getFragmentManager());
-
-                                            recyclerViewProductos.setAdapter(adapter);
-*/
-
-
-/*
-
-                                        } else {
-                                            Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
-                                        }
-                                    } else {
-                                        Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                                @Override
-                                public void onFailure(Call call, Throwable t) {
-                                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }
-                @Override
-                public void onFailure(Call call, Throwable t) {
-
-                }
-            });
-        }else {
-            */
-
-
-      //  }
-
-
-
         final String strDescripcion2 = ((Sessions) getActivity().getApplication()).getsesDescripcion();
         final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
 
-
-
-
-
-
-  //      btnFirmar = (Button) rootView.findViewById(R.id.btnFirmar);
-
-
-
-/*
-        try {
-            File f=new File(directory , "firma.jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            imgFirma=(ImageView)rootView.findViewById(R.id.imgFirma);
-            imgFirma.setImageBitmap(b);
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-*/
-
         imgFirma=(ImageView)rootView.findViewById(R.id.imgFirma);
-
-       getImageFirma();
-
-
-
 
         // Inflate the layout for this fragment
         return rootView;
@@ -717,7 +526,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                putImageFirma();
                 pedidoActualizarSurtido("d9da86d7-0fee-43c9-b969-94779d106231");
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
@@ -751,14 +560,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         recyclerViewCatalagoProductos.setHasFixedSize(true);
         recyclerViewCatalagoProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-/*
-        ArrayList<CatalagoProducto> listItemsCatalagoProducto = new ArrayList<CatalagoProducto>();
-        myCatalagoProducto=new CatalagoProducto("f6674b0d-6265-443d-abfd-5c1b292942b7","Tanque de 40 K",650.0,"Tanque");
-        listItemsCatalagoProducto.add(myCatalagoProducto);
-        adapterCatalago = new CatalagoProductosAdapter(listItemsCatalagoProducto, getActivity(),  getFragmentManager());
-*/
-
-
         /*section - getCatalagoProductos*/
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
@@ -776,8 +577,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             call = service.getCatalagoProductos(strtoken);
         }
 
-
-
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -786,16 +585,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
                     if(resObj2.geterror().equals("false")) {
 
-                       /*
-                        ArrayList<CatalagoProducto> listItemsCatalagoProducto = new ArrayList<CatalagoProducto>();
-
-                        myCatalagoProducto=new CatalagoProducto("f6674b0d-6265-443d-abfd-5c1b292942b7","GEORGE de 40 K",650.0,"Tanque");
-
-
-                        listItemsCatalagoProducto.add(myCatalagoProducto);
-                        listItemsCatalagoProducto.add((CatalagoProducto) Arrays.asList(resObj2.getcatalogoProductos()));
-                        adapterCatalago = new CatalagoProductosAdapter(listItemsCatalagoProducto, getActivity(),  getFragmentManager());
-*/
                         adapterCatalago = new CatalagoProductosAdapter(Arrays.asList(resObj2.getcatalogoProductos()), getActivity(),  getFragmentManager());
                         recyclerViewCatalagoProductos.setAdapter(adapterCatalago);
 
@@ -914,129 +703,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
 
         });
-
-
-
-
-    }
-
-    public void checkPedidoPendiente(){
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
-        final String[] strReturnToken = new String[1];
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call call = service.bitacora(true, strimei, strchofer,  strcamion, null);
-
-        if (strtoken == null) call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) {
-                    ObjetoRes obj_bitacora = (ObjetoRes) response.body();
-                    if (obj_bitacora.geterror().equals("false")) {
-
-                        if (strtoken == null) {
-                            ((Sessions) getActivity().getApplicationContext()).setsessToken(obj_bitacora.gettoken());
-
-                            // setSesOidProducto(productos.get(position).getOidProducto());
-                            //  String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
-
-                            call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
-                        } else {
-                            ((Sessions) getActivity().getApplicationContext()).setsessToken(strtoken);
-
-                            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
-                        }
-                        //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-                        call.enqueue(new Callback() {
-                            @Override
-                            public void onResponse(Call call, Response response) {
-                                if (response.isSuccessful()) {
-                                    ObjetoRes resObj = (ObjetoRes) response.body();
-
-                                    if (resObj.geterror().equals("false")) {
-
-                                        if (resObj.getpedido() != null) {
-                                            Toast.makeText(getActivity(), "ADMIN:" + Arrays.asList(resObj.getpedido()), Toast.LENGTH_SHORT).show();
-                                            ArrayList<Pedido> listItemsPedido = new ArrayList<Pedido>();
-
-                                           // listItemsPedido.add((Pedido) Arrays.asList(resObj.getpedido()));
-
-                                            //Log.d("LADY" , listItemsPedido.get(0).getOid());
-
-                                          //  List<Pedido> rs = (List<Pedido>) response.body();
-                                            //Log.d("TT", rs.toString());
-
-
-
-
-                                        }else{
-                                            Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    } else {
-                                        Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                            @Override
-                            public void onFailure(Call call, Throwable t) {
-                                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call call, Throwable t) {
-
-            }
-        });
-        else {
-            call = userService.getPedidos(strchofer, "Pendiente", strtoken);
-            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-            call.enqueue(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    if(response.isSuccessful()){
-                        ObjetoRes resObj = (ObjetoRes) response.body();
-
-                        if(resObj.geterror().equals("false")) {
-                            //  Toast.makeText(getActivity(), "mensaje! " + resObj.getpedido(), Toast.LENGTH_SHORT).show();
-
-                            if(resObj.getpedido() != null) {
-
-                                Toast.makeText(getActivity(), "info:" + Arrays.asList(resObj.getpedido()) , Toast.LENGTH_SHORT).show();
-
-
-                            } else{
-                                Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
-
-                            }
-
-                        } else {
-                            Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "info: error! " , Toast.LENGTH_SHORT).show();
-                    }
-                }
-                @Override
-                public void onFailure(Call call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-
-
-
     }
 
     @Override
@@ -1147,7 +813,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 .build();
         final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.Foto("bd88c0a6-91ce-4f81-95eb-b8ec8ebdfcfb", 3, "f87b5f10-12d2-428d-8bf1-606150f73185");
+        Call call = service.Foto(pedidoID, 3, strtoken);
 
         call.enqueue(new Callback() {
             @Override
@@ -1162,7 +828,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
                         signaturePad.setVisibility(View.GONE);
 
-                        decodedByte = decodeBase64(archivo.substring(22));
+                        decodedByte = decodeBase64(archivo);
                         UsuarioInfo uss = new UsuarioInfo();
                         uss.setFotoFirma(decodedByte);
                         imgFirma.setImageBitmap(UsuarioInfo.getFotoFirma());
@@ -1206,20 +872,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void putImageFirma(){
-
-
-
         //encode image to base64 string
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Bitmap bitmap = signaturePad.getTransparentSignatureBitmap();
+        Bitmap bitmap = signaturePad.getSignatureBitmap();
 
 
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
         String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-
-        Toast.makeText(getActivity(), "data:image/png;base64," + imageString, Toast.LENGTH_SHORT).show();
-
 
         BASEURL = "http://" + strIP + ":8060/glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
@@ -1228,40 +888,26 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 .build();
         final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.in_foto("bd88c0a6-91ce-4f81-95eb-b8ec8ebdfcfb", "data:image/png;base64,"+imageString, 3, "f87b5f10-12d2-428d-8bf1-606150f73185");
+        Call call = service.in_foto(pedidoID, imageString, 3, strtoken);
 
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
                 if (response.isSuccessful()) {
                     ObjetoRes resObj = (ObjetoRes) response.body();
-
                     if (resObj.geterror().equals("false")) {
-
                         Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
-
-
                     }else {
                         Toast.makeText(getActivity(), "No fue posible guardar la firma!", Toast.LENGTH_SHORT).show();
-
-
                     }
-
-
                 }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-
             }
         });
 
-
-
-
     }
-
-
 
     public void getUbicacion(){
         getLocation();

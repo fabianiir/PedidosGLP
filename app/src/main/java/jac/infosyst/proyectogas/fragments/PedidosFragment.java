@@ -304,7 +304,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             tipoPedidos = 1;
 
             Toast.makeText(getActivity(), "Actualizando pedidos realizados..." , Toast.LENGTH_SHORT).show();
-
         }
 
         if (tipoPedidos == 0){
@@ -331,45 +330,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
         Call call;
 
         if (strtoken == null) {
-            call = userService.getPedidos(strchofer, "Pendiente", "100ca218-fc0c-484d-8866-e9b838ae55f0");
-            Toast.makeText(getActivity(), strchofer + "/" +"100ca218-fc0c-484d-8866-e9b838ae55f", Toast.LENGTH_SHORT).show();
 
-            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
-            call.enqueue(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    if (response.isSuccessful()) {
-                        ObjetoRes resObj = (ObjetoRes) response.body();
-
-                        if (resObj.geterror().equals("false")) {
-
-                            if (resObj.getpedido() != null) {
-                                //Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
-                                adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
-                                recyclerViewPedidos.setAdapter(adapter);
-
-                            } else {
-                                Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "sam error! ", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-        /*
-
-        if (strtoken == null) {
-
-            call = service.camion(Integer.parseInt("14"));
+            call = service.camion(Integer.parseInt(strcamion));
             call.enqueue(new Callback() {
                 @Override
                 public void onResponse(Call call, Response response) {
@@ -466,8 +428,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }
             });
         }
-        */
-
         else {
 
             call = userService.getPedidos(strchofer, "Pendiente", strtoken);
@@ -488,7 +448,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(getActivity(), " no datos!" + strchofer +"/"+ strtoken, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), " no hay datos!" + strchofer +"/"+ strtoken, Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();

@@ -212,7 +212,6 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
         }
 
-
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -223,8 +222,6 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
         Call call = service.up_detalle(idProducto, cantidad, surtido,  precio, token);
 
-
-
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -233,34 +230,18 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                     if(resObj.geterror().equals("false")) {
                         Toast.makeText(mCtx, resObj.getMessage() , Toast.LENGTH_SHORT).show();
-                        /*if(mCtx instanceof SurtirPedidoFragment){
-                            ((SurtirPedidoFragment)mCtx).getFecha();
-
-
-                        }*/
-
-
-
-
-
                     } else {
                         Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();
                 }
-
-
             }
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
         });
-
-
     }
-
 }
 
