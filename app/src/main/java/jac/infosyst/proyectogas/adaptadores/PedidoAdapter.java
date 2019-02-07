@@ -81,11 +81,12 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         holder.textViewdetalleproducto.setText(pedido.getnombre());
         holder.textViewfirmaurl.setText(pedido.gettelefono());
 
-       // Toast.makeText(mCtx, "pedido oid: " + pedido.getOid(), Toast.LENGTH_SHORT).show();
+
 
         /*validar todas las llamadas si son nulas*/
 
-        if (pedido.getHobbies() != null) {
+
+            if (pedido.getHobbies() != null) {
 
             for (Producto hobby : pedido.getHobbies()) {
 
@@ -103,9 +104,16 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                // storeSqLiteProductos(pedido.getOid(), hobby.getOidProducto(), hobby.getCantidad(), hobby.getsurtido(),
                     //    hobby.getPrecio(), hobby.getdescripcion());
 
-
+                Log.d("pedido: ", pedido.getOid());
 
             }
+        }else{
+            ((Sessions)mCtx.getApplicationContext()).setsesTotal("0");
+
+                Log.d("pedido productos null: ", pedido.getOid());
+
+
+
         }
 
 
@@ -139,6 +147,15 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ((Sessions)mCtx.getApplicationContext()).setSestipo_pedido(pedidos.get(position).gettipo_pedido());
+                ((Sessions)mCtx.getApplicationContext()).setSesubicacion_latitude(pedidos.get(position).getubicacion_lat());
+                ((Sessions)mCtx.getApplicationContext()).setSesubicacion_longitude(pedidos.get(position).getubicacion_long());
+
+
+
+
+                // Toast.makeText(mCtx, "tipo_pedido: " + pedidos.get(position).gettipo_pedido(), Toast.LENGTH_SHORT).show();
+
                 Log.d(TAG, "onClick: alPedidos: " + pedidos.get(position).getcliente());
                 Log.d(TAG, "onClick: textViewCliente: " + pedidos.get(position));
 

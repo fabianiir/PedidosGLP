@@ -54,6 +54,16 @@ public class ObjetoRes {
     }
 
 
+    private String estatus;
+
+    public String getestatus() {
+        return estatus;
+    }
+
+    public void setestatus(String estatus) {
+        this.estatus = estatus;
+    }
+
     public Usuario[] user;
 
     public Usuario[] getuser() {

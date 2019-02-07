@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,7 +54,7 @@ import com.github.gcacace.signaturepad.views.SignaturePad;
 import android.content.ContentValues;
 
 @SuppressLint("ValidFragment")
-public class DetallePedidoFragment  extends Fragment{
+public class DetallePedidoFragment  extends Fragment  implements LocationListener {
 
     private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle
             , textViewFirma, textViewTotal, textViewObservaciones;
@@ -98,6 +101,13 @@ public class DetallePedidoFragment  extends Fragment{
     ImageView imgFirma;
     String imageurl;
 
+    LocationManager locationManager;
+    String strLatitude = "";
+    String strLongitude = "";
+
+    Location location;
+
+
     public DetallePedidoFragment(Context mCtx) {
         // Required empty public constructor
         this.mCtx = mCtx;
@@ -115,6 +125,8 @@ public class DetallePedidoFragment  extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detalle_pedido, container, false);
+        getLocation();
+
 // path to /data/data/yourapp/app_data/imageDir
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
@@ -200,9 +212,27 @@ public class DetallePedidoFragment  extends Fragment{
         btnComoLlegar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri intentUri = Uri.parse("geo:41.382,2.170?z=16&q=41.382,2.170(Esta+Es+La+Etiqueta)");
-                Intent intent = new Intent(Intent.ACTION_VIEW, intentUri);
-                startActivity(intent);
+
+               // Uri intentUri = Uri.parse("geo:41.382,2.170?z=16&q=41.382,2.170(Esta+Es+La+Etiqueta)");
+
+                //Intent intent = new Intent(Intent.ACTION_VIEW, intentUri);
+
+                if(((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude() != null ||
+                        ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude() != null ) {
+                    String query = "google.navigation:q=" + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude()
+                            + "," + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude() + "";
+
+
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(query));
+
+                    startActivity(intent);
+                }
+                else{
+
+                    Toast.makeText(getActivity(), "Ubicacion No disponible!", Toast.LENGTH_SHORT).show();
+
+                }
+
             }
         });
 
@@ -394,8 +424,70 @@ public class DetallePedidoFragment  extends Fragment{
 
 
 
+    public void getLocation(){
+
+        try {
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            if (location != null){
+                callSeguimiento();
+            }else{
+                Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+            }
+
+
+            //   isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            // strLatitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude());
+            // strLongitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude());
+
+
+
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
+
+        }
+
 
     }
+    public void callSeguimiento(){
+        Toast.makeText(getActivity(), "Ir a Latitude: " + strLongitude + ", Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
+
+    }
+    @Override
+    public void onLocationChanged(Location location) {
+        // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
+        strLatitude = String.valueOf(location.getLatitude());
+        strLongitude = String.valueOf(location.getLongitude());
+
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(getActivity(), "Porfavor Habilite su GPS e Internet", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+
+
+
+}
 
 
 

@@ -162,6 +162,7 @@ public class FragmentDrawer extends Fragment {
                 public void onResponse(Call call, Response response) {
                     if (response.isSuccessful()) {
                         ObjetoRes resObj = (ObjetoRes) response.body();
+
                         if (resObj.geterror().equals("false")) {
                             List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
                             archivo = arrayListImagen.get(0).getArchivo();
@@ -171,6 +172,8 @@ public class FragmentDrawer extends Fragment {
                             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
                             imageViewPerfil.setImageBitmap(UsuarioInfo.getFoto());
                         }
+
+
                     }
                 }
                 @Override

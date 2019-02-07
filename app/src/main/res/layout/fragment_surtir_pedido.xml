@@ -104,6 +104,18 @@
                 android:textSize="18dp"
                 app:fontFamily="@font/roboto" />
 
+            <ImageView
+                android:id="@+id/imageViewIncidencia"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_menu_camera"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"></ImageView>
+
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -123,6 +135,15 @@
                         android:layout_height="match_parent">
 
                     </android.support.v7.widget.RecyclerView>
+<!--
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recyclerViewPedidosHide"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone">
+
+                    </android.support.v7.widget.RecyclerView>
+-->
 
                 </LinearLayout>
             </android.support.constraint.ConstraintLayout>

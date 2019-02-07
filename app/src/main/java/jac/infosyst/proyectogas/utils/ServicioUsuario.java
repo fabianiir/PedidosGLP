@@ -63,7 +63,22 @@ public interface ServicioUsuario {
           @Field("token") String token
   );
 
+  @FormUrlEncoded
+  @POST("fotos/")
+  Call<ObjetoRes> Foto(
+          @Field("id") String id,
+          @Field("tipo") int tipo,
+          @Field("token") String token
+  );
 
+    @FormUrlEncoded
+    @POST("in_foto/")
+    Call<ObjetoRes> in_foto(
+            @Field("id") String id,
+            @Field("archivo") String archivo,
+            @Field("tipo") int tipo,
+            @Field("token") String token
+    );
 
 
 /*
@@ -196,6 +211,16 @@ public interface ServicioUsuario {
           @Field("precio") int precio,
           @Field("pedido_id") String pedido_id,
           @Field("producto_id") String producto_id,
+          @Field("token") String token
+  );
+
+  @FormUrlEncoded
+  @POST("up_detalle")
+  Call<ObjetoRes> up_detalle(
+          @Field("id") String id,
+          @Field("cantidad") int cantidad,
+          @Field("surtido") boolean surtido,
+          @Field("precio") int precio,
           @Field("token") String token
   );
 

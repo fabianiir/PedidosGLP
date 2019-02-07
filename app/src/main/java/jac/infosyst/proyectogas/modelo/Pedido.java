@@ -18,7 +18,11 @@ public class Pedido {
     private String comentarios_cliente;
     private String suma_iva;
     private String total;
+    private String tipo_pedido;
     private String estatus;
+
+    private String ubicacion_lat;
+    private String ubicacion_long;
 
    // private List<ArrayList> productos = new ArrayList<>();
 
@@ -34,8 +38,8 @@ public class Pedido {
 
 
     public Pedido(String Oid, String nombre, String placas, String fecha_hora_programada, String cliente, String direccion,
-            String cp, String telefono, String comentarios_cliente, String suma_iva, String total, String estatus
-           , Producto[] productos
+            String cp, String telefono, String comentarios_cliente, String suma_iva, String total,String tipo_pedido,  String estatus
+           , Producto[] productos, String ubicacion_lat,String ubicacion_long
                 ) {
         this.Oid = Oid;
         this.nombre = nombre;
@@ -48,8 +52,11 @@ public class Pedido {
         this.comentarios_cliente = comentarios_cliente;
         this.suma_iva = suma_iva;
         this.total = total;
+        this.tipo_pedido = tipo_pedido;
         this.estatus = estatus;
         this.productos = productos;
+        this.ubicacion_lat = ubicacion_lat;
+        this.ubicacion_long = ubicacion_long;
 
     }
 
@@ -97,6 +104,7 @@ public class Pedido {
         return fecha_hora_programada;
     }
 
+    public  String gettipo_pedido() { return  tipo_pedido; }
 
     public  String getestatus () { return  estatus; }
 
@@ -109,6 +117,10 @@ public class Pedido {
         this.productos = productos;
     }
 
+
+    public  String getubicacion_lat() { return  ubicacion_lat; }
+
+    public  String getubicacion_long() { return  ubicacion_long; }
 
 
 

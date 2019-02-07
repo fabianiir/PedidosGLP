@@ -2,6 +2,7 @@ package jac.infosyst.proyectogas.utils;
 
 import android.app.Application;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import jac.infosyst.proyectogas.modelo.Producto;
@@ -243,6 +244,49 @@ public class Sessions  extends Application {
     public void setSesOidProducto(String OidProducto) {
         this.OidProducto = OidProducto;
     }
+
+    private String tipo_pedido;
+
+    public String getSestipo_pedido() {
+        return tipo_pedido;
+    }
+
+    public void setSestipo_pedido(String tipo_pedido) {
+        this.tipo_pedido = tipo_pedido;
+    }
+
+
+    private ArrayList<Double> arrayPriceTotal;
+
+    public ArrayList<Double> getSesarrayPriceTotal() {
+        return arrayPriceTotal;
+    }
+
+    public void setSesarrayPriceTotal(ArrayList<Double> arrayPriceTotal) {
+        this.arrayPriceTotal = arrayPriceTotal;
+    }
+
+
+    private String ubicacion_lat;
+
+    public String getSesubicacion_latitude() {
+        return ubicacion_lat;
+    }
+
+    public void setSesubicacion_latitude(String ubicacion_lat) {
+        this.ubicacion_lat = ubicacion_lat;
+    }
+
+    private String ubicacion_long;
+
+    public String getSesubicacion_longitude() {
+        return ubicacion_long;
+    }
+
+    public void setSesubicacion_longitude(String ubicacion_long) {
+        this.ubicacion_long = ubicacion_long;
+    }
+
 
 /*
     private String sessToken;

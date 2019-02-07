@@ -8,12 +8,14 @@ public class UsuarioInfo {
     private static String nombre;
     private static String placas;
     private static Bitmap foto;
+    private static Bitmap fotoFirma;
 
     public UsuarioInfo() {
         this.oid = oid;
         this.nombre = nombre;
         this.placas = placas;
         this.foto = foto;
+        this.fotoFirma = fotoFirma;
     }
 
     public static String getOid() {
@@ -45,4 +47,13 @@ public class UsuarioInfo {
     }
 
     public void  setFoto(Bitmap bitmap) { UsuarioInfo.foto = bitmap; }
+
+    public static Bitmap getFotoFirma() {
+        return fotoFirma;
+    }
+
+    public void  setFotoFirma(Bitmap bitmap) { UsuarioInfo.fotoFirma = bitmap; }
+
+
+
 }
