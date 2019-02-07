@@ -156,8 +156,7 @@ public class FragmentDrawer extends Fragment {
                     .build();
             final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-            //Call call = service.Foto(UsuarioInfo.getOid(),"2", strtoken);
-            Call call = service.Foto(UsuarioInfo.getOid(), "2", "2bd65cb6-fea1-4c74-9add-f6ff31f50ca5");
+            Call call = service.Foto(UsuarioInfo.getOid(), "2", strtoken);
             call.enqueue(new Callback() {
                 @Override
                 public void onResponse(Call call, Response response) {

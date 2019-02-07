@@ -180,6 +180,32 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         String strEstatus = ((Sessions)getActivity().getApplication()).getsesEstatus();
         String strFirma = ((Sessions)getActivity().getApplication()).getsesFirmaURL();
         String strTotal = ((Sessions)getActivity().getApplication()).getsesTotal();
+
+        if(strCliente == null){
+            strCliente = "N/A";
+        }
+        if(strDireccion == null){
+            strDireccion = "N/A";
+        }
+        if(strDescripcion == null){
+            strDescripcion = "N/A";
+        }
+        if(strEstatus == null){
+            strEstatus = "N/A";
+        }
+        if(strDetalle == null){
+            strDescripcion = "N/A";
+        }
+        if(strFirma == null){
+            strFirma = "N/A";
+        }
+        if(strFirma == null){
+            strFirma = "N/A";
+        }
+        if(strTotal == null){
+            strTotal = "N/A";
+        }
+
         textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
         textViewCliente.setText("Nombre: " + strCliente);
         textViewDireccion = (TextView) rootView.findViewById(R.id.tvDireccion);
@@ -270,9 +296,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         }
 
-
-
-
         Toast.makeText(getActivity(), "dato:" + ((Sessions)getActivity().getApplicationContext()).getsessToken() , Toast.LENGTH_SHORT).show();
 
 
@@ -294,7 +317,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     if(resObj.geterror().equals("false")) {
                         adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(),  getFragmentManager());
                         recyclerViewProductos.setAdapter(adapter);
-
                     } else {
                         Toast.makeText(getActivity(), "no datos!" , Toast.LENGTH_SHORT).show();
                     }

@@ -4,6 +4,7 @@ package jac.infosyst.proyectogas.fragments;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -16,6 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import jac.infosyst.proyectogas.FragmentDrawer;
+import jac.infosyst.proyectogas.LectorQR.Escaner;
+import jac.infosyst.proyectogas.LoginActivity;
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
 
@@ -32,6 +37,7 @@ import java.util.List;
 import jac.infosyst.proyectogas.modelo.Camion;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Chofer;
+import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Usuario;
 import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
@@ -301,7 +307,11 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         }
 
-        actualizarPedidos();
+        if (tipoPedidos == 0){
+            actualizarPedidosPendientes();
+        }else if(tipoPedidos == 1){
+            actualizarPedidosSurtidos();
+        }
         //  actualizarPedidos2();
         // obtenerDatosUsuario();
 
@@ -309,33 +319,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
         return rootView;
     }
 
-    public void actualizarPedidos(){
-/*
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
-        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-        String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
-
-        final int recordCount = db.rawQuery(sql, null).getCount();
-        //  Toast.makeText(getApplicationContext(), "contador: " + recordCount, Toast.LENGTH_LONG).show();
-
-        SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
-
-        Cursor cursor = dbConn.rawQuery(sql, null);
-        String email="";
-        String checkEmpty = "";
-        if (cursor.moveToFirst()) {
-
-            int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
-            String firstname = cursor.getString(cursor.getColumnIndex("status"));
-            email = cursor.getString(cursor.getColumnIndex("ip"));
-            // Toast.makeText(getApplicationContext(), "datos: " + email, Toast.LENGTH_LONG).show();
-
-        }
-        cursor.close();
-*/
-
-
+    public void actualizarPedidosPendientes(){
         BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
         final String[] strReturnToken = new String[1];
         Retrofit retrofit = new Retrofit.Builder()
@@ -372,6 +356,9 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
                                             values1.put("Oid", strchofer);
                                             values1.put("token", obj_bitacora.gettoken());
+
+                                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                                            startActivity(intent);
 
                                             db.insert("usuario", null, values1);
 
@@ -456,6 +443,47 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }
             });
         }
+    }
+
+    public void actualizarPedidosSurtidos() {
+        BASEURL = "http://" + strIP + ":8060/glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Call call;
+
+        call = userService.getPedidos(strchofer, "Surtido", strtoken);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    if (resObj.geterror().equals("false")) {
+
+                        if (resObj.getpedido() != null) {
+                            Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
+                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
+                            recyclerViewPedidos.setAdapter(adapter);
+
+                        } else {
+                            Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void obtenerDatosUsuario(){
