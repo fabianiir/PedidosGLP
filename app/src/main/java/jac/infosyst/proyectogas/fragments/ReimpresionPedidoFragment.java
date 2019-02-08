@@ -66,7 +66,22 @@ public class ReimpresionPedidoFragment  extends Fragment {
         Intent intent = new Intent(getActivity(), Impresora.class);
         startActivity(intent);
         Toast.makeText(getActivity(), "Reimprimiendo Pedido" , Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+
+
+
+        return  rootView;
+
+
     }
+
+
+
+
+
 
         @Override
         public void onAttach(Activity activity) {
