@@ -306,7 +306,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 try
                 {
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
-                    MainActivity.printData(imprCliente,imprDireccion, imprTotal, imprChofer, imprUnidad,strFecha);
+                    MainActivity.printData(imprCliente,imprDireccion, imprTotal, imprChofer, imprUnidad,strFecha,true);
 
                    // Intent intent = new Intent(getActivity(), Impresora.class);
 
@@ -522,7 +522,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
                 try {
-                    MainActivity.printData(imprCliente, imprDireccion,imprTotal, imprChofer, imprUnidad,strFecha);
+                    MainActivity.printData(imprCliente, imprDireccion,imprTotal, imprChofer, imprUnidad,strFecha,false);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

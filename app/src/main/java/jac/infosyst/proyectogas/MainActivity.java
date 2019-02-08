@@ -411,7 +411,7 @@ public class MainActivity extends AppCompatActivity
 
 
     // Printing Text to Bluetooth Printer //
-    public static void printData(String cliente, String direccion, String total,String chofer, String unidad, String fecha) throws  IOException{
+    public static void printData(String cliente, String direccion, String total,String chofer, String unidad, String fecha, boolean reImpresion) throws  IOException{
         try{
 
 
@@ -425,6 +425,13 @@ public class MainActivity extends AppCompatActivity
                     "        FRACC. INDUSTRIAL PEDRO CARRIZO      \n" +
                     "              C.P.37500 LEON GTO      \n" +
                     "            TEL 01 (477) 771 34 05   \n";
+if(reImpresion){
+
+    BILL = BILL
+            + "            R E  I M P R E S I O N        \n";
+
+}
+
             BILL = BILL
                     + "-----------------------------------------------\n";
 
@@ -432,6 +439,12 @@ public class MainActivity extends AppCompatActivity
                     + "OPERADOR:"+chofer.toUpperCase()+"\n" +
                     "UNIDAD:"+unidad.toUpperCase()+"\n"+
                     "FECHA:"+fecha+ "\n";
+            if(reImpresion){
+
+                BILL = BILL
+                        + "            R E  I M P R E S I O N        \n";
+
+            }
 
 
             BILL = BILL
@@ -462,14 +475,19 @@ public class MainActivity extends AppCompatActivity
 
             BILL = BILL
                     + "\n-----------------------------------------------";
-            BILL = BILL + "\n\n ";
+            BILL = BILL + "\n";
+            if(reImpresion){
+                BILL = BILL
+                        + "            R E  I M P R E S I O N        \n";
+
+            }
 
             BILL = BILL + "                         SUBTOTAL:" + "   " + "$800.00" + "\n";
             BILL = BILL + "                            I.V.A.:" + "   " + "$128.00" + "\n";
             BILL = BILL + "                             TOTAL:" + "   " + "$"+total+ ".00\n";
 
             BILL = BILL
-                    + "-----------------------------------------------\n";
+                    + "-----------------------------------------------\n\n";
             BILL = BILL + "\n\n ";
             outputStream.write(BILL.getBytes());
             //This is printer specific code you can comment ==== > Start

@@ -73,7 +73,7 @@ public class ReimpresionPedidoFragment  extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                    MainActivity.printData(nombCliente,direcCliente,totalCliente, UsuarioInfo.getNombre(),UsuarioInfo.getPlacas(),fecha);
+                    MainActivity.printData(nombCliente,direcCliente,totalCliente, UsuarioInfo.getNombre(),UsuarioInfo.getPlacas(),fecha,true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
