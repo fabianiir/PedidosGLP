@@ -50,14 +50,11 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-import jac.infosyst.proyectogas.ImpresoraBluetooth.Impresora;
-import jac.infosyst.proyectogas.LoginActivity;
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.CatalagoProductosAdapter;
-import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.Chofer;
@@ -67,6 +64,8 @@ import jac.infosyst.proyectogas.modelo.ObjetoRes2;
 import jac.infosyst.proyectogas.modelo.Pedido;
 
 import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.Usuario;
+import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
@@ -81,16 +80,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import android.support.design.widget.FloatingActionButton;
 
 import java.util.Calendar;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 
 
 import android.util.Base64;
 
 public class SurtirPedidoFragment  extends Fragment implements LocationListener {
-    private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle
-            , textViewFirma, textViewTotal;
+    private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle, textViewFirma, textViewTotal;
 
     Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
@@ -109,13 +104,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     SignaturePad signaturePad;
     /*foto incidencia*/
-    private static final int PICTURE_RESULT = 122 ;
+    private static final int PICTURE_RESULT = 122;
     private ContentValues values;
     private Uri imageUri;
     private Bitmap thumbnail;
 
     String imageurl;
-    File directory,directoryIncidencia;
+    File directory, directoryIncidencia;
     ImageView imgFirma;
     ImageView firmaImage, imageViewIncidencia;
 
@@ -134,11 +129,23 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     private static final String TAG = "SurtirPedidoFragment";
 
     private List<Pedido> pedidos;
+    //   private List<Producto> productos;
+    //
 
+    // List<Producto> listAdapter;
     List<String> listAdapter;
 
     Producto myCustomProducto;
     CatalagoProducto myCatalagoProducto;
+
+
+    //Variables para impresora
+    String imprCliente = "";
+    String imprDireccion="";
+    String imprTotal="";
+    String imprChofer="";
+    String imprUnidad="";
+
 
     String strHora = "";
     String strFecha = "";
@@ -269,6 +276,17 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         textViewFirma.setText("Firma: " + strFirma);
         textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
         btnGuardar = (Button)rootView.findViewById(R.id.btnGuardar);
+
+
+        //Asignacion de variables para impresora
+        imprCliente=strCliente;
+        imprDireccion=strDireccion;
+        imprTotal= strTotal;
+        imprChofer = UsuarioInfo.getNombre();
+        imprUnidad= UsuarioInfo.getPlacas();
+
+
+
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -287,6 +305,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 try
                 {
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
+                    MainActivity.printData(imprCliente,imprDireccion, imprTotal, imprChofer, imprUnidad,strFecha);
 
                    // Intent intent = new Intent(getActivity(), Impresora.class);
 
@@ -501,6 +520,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 pedidoActualizarSurtido("d9da86d7-0fee-43c9-b969-94779d106231");
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
+                try {
+                    MainActivity.printData(imprCliente, imprDireccion,imprTotal, imprChofer, imprUnidad,strFecha);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
