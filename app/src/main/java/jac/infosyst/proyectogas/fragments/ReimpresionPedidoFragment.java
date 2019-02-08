@@ -82,7 +82,17 @@ public class ReimpresionPedidoFragment  extends Fragment {
         Toast.makeText(getActivity(), "Reimprimiendo Pedido" , Toast.LENGTH_SHORT).show();
 
 
+            }
+        });
+
+
+
+        return  rootView;
+
+
     }
+
+
 
 
 
