@@ -9,6 +9,7 @@ import java.util.List;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 
 import jac.infosyst.proyectogas.modelo.ObjetoRes2;
+import jac.infosyst.proyectogas.modelo.ObjetoRes3;
 import jac.infosyst.proyectogas.modelo.Pedidos;
 //import jac.infosyst.proyectogas.utils.Result;
 //import jac.infosyst.proyectogas.modelo.User;
@@ -143,12 +144,16 @@ public interface ServicioUsuario {
   @POST("cat_productos")
   Call<ObjetoRes2> getCatalagoProductos(@Field("token") String token);
 
-    @FormUrlEncoded
-    @POST("productos")
-    Call<ObjetoRes> getProductos(
-            @Field("pedido_id") String pedido_id,
-            @Field("token") String token
-    );
+  @FormUrlEncoded
+  @POST("cat_estatus")
+  Call<ObjetoRes3> getCatalogoEstatus(@Field("token") String token);
+
+  @FormUrlEncoded
+  @POST("productos")
+  Call<ObjetoRes> getProductos(
+          @Field("pedido_id") String pedido_id,
+          @Field("token") String token
+  );
 
   @FormUrlEncoded
   @POST("detalle")

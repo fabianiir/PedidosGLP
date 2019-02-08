@@ -58,6 +58,7 @@ import jac.infosyst.proyectogas.adaptadores.CatalagoProductosAdapter;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.Chofer;
+import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.Imagen;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.ObjetoRes2;
@@ -642,8 +643,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         Call call = service.up_pedido(pedidoID, strHora, strFecha,
                 "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
                 19, 21, "b01020c8-4ab1-49b1-9ae1-87b2ec84465d", "null",
-                "1bcd4387-9f14-43cb-84c8-e2fb46ac67f2", "Up_1",
-                strtoken);
+                Estatus.getSurtidoId(), "Up_1", strtoken);
 
         call.enqueue(new Callback() {
 

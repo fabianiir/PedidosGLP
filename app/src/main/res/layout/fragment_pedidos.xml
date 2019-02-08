@@ -58,7 +58,7 @@
             android:layout_marginTop="16dp"
 
             android:background="@color/BotonGris"
-            android:text="Imprimir"
+            android:text="Reimprimir"
             android:textColor="@color/colorPrimary" />
 
         <Button

@@ -35,8 +35,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import jac.infosyst.proyectogas.modelo.Camion;
+import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
+import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Chofer;
+import jac.infosyst.proyectogas.modelo.ObjetoRes3;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Usuario;
 import jac.infosyst.proyectogas.modelo.UsuarioInfo;
@@ -236,8 +239,35 @@ public class PedidosFragment extends Fragment implements LocationListener {
         final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
         Call call;
 
-        if (strtoken == null) {
+        call = service.getCatalogoEstatus(strtoken);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    ObjetoRes3 obj_estatus = (ObjetoRes3) response.body();
+                    if (obj_estatus.geterror().equals("false")) {
+                        List<CatalogoEstatus> arrayListEstatus = Arrays.asList(obj_estatus.getCatalogoEstatus());
+                        Estatus estatus = new Estatus();
+                        for (int i = 0; i < arrayListEstatus.size(); i ++){
+                            if(arrayListEstatus.get(i).getdescripcion().equals("Pendiente")){
+                                estatus.setPendienteId(arrayListEstatus.get(i).getIdProducto());
+                            }else if(arrayListEstatus.get(i).getdescripcion().equals("Surtido")){
+                                estatus.setSurtidoId(arrayListEstatus.get(i).getIdProducto());
+                            }else if(arrayListEstatus.get(i).getdescripcion().equals("Cancelado")){
+                                estatus.setCanceladoId(arrayListEstatus.get(i).getIdProducto());
+                            }
+                        }
+                    }
+                }
+            }
 
+            @Override
+            public void onFailure(Call call, Throwable t) {
+
+            }
+        });
+
+        if (strtoken == null) {
             call = service.camion(Integer.parseInt(strcamion));
             call.enqueue(new Callback() {
                 @Override
@@ -284,7 +314,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                                                 Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
                                                                 adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                                                                 recyclerViewPedidos.setAdapter(adapter);
-
                                                             } else {
                                                                 Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                                                             }
@@ -295,7 +324,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                                         Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
-
                                                 @Override
                                                 public void onFailure(Call call, Throwable t) {
                                                     Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();

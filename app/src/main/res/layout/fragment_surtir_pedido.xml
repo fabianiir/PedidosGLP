@@ -110,7 +110,9 @@
                 android:layout_height="80dp"
 
                 android:layout_marginTop="20dp"
+                android:cropToPadding="?android:attr/windowOverscan"
                 android:src="@drawable/ic_menu_camera"
+                android:theme="@style/AppTheme"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
