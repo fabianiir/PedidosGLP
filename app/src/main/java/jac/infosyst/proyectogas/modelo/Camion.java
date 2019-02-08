@@ -1,7 +1,6 @@
 package jac.infosyst.proyectogas.modelo;
 
 public class Camion {
-
     private String Oid;
     private String placas;
 

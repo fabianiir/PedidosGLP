@@ -20,8 +20,6 @@ public class Spinner {
 
         }
 
-
-
         public String getoid() {
             return Oid;
         }
@@ -29,13 +27,10 @@ public class Spinner {
         public String getnombre() {
             return nombre;
         }
-    public String getGCRecord() {
+        public String getGCRecord() {
         return GCRecord;
     }
-    public String getOptimisticLockField() {
+        public String getOptimisticLockField() {
         return OptimisticLockField;
     }
-
-
-
 }

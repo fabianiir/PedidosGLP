@@ -25,22 +25,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
-    /*
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
-*/
-
-
-
-
-        @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -49,22 +34,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.activity_maps, container, false);
-
-        //SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager()
-          //      .findFragmentById(R.id.map);
-
-
-
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-
         mapFragment.getMapAsync(this);
-
         return rootView;
-
     }
-
-
-
 
     /**
      * Manipulates the map once available.
@@ -79,7 +52,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -91,7 +63,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback {
             return;
         }
         mMap.setMyLocationEnabled(true);
-
         mMap.setTrafficEnabled(true);
 
         LatLng pedido1 = new LatLng(19.3802955,-99.1412775);
@@ -105,10 +76,5 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback {
         LatLng pedido3 = new LatLng(19.380558, -99.152393);
         mMap.addMarker(new MarkerOptions().position(pedido3).title("Pedido 3"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(pedido3));
-
-
-
     }
-
-
 }

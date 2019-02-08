@@ -28,9 +28,4 @@ public class Usuario {
     public UsuarioInfo[] getUsuarioInfo() {
         return user;
     }
-
-
-
-
-
 }

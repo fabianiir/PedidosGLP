@@ -1,6 +1,7 @@
 package jac.infosyst.proyectogas.modelo;
 
 public class Imagen {
+
     private String Oid;
     private String pedido;
     private String archivo;

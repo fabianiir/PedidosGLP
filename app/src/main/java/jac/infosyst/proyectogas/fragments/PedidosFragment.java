@@ -95,8 +95,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
     int tiempoSeguimiento = 10000;
     Location location;
 
-
-
     private List<String> hobbies = new ArrayList<String>();
 
     public PedidosFragment() {
@@ -106,34 +104,13 @@ public class PedidosFragment extends Fragment implements LocationListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
-
         ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
-
-
-
-
-       /*
-        final Handler handler = new Handler();
-
-
-        final Runnable r = new Runnable() {
-            public void run() {
-                seguimiento();
-                handler.postDelayed(this, tiempoSeguimiento);
-            }
-        };
-
-        handler.postDelayed(r, tiempoSeguimiento);
-        */
-
-
 
         Sessions strSess = new Sessions();
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
@@ -145,15 +122,11 @@ public class PedidosFragment extends Fragment implements LocationListener {
         final int recordCount = db.rawQuery(sql, null).getCount();
         //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
 
-
         final Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
-
         }
-
-
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
@@ -165,99 +138,38 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         final int recordCount3 = db.rawQuery(sql3, null).getCount();
         //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
-
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
-
         Cursor cursor3 = dbConn3.rawQuery(sql3, null);
 
         if (cursor3.moveToFirst()) {
             strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
             //  Toast.makeText(getActivity(), "usuario: " + strchofer + strtoken , Toast.LENGTH_LONG).show();
-
-
         }
-
-
-
-
-      /*
-        if (record2.moveToFirst()) {
-
-            strchofer = record2.getString(record.getColumnIndex("Oid"));
-            strtoken = record2.getString(record.getColumnIndex("token"));
-        }
-        */
-
-
-
-
         objSessions = new Sessions();
         userService = ApiUtils.getUserService();
-
 
         recyclerViewPedidos = (RecyclerView) rootView.findViewById(R.id.recyclerViewPedidos);
         recyclerViewPedidos.setHasFixedSize(true);
         recyclerViewPedidos.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-        /*
-        final Handler handler = new Handler();
-
-        final Runnable r = new Runnable() {
-            public void run() {
-                actualizarPedidos();
-                handler.postDelayed(this, tiempoActualizarPedidos);
-            }
-        };
-
-        handler.postDelayed(r, tiempoActualizarPedidos);
-        */
-
-        //((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Home");
-        // getActivity().setTitle("your title");
-/*
-        Bundle bundle = getActivity().getIntent().getExtras();
-        if (bundle != null)
-        {
-            strtext = this.getArguments().getString("tipoPedidos");
-        }
-        */
-
-        // String strtext = this.getArguments().getString("tipoPedidos");
-
-        //Toast.makeText(getActivity(),  strNameTittle , Toast.LENGTH_SHORT).show();
-
-
-        //idPedido =  ((Sessions)getActivity().getApplicationContext()).getSesIdPedido();
-
 
         btnAtenderPedido = (Button) rootView.findViewById(R.id.btnAtenderPedido);
         btnAtenderPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-
-
                 if(((Sessions)getActivity().getApplicationContext()).getSesIdPedido().equals("null")) {
 
                     Toast.makeText(getActivity(),  "Debe seleccionar un Pedido!" , Toast.LENGTH_SHORT).show();
                 }
                 else{
-
                     DetallePedidoFragment dpf = new DetallePedidoFragment(getActivity().getBaseContext());
                     FragmentManager fragmentManager = getFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.container_body, dpf);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
-
                 }
-
-
-
-
-
             }
         });
         btnCancelarPedido = (Button) rootView.findViewById(R.id.btnCancelarPedido);
@@ -295,7 +207,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             tipoPedidos = 0;
 
             Toast.makeText(getActivity(), "Actualizando pedidos..." , Toast.LENGTH_SHORT).show();
-
         }
         if(strNameTittle.equals("Pedidos Realizados")){
             btnAtenderPedido.setVisibility(View.GONE);
@@ -311,15 +222,11 @@ public class PedidosFragment extends Fragment implements LocationListener {
         }else if(tipoPedidos == 1){
             actualizarPedidosSurtidos();
         }
-        //  actualizarPedidos2();
-        // obtenerDatosUsuario();
-
-
         return rootView;
     }
 
     public void actualizarPedidosPendientes(){
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP+ "glpservices/webresources/glpservices/";
         final String[] strReturnToken = new String[1];
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -361,8 +268,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                             startActivity(intent);
 
                                             db.insert("usuario", null, values1);
-
-
 
                                             call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
 
@@ -412,14 +317,9 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 }
                             });
                         }else{
-
                             Toast.makeText(getActivity(), "camion.error.true!", Toast.LENGTH_SHORT).show();
-
                         }
                     }else{
-
-                      //  Toast.makeText(getActivity(), "camion.success.false!", Toast.LENGTH_SHORT).show();
-
                     }
                 }
                 @Override
@@ -429,7 +329,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             });
         }
         else {
-
             call = userService.getPedidos(strchofer, "Pendiente", strtoken);
             call.enqueue(new Callback() {
                 @Override
@@ -463,7 +362,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     }
 
     public void actualizarPedidosSurtidos() {
-        BASEURL = "http://" + strIP + ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -495,7 +394,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                     Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -558,7 +456,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
         getLocation();
     }
 
-
     public void getLocation(){
 
         try {
@@ -573,31 +470,16 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
 
             }
-
-
-            //   isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            // strLatitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude());
-            // strLongitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude());
-
-
-
         }
         catch(SecurityException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
 
         }
-
-
     }
-
-
-
 
     public void callSeguimiento(){
         Toast.makeText(getActivity(), "Latitude: " + strLongitude + " Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
-
     }
 
 
@@ -606,8 +488,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
         // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
         strLatitude = String.valueOf(location.getLatitude());
         strLongitude = String.valueOf(location.getLongitude());
-
-
     }
 
     @Override
@@ -617,12 +497,10 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
 
@@ -636,6 +514,4 @@ public class PedidosFragment extends Fragment implements LocationListener {
     public void onDetach() {
         super.onDetach();
     }
-
-
 }

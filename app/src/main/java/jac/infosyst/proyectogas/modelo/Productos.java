@@ -16,6 +16,5 @@ public class Productos {
     public void seProductos(ArrayList<Producto> productos) {
         this.productos = productos;
     }
-
 }
 

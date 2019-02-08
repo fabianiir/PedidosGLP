@@ -34,7 +34,6 @@ public class NdefMessageParser {
                 });
             }
         }
-
         return elements;
     }
 }

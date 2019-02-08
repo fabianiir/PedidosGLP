@@ -21,7 +21,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     private LayoutInflater inflater;
     private Context context;
 
-   // private final Integer[] imgid;
     ImageView imageView;
 
     public NavigationDrawerAdapter(Context context, List<NavDrawerItem> data) {
@@ -29,7 +28,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         inflater = LayoutInflater.from(context);
         //dont show labels on menu
         this.data = data;
-
     }
 
     public void delete(int position) {
@@ -49,8 +47,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         NavDrawerItem current = data.get(position);
         holder.title.setText(current.getTitle());
         holder.imageView.setImageResource(current.getimgMenu());
-
-
     }
 
     @Override

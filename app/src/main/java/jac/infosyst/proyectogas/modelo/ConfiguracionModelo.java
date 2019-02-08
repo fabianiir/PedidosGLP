@@ -11,7 +11,6 @@ public class ConfiguracionModelo {
 
     }
 
-
     public String getIP() {
         return ip;
     }
@@ -19,9 +18,4 @@ public class ConfiguracionModelo {
     public String getCelular() {
         return celular;
     }
-
-
-
-
-
 }

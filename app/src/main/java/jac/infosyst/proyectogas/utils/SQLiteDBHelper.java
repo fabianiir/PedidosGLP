@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 public class SQLiteDBHelper extends SQLiteOpenHelper{
 
-
     private Context ctx;
     private String crearTablaUsuarios = "";
     private String crearTablaconfsqlite = "";
@@ -23,12 +22,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
 
     protected static final String DATABASE_NAME = "proyectogas17";
 
-    /*
-    public SQLiteDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
-        ctx = context;
-    }
-    */
     public SQLiteDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         ctx = context;
@@ -56,7 +49,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
                 "( id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 " emai TEXT) ";
 
-
         db.execSQL(sqlDispositivo);
 
         String sqlproductos = "CREATE TABLE productos " +
@@ -68,11 +60,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
                 " precio DOUBLE, " +
                 " descripcion TEXT, " +
                 " activo TEXT) ";
-
-
         db.execSQL(sqlproductos);
-
-
     }
 
     @Override
@@ -83,77 +71,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
 
         onCreate(db);
     }
-
-
-
-/*
-
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        this.buildCreateTableSql();
-        sqLiteDatabase.execSQL(crearTablaUsuarios);
-        sqLiteDatabase.execSQL(crearTablaconfsqlite);
-        sqLiteDatabase.execSQL(crearTablaconfsqlite2);
-
-
-        //Toast.makeText(ctx, "Table " + USUARIOS_TABLE_NAME + " is created successfully. ", Toast.LENGTH_SHORT).show();
-
-
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Toast.makeText(ctx, "SQLITE ACUTALIZADA", Toast.LENGTH_SHORT).show();
-
-    }
-
-
-    private void buildCreateTableSql()
-    {
-        // Build create book table sql.
-        StringBuffer bookSqlBuf = new StringBuffer();
-
-        // Create table sql.
-        bookSqlBuf.append("create table ");
-        bookSqlBuf.append(USUARIOS_TABLE_NAME);
-        bookSqlBuf.append("( id integer primary key autoincrement,");
-        bookSqlBuf.append(" nombre text,");
-        bookSqlBuf.append(" correo text,");
-        bookSqlBuf.append(" contrasena text,");
-        bookSqlBuf.append(" sexo text )");
-
-        crearTablaUsuarios = bookSqlBuf.toString();
-
-        StringBuffer confsqliteSqlBuf = new StringBuffer();
-
-
-        confsqliteSqlBuf.append("create table ");
-        confsqliteSqlBuf.append(CONFSQLITE_TABLE_NAME);
-        confsqliteSqlBuf.append("( id integer primary key autoincrement,");
-        confsqliteSqlBuf.append(" status integer, ");
-        confsqliteSqlBuf.append(" ipServidor text )");
-
-        crearTablaconfsqlite = confsqliteSqlBuf.toString();
-*/
-
-        /*
-        StringBuffer confsqlite2 = new StringBuffer();
-
-
-        confsqlite2.append("create table ");
-        confsqlite2.append(CONFSQLITE2_TABLE_NAME);
-        confsqlite2.append("( id integer primary key autoincrement,");
-        confsqlite2.append(" status integer, ");
-        confsqlite2.append(" ipServidor text )");
-
-        crearTablaconfsqlite2 = confsqlite2.toString();
-
-
-
-    }
-*/
-
-
 }
 
 

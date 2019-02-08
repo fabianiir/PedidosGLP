@@ -12,21 +12,13 @@ public class CatalagoProducto {
 
     private String unidad;
 
-
-
-
-    // private List<Integer> productos = new ArrayList<Integer>();
-
     public CatalagoProducto(String Oid,  String descripcion,  double precio_unitario,  String unidad ) {
         this.Oid = Oid;
         this.descripcion = descripcion;
 
         this.precio_unitario = precio_unitario;
         this.unidad = unidad;
-
-
     }
-
 
     public String getIdProducto() {
         return Oid;
@@ -43,9 +35,6 @@ public class CatalagoProducto {
     public double getprecio_unitario() {
         return precio_unitario;
     }
-
-
-
 }
 
 

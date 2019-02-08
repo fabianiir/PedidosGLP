@@ -12,7 +12,6 @@ public class Configuracion {
 
     }
 
-
     public String getIP() {
         return ip;
     }
@@ -20,8 +19,4 @@ public class Configuracion {
     public String getCelular() {
         return celular;
     }
-
-
-
-    
 }

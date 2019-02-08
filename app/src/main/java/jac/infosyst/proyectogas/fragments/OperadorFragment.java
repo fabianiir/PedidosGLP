@@ -45,11 +45,9 @@ public class OperadorFragment  extends Fragment {
     private TextView textViewInterno;
     private ImageView imageViewPerfil;
 
-
     private static SQLiteDBHelper sqLiteDBHelper = null;
     private static String DB_NAME = "proyectogas11.db";
     private static int DB_VERSION = 1;
-
 
     public OperadorFragment() {
     }
@@ -57,17 +55,12 @@ public class OperadorFragment  extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_operador, container, false);
-
-
 
         textViewInterno = (TextView) rootView.findViewById(R.id.Nom_Operador);
         textViewInterno.setText(UsuarioInfo.getNombre());
@@ -93,7 +86,6 @@ public class OperadorFragment  extends Fragment {
             Log.i("Mensaje", "Se tiene permiso!");
         }
 
-
         String myIMEI = "";
 
         TelephonyManager mTelephony = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
@@ -113,12 +105,8 @@ public class OperadorFragment  extends Fragment {
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-
         ContentValues values2 = new ContentValues();
-
         values2.put("emai", emai);
-
         db.insert("dispositivo", null, values2);
-
     }
 }

@@ -24,7 +24,6 @@ import android.widget.Toast;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
-
 import jac.infosyst.proyectogas.FragmentDrawer;
 import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
@@ -52,7 +51,6 @@ import jac.infosyst.proyectogas.fragments.SurtirPedidoFragment;
 
 public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewHolder> {
 
-
     private List<Producto> productos;
     private Context mCtx;
     FragmentManager f_manager;
@@ -77,7 +75,6 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
         this.f_manager = f_manager;
     }
 
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
@@ -97,39 +94,16 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
         listPriceTotal = new ArrayList<Double>();
         listPriceTotal.add(producto.getPrecio());
 
-
         ((Sessions)mCtx.getApplicationContext()).setSesarrayPriceTotal(listPriceTotal);
-
-
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-
-//                                                                                        catalagoProductos.get(position).getdescripcion()
                 ((Sessions)mCtx.getApplicationContext()).setSesOidProducto(productos.get(position).getOidProducto());
                 String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
 
-
-
                 Toast.makeText(mCtx, "Producto selecciono: " + strIdProducto, Toast.LENGTH_SHORT).show();
-
-             //   ((Sessions)mCtx.getApplicationContext()).setSesDetalleProductoSurtir(productos.get(position).getDetalle());
-
-               // ((Sessions)mCtx.getApplicationContext()).setSesIdPedido(productos.get(position).getIdPedido());
-
-                /*
-                ((Sessions)mCtx.getApplicationContext()).setSesCliente(pedidos.get(position).getcliente());
-                ((Sessions)mCtx.getApplicationContext()).setsesDireccion(pedidos.get(position).getdireccion());
-                ((Sessions)mCtx.getApplicationContext()).setsesDescripcion(pedidos.get(position).getdescripcion());
-                ((Sessions)mCtx.getApplicationContext()).setsesEstatus(pedidos.get(position).getestatus());
-                ((Sessions)mCtx.getApplicationContext()).setsesDetalleProducto(pedidos.get(position).getdetalleproducto());
-                ((Sessions)mCtx.getApplicationContext()).setsesFirmaURL(pedidos.get(position).getfirmaurl());
-                ((Sessions)mCtx.getApplicationContext()).setsesTotal(Double.toString(pedidos.get(position).gettotal()));
-*/
-
-
             }
         });
         holder.btnRestarProducto.setOnClickListener(new View.OnClickListener() {
@@ -137,44 +111,22 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
             public void onClick(View view) {
                 ((Sessions)mCtx.getApplicationContext()).setSesOidProducto(productos.get(position).getOidProducto());
 
-
                 Toast.makeText(mCtx, "Restar producto: " +  String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
 
                 restarProducto(String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(),  "f87b5f10-12d2-428d-8bf1-606150f73185");
-                /*
-                sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
-
-                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-                ContentValues cv = new ContentValues();
-                cv.put("activo", "cero");
-
-                db.update("productos", cv, "OidProducto='"+ String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto())+"'", null);
-*/
-
-
-
-              //  ((Sessions)mCtx.getApplicationContext()).setSesidProducto(producºtos.get(position).getIdProducto());
-              //  restarProducto(((Sessions)mCtx.getApplicationContext()).getSesidProducto());
-
-
             }
         });
-
     }
-
 
     @Override
     public int getItemCount() {
         return productos.size();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textViewProducto,textViewPrecio, textViewCantidad ;
         public Button btnRestarProducto;
-
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -183,25 +135,16 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
             textViewPrecio = (TextView) itemView.findViewById(R.id.textViewPrecio);
             textViewCantidad = (TextView) itemView.findViewById(R.id.textViewCantidad);
 
-
             btnRestarProducto = (Button) itemView.findViewById(R.id.btnRestarProducto);
 
-
             parentLayout = itemView.findViewById(R.id.parent_layout_producto);
-
-
-
         }
-
         LinearLayout parentLayout;
     }
-
-
 
     public void restarProducto(String idProducto, int cantidad, boolean surtido, int precio, String token){
         sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
@@ -212,7 +155,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
         }
 
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())

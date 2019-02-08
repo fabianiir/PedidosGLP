@@ -52,7 +52,6 @@ import java.util.ArrayList;
 
 public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProductosAdapter.ViewHolder> {
 
-
     private List<CatalagoProducto> catalagoProductos;
     private Context mCtx;
     FragmentManager f_manager;
@@ -70,7 +69,6 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
         this.f_manager = f_manager;
     }
 
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
@@ -81,18 +79,15 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
     @Override
     public void onBindViewHolder(final CatalagoProductosAdapter.ViewHolder holder, final int position) {
         CatalagoProducto catalagoProducto = catalagoProductos.get(position);
-        holder.textViewProducto.setText(""+catalagoProducto.getdescripcion());
-        holder.textViewprecio_unitario.setText(""+catalagoProducto.getprecio_unitario());
-
+        holder.textViewProducto.setText( "" + catalagoProducto.getdescripcion());
+        holder.textViewprecio_unitario.setText( "" + catalagoProducto.getprecio_unitario());
 
         holder.btnAgregarCatalagoProducto.setTag(catalagoProducto.getIdProducto());
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Toast.makeText(mCtx, ""+ catalagoProductos.get(position).getdescripcion(), Toast.LENGTH_SHORT).show();
-
             }
         });
 
@@ -105,32 +100,19 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
                 //holder.parentLayout.setVisibility(view.GONE);
                sumarProducto(1, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
                        catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
-
-
-
             }
         });
-
     }
-
-
-/*cuando elige que si; desahabilitarlo, unico habilitado el de reimprimir ticket
-* validacion lista pedidos, seleccionar uno*/
-
-
-
 
     @Override
     public int getItemCount() {
         return catalagoProductos.size();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textViewProducto, textViewprecio_unitario;
         public Button btnAgregarCatalagoProducto;
-
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -140,20 +122,14 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
             btnAgregarCatalagoProducto = (Button) itemView.findViewById(R.id.btnAgregarCatalagoProducto);
 
-
             parentLayout = itemView.findViewById(R.id.parent_layout_catalago_producto);
-
-
-
         }
-
         LinearLayout parentLayout;
     }
 
 
     public void storeSqLiteProductos(double price){
         Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
-
 
         sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
 
@@ -166,11 +142,6 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
 
         db.insert("productos", null, productosVal);
-
-
-
-
-
     }
 
 
@@ -186,22 +157,19 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
-
         }
 
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
         Call call = service.sumarProducto(cantidad, precio, pedidoId, productoId, ((Sessions)mCtx.getApplicationContext()).getsessToken());
 
         Toast.makeText(mCtx, "/" + cantidad + "/" + precio +  "/" + pedidoId +  "/" + productoId +  "/" + token  , Toast.LENGTH_SHORT).show();
-
 
         call.enqueue(new Callback() {
             @Override
@@ -230,7 +198,6 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
     }
 
-
     public void restarProducto(int idProducto){
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -242,13 +209,10 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
         Call<Result> call = service.actualizarProducto(idProducto);
 
-
-
         call.enqueue(new Callback<Result>() {
             @Override
             public void onResponse(Call<Result> call, Response<Result> response) {
                 Toast.makeText(mCtx, response.body().getMessage(), Toast.LENGTH_LONG).show();
-
             }
 
             @Override
@@ -256,9 +220,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
                 Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
     }
-
 }
 
 

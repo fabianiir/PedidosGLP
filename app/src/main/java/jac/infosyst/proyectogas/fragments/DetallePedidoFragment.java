@@ -107,7 +107,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
     Location location;
 
-
     public DetallePedidoFragment(Context mCtx) {
         // Required empty public constructor
         this.mCtx = mCtx;
@@ -119,8 +118,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -131,7 +128,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
-
 
         String strIdPedido = ((Sessions) getActivity().getApplication()).getSesIdPedido();
         String strCliente = ((Sessions) getActivity().getApplication()).getSesCliente();
@@ -146,18 +142,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         textViewObservaciones = (TextView) rootView.findViewById(R.id.textViewObservaciones);
         imageViewIncidencia = (ImageView) rootView.findViewById(R.id.imageViewIncidencia);
 
-/*
-        if (strDescripcion.equals("Recarga")) {
-            textViewObservaciones.setVisibility(View.GONE);
-            imageViewIncidencia.setVisibility(View.GONE);
-
-        }
-        if (strDescripcion.equals("Fuga")) {
-            textViewObservaciones.setVisibility(View.VISIBLE);
-            imageViewIncidencia.setVisibility(View.VISIBLE);
-
-        }
-*/
         if(strCliente == null){
             strCliente = "N/A";
         }
@@ -195,11 +179,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
         textViewTotal.setText("Total: " + strTotal);
 
-
-      //  btnFirmar = (Button) rootView.findViewById(R.id.btnFirmar);
-        //btnFirmar.setEnabled(false);
-
-
         btnSurtirPedido = (Button) rootView.findViewById(R.id.btnSurtirPedido);
         btnSurtirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,15 +192,10 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             @Override
             public void onClick(View v) {
 
-               // Uri intentUri = Uri.parse("geo:41.382,2.170?z=16&q=41.382,2.170(Esta+Es+La+Etiqueta)");
-
-                //Intent intent = new Intent(Intent.ACTION_VIEW, intentUri);
-
                 if(((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude() != null ||
                         ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude() != null ) {
                     String query = "google.navigation:q=" + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude()
                             + "," + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude() + "";
-
 
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(query));
 
@@ -230,12 +204,9 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 else{
 
                     Toast.makeText(getActivity(), "Ubicacion No disponible!", Toast.LENGTH_SHORT).show();
-
                 }
-
             }
         });
-
 
         signaturePad = (SignaturePad) rootView.findViewById(R.id.signaturePad);
         signaturePad.setEnabled(false);
@@ -261,19 +232,9 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 imageUri = getActivity().getContentResolver().insert(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-
-
-               // imageUri = Uri.fromFile(directoryIncidencia);
-
-              //  Toast.makeText(getActivity(), "Foto guardada en: " + imageUri, Toast.LENGTH_SHORT).show();
-
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(intent, PICTURE_RESULT);
-             //   Toast.makeText(getActivity(), "PICTURE_RESULT" + PICTURE_RESULT, Toast.LENGTH_SHORT).show();
-
-
-
             }
         });
 
@@ -288,85 +249,12 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             e.printStackTrace();
         }
 
-
         return rootView;
-
         }
-
-
-        /*firmas*/
-        /*
-        firmaImage = (ImageView) rootView.findViewById(R.id.imageView1);
-
-
-        String image_path = getActivity().getIntent().getStringExtra("imagePath");
-        Bitmap bitmap = BitmapFactory.decodeFile(image_path);
-        firmaImage.setImageBitmap(bitmap);
-        mContent = (RelativeLayout) rootView.findViewById(R.id.canvasLayout);
-        mSignature = new signature(getActivity().getApplicationContext(), null);
-        mSignature.setBackgroundColor(Color.WHITE);
-        // Dynamically generating Layout through java code
-        mContent.addView(mSignature, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        btnFirmar.setEnabled(false);
-        view = mContent;
-        btnFirmar.setOnClickListener(new OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             Log.v("log_tag", "Panel Saved");
-                                             if (Build.VERSION.SDK_INT >= 23) {
-                                                 isStoragePermissionGranted();
-                                             } else {
-                                                 view.setDrawingCacheEnabled(true);
-                                                 mSignature.save(view, StoredPath);
-                                                 Toast.makeText(getActivity().getApplicationContext(), "Successfully Saved", Toast.LENGTH_SHORT).show();
-
-                                                 recreate();
-                                             }
-                                         }
-                                     });
-
-
-                // Method to create Directory, if the Directory doesn't exists
-                file = new File(DIRECTORY);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-*/
-
-
-
-
-
-/*
-        guardarFirmaLocalmente();
-        btnFirmar.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                Log.v("log_tag", "Panel Saved");
-                boolean error = captureSignature();
-                if(!error){
-                    mContent.setDrawingCacheEnabled(true);
-                    save();
-                    Bundle b = new Bundle();
-                    b.putString("status", "done");
-                    Intent intent = new Intent();
-                    intent.putExtras(b);
-                    getActivity().setResult(RESULT_OK,intent);
-
-                    getActivity().finish();
-                }
-            }
-        });*/
-
-
 
         public void iraSurtirPedido() {
 
-
             SurtirPedidoFragment spf = new SurtirPedidoFragment();
-
 
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -376,15 +264,11 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
         }
 
-
-
-
-
     /*foto incidencia*/
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case PICTURE_RESULT:
-                if (requestCode == PICTURE_RESULT)
+                if (requestCode == PICTURE_RESULT) {
                     if (resultCode == Activity.RESULT_OK) {
                         try {
                             thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
@@ -394,10 +278,9 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                             e.printStackTrace();
                         }
                     }
+                }
         }
     }
-
-
 
     public String getRealPathFromURI(Uri contentUri) {
         String[] proj = { MediaStore.Images.Media.DATA };
@@ -421,9 +304,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         return false;
     }
 
-
-
-
     public void getLocation(){
 
         try {
@@ -436,25 +316,12 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 callSeguimiento();
             }else{
                 Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-
             }
-
-
-            //   isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            // strLatitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude());
-            // strLongitude = String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude());
-
-
-
         }
         catch(SecurityException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-
         }
-
-
     }
     public void callSeguimiento(){
         Toast.makeText(getActivity(), "Ir a Latitude: " + strLongitude + ", Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
@@ -483,10 +350,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     public void onProviderEnabled(String provider) {
 
     }
-
-
-
-
 }
 
 

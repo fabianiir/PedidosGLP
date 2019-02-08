@@ -19,7 +19,6 @@ public class Sessions  extends Application {
         this.nameTitle = nameTitle;
     }
 
-
     private String idPedido;
 
     public String getSesIdPedido() {
@@ -186,11 +185,6 @@ public class Sessions  extends Application {
         this.sessumaiva = sessumaiva;
     }
 
-
-
-
-
-
     private String strIpServidor;
 
     public String getSesstrIpServidor() {
@@ -198,8 +192,6 @@ public class Sessions  extends Application {
     }
 
     public void setSesstrIpServidor(String strIpServidor) { this.strIpServidor = strIpServidor; }
-
-
 
     private String sesscamion_id;
 
@@ -286,22 +278,4 @@ public class Sessions  extends Application {
     public void setSesubicacion_longitude(String ubicacion_long) {
         this.ubicacion_long = ubicacion_long;
     }
-
-
-/*
-    private String sessToken;
-
-    public String getsessToken() {
-        return sessToken;
-    }
-
-    public void setsessToken(String sessToken) {
-        this.sessToken = sessToken;
-    }
-
-*/
-
-
-
-
 }

@@ -27,13 +27,11 @@ public class ReimpresionPedidoFragment  extends Fragment {
 
     public ReimpresionPedidoFragment(Context mCtx) {
         this.mCtx = mCtx;
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -47,45 +45,28 @@ public class ReimpresionPedidoFragment  extends Fragment {
         tvCanEstatus = (TextView) rootView.findViewById(R.id.tvCanEstatus);
         tvCanTotal = (TextView) rootView.findViewById(R.id.tvCanTotal);
 
-
-
         tvCanNombreOperador.setText("Nombre: " + ((Sessions)getActivity().getApplicationContext()).getSesCliente());
         tvCanDireccion.setText("Direccion: " + ((Sessions)getActivity().getApplicationContext()).getsesDireccion());
         tvCanDescripcion.setText("Descripcion: " + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion());
         tvCanEstatus.setText("Estatus: " + ((Sessions)getActivity().getApplicationContext()).getsesEstatus());
         tvCanTotal.setText("Total: " + ((Sessions)getActivity().getApplicationContext()).getsesTotal());
 
-
-
         btnReimprimirPedido = (Button) rootView.findViewById(R.id.btnReimprimirPedido);
         btnReimprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 reimprimirPedido();
-
-
             }
         });
 
-
-
         return  rootView;
-
-
     }
 
     public void reimprimirPedido(){
-
         Intent intent = new Intent(getActivity(), Impresora.class);
         startActivity(intent);
         Toast.makeText(getActivity(), "Reimprimiendo Pedido" , Toast.LENGTH_SHORT).show();
-
-
     }
-
-
-
 
         @Override
         public void onAttach(Activity activity) {
@@ -96,11 +77,4 @@ public class ReimpresionPedidoFragment  extends Fragment {
         public void onDetach() {
             super.onDetach();
         }
-
-
-
-
-
-
-
     }

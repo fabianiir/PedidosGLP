@@ -53,7 +53,4 @@ public class UsuarioInfo {
     }
 
     public void  setFotoFirma(Bitmap bitmap) { UsuarioInfo.fotoFirma = bitmap; }
-
-
-
 }

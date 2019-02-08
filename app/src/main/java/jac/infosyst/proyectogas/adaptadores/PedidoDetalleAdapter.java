@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolder> {
+public class PedidoDetalleAdapter  extends RecyclerView.Adapter<PedidoDetalleAdapter.ViewHolder> {
 
     private List<Pedido> pedidos;
     private Context mCtx;
@@ -51,7 +52,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
     private static String DB_NAME = "proyectogas17.db";
     private static int DB_VERSION = 1;
 
-   public PedidoAdapter(List<Pedido> pedidos, Context mCtx, FragmentManager f_manager) {
+    public PedidoDetalleAdapter(List<Pedido> pedidos, Context mCtx, FragmentManager f_manager) {
         this.pedidos = pedidos;
         this.mCtx = mCtx;
         // this.listener = listener;
@@ -66,8 +67,13 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
     }
 
     @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+    }
+
+    @Override
     public void onBindViewHolder(final PedidoAdapter.ViewHolder holder, final int position) {
-            final Pedido pedido = pedidos.get(position);
+        final Pedido pedido = pedidos.get(position);
         holder.textViewCliente.setText(pedido.getcliente());
         holder.textViewDescripcion.setText(pedido.getplacas());
         holder.textViewEstatus.setText(pedido.getcp());
@@ -76,7 +82,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         holder.textViewdetalleproducto.setText(pedido.getnombre());
         holder.textViewfirmaurl.setText(pedido.gettelefono());
 
-            if (pedido.getHobbies() != null) {
+        if (pedido.getHobbies() != null) {
 
             for (Producto hobby : pedido.getHobbies()) {
                 Log.d("pedido: ", pedido.getOid());
@@ -84,7 +90,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         }else{
             ((Sessions)mCtx.getApplicationContext()).setsesTotal("0");
 
-                Log.d("pedido productos null: ", pedido.getOid());
+            Log.d("pedido productos null: ", pedido.getOid());
         }
 
         if (!selected.contains(position)){
@@ -127,7 +133,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 ((Sessions)mCtx.getApplicationContext()).setSesDetalleProductoSurtir(pedidos.get(position).getHobbies());
                 ((Sessions)mCtx.getApplicationContext()).setsesTotal(pedidos.get(position).gettotal());
 
-               // view.setBackgroundColor(Color.CYAN);
+                // view.setBackgroundColor(Color.CYAN);
                 holder.relativeRow.setBackgroundColor(Color.parseColor("#004C7A"));
                 holder.textViewCliente.setTextColor(Color.parseColor("#ffffff"));
                 holder.textViewDescripcion.setTextColor(Color.parseColor("#ffffff"));

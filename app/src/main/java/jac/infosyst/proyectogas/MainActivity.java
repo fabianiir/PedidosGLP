@@ -38,8 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
      //   implements NavigationView.OnNavigationItemSelectedListener {
-        implements FragmentDrawer.FragmentDrawerListener{
-
+    implements FragmentDrawer.FragmentDrawerListener{
 
     private static String TAG = MainActivity.class.getSimpleName();
 
@@ -57,14 +56,12 @@ public class MainActivity extends AppCompatActivity
     private int DB_VERSION = 1;
     String strIP = "";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         objSessions = new Sessions();
-
 
         strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
 
@@ -79,43 +76,9 @@ public class MainActivity extends AppCompatActivity
         final Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
-
             strIP = record.getString(record.getColumnIndex("ip"));
-
             objSessions.setSesstrIpServidor(strIP);
-
-
         }
-
-
-
-       // Toast.makeText(this, "Main! " +strRolUsuario, Toast.LENGTH_SHORT).show();
-
-
-/*
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-
-*/
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -130,17 +93,7 @@ public class MainActivity extends AppCompatActivity
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         drawerFragment.setDrawerListener(this);
 
-
-
-        // display the first navigation drawer view on app launch
         displayView(0);
-
-
-       // bundle = new Bundle();
-       // pedidoObj = new PedidosFragment();
-      //  pedidoObj.setArguments(bundle);
-
-
     }
 
     @Override
@@ -175,57 +128,15 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-/*
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_pedidos) {
-            // Handle the camera action
-
-        } else if (id == R.id.nav_operador) {
-
-        } else if (id == R.id.nav_mapa) {
-            Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_ajustes) {
-
-        } else if (id == R.id.nav_prealizados) {
-
-        } else if (id == R.id.nav_cerrar) {
-
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-*/
-
     @Override
     public void onDrawerItemSelected(View view, int position)
     {
-
-       // if(position == 5){
-            // Toast.makeText(MainActivity.this, "cerrar: " , Toast.LENGTH_SHORT).show();
-        //    insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
-        //    Log.v(TAG,"token: " + position);
-
-        //}
         displayView(position);
-
-
     }
 
     private void displayView(int position) {
         Fragment fragment = null;
         String title = getString(R.string.app_name);
-
 
         switch (position) {
 
@@ -275,7 +186,6 @@ public class MainActivity extends AppCompatActivity
 
                 }
 
-
                 break;
 
             case 5:
@@ -289,11 +199,7 @@ public class MainActivity extends AppCompatActivity
 
             default:
                 break;
-
         }
-
-
-
 
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -307,14 +213,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-
     public void insertBitacora(boolean evento, String emai, String chofer_id, String camion_id , String token){
 
-      //  Toast.makeText(getApplicationContext(), "cerrar: " , Toast.LENGTH_SHORT).show();
-
-
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -332,32 +233,19 @@ public class MainActivity extends AppCompatActivity
 
                     if(resObj.geterror().equals("false")){
 
-
-                     //   Toast.makeText(getApplicationContext(), "token: " + resObj.gettoken(), Toast.LENGTH_SHORT).show();
-
                         Log.d(TAG,"token: " + resObj.gettoken());
-
                     } else {
                         Toast.makeText(getApplicationContext(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 else {
                     Toast.makeText(getApplicationContext(), "Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
-
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
-
-
-
 }

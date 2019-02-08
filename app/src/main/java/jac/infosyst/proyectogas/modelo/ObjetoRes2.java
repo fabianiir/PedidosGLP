@@ -27,6 +27,4 @@ public class ObjetoRes2 {
     public CatalagoProducto[] getcatalogoProductos() {
         return catalogo;
     }
-
-
 }

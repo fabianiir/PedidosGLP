@@ -16,7 +16,6 @@ public class NavDrawerItem
         this.showNotify = showNotify;
         this.title = title;
         this.imgMenu = imgMenu;
-
     }
 
     public boolean isShowNotify() {
@@ -42,8 +41,6 @@ public class NavDrawerItem
     public void setimgMenu(int imgMenu) {
         this.imgMenu = imgMenu;
     }
-
-
 }
 
 

@@ -100,6 +100,5 @@ public class ObjetoRes {
     public Spinner[] getmotivoscancelacion() {
         return catalogo;
     }
-
 }
 

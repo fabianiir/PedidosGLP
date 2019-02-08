@@ -182,6 +182,4 @@ public class SmartPoster implements ParsedNdefRecord {
         }
         return new String(type.getPayload(), Charsets.UTF_8);
     }
-
-
 }

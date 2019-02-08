@@ -134,10 +134,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     private static final String TAG = "SurtirPedidoFragment";
 
     private List<Pedido> pedidos;
- //   private List<Producto> productos;
- //
 
-   // List<Producto> listAdapter;
     List<String> listAdapter;
 
     Producto myCustomProducto;
@@ -163,7 +160,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     String archivo = "";
     Bitmap decodedByte;
 
-
     public SurtirPedidoFragment() {
 
     }
@@ -173,8 +169,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         super.onCreate(savedInstanceState);
 
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -188,12 +182,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         userService = ApiUtils.getUserService();
         dialog = new ProgressDialog(getActivity());
 
-
-
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
-
 
         String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
 
@@ -217,7 +208,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         final int recordCount = dbConn3.rawQuery(sql, null).getCount();
         //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
 
-
         final Cursor record = dbConn3.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
@@ -226,7 +216,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         }
 
     //    checkPedidoPendiente();
-
 
         Toast.makeText(getActivity(), "ticket:" + ((Sessions)getActivity().getApplication()).getSesIdPedido(), Toast.LENGTH_SHORT).show();
 
@@ -421,7 +410,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         });
 
 
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -439,38 +428,24 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onResponse(Call call, Response response) {
                 if(response.isSuccessful()){
                     ObjetoRes resObj = (ObjetoRes) response.body();
-
-                    if(resObj.geterror().equals("false")) {
-
-                            if(resObj.getestatus().equals("Pendiente")){
-                                btnReimpresionTicket.setVisibility(View.GONE);
-
-                            }else{
-                                fabAgregarProducto.setEnabled(false);
-                                btnReimpresionTicket.setVisibility(View.VISIBLE);
-                                signaturePad.setEnabled(false);
-                                btnGuardar.setEnabled(false);
-                                btnLimpiar.setEnabled(false);
-                                getImageFirma();
-                            }
-
+                        if(resObj.getestatus().equals("Pendiente")){
+                            btnReimpresionTicket.setVisibility(View.GONE);
+                        }else {
+                            fabAgregarProducto.setEnabled(false);
+                            btnReimpresionTicket.setVisibility(View.VISIBLE);
+                            signaturePad.setEnabled(false);
+                            btnGuardar.setEnabled(false);
+                            btnLimpiar.setEnabled(false);
+                            getImageFirma();
+                        }
                         textViewTotal.setText("" + ((Sessions)getActivity().getApplicationContext()).getSesarrayPriceTotal());
 
-                            if(resObj.getproducto() != null){
-                                adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager());
-                                recyclerViewProductos.setAdapter(adapter);
-                            }else {
-                                Toast.makeText(getActivity(), "No Productos!" , Toast.LENGTH_SHORT).show();
-
-                            }
-
-
-                    } else {
-                        textViewTotal.setText("Total $0");
-
-                        Toast.makeText(getActivity(), resObj.getMessage() , Toast.LENGTH_SHORT).show();
-
-                    }
+                        if(resObj.getproducto() != null){
+                            adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager());
+                            recyclerViewProductos.setAdapter(adapter);
+                        }else {
+                            Toast.makeText(getActivity(), "No Productos!", Toast.LENGTH_SHORT).show();
+                        }
                 } else {
                     Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
                 }
@@ -488,9 +463,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         // Inflate the layout for this fragment
         return rootView;
-
     }
-
 
     public void mostrarConfirmacion(String mensaje){
       //  Toast.makeText(getActivity(), "Pedido guardado!", Toast.LENGTH_SHORT).show();
@@ -504,7 +477,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         POPUP_WINDOW_CONFIRMACION.setWidth(width);
         POPUP_WINDOW_CONFIRMACION.setHeight(height);
         POPUP_WINDOW_CONFIRMACION.setFocusable(true);
-
 
         POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
 
@@ -520,7 +492,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 POPUP_WINDOW_CONFIRMACION.dismiss();
             }
         });
-
 
         Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
         btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
@@ -546,7 +517,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         POPUP_WINDOW_CATALAGOPRODUCTOS.setHeight(height);
         POPUP_WINDOW_CATALAGOPRODUCTOS.setFocusable(true);
 
-
         POPUP_WINDOW_CATALAGOPRODUCTOS.setBackgroundDrawable(null);
 
         POPUP_WINDOW_CATALAGOPRODUCTOS.showAtLocation(layoutCatalagoProductos, Gravity.CENTER, 1, 1);
@@ -554,14 +524,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         TextView txtMessage = (TextView) layoutCatalagoProductos.findViewById(R.id.layout_popup_txtMessage);
         txtMessage.setText(mensaje);
 
-
-
         recyclerViewCatalagoProductos = (RecyclerView) layoutCatalagoProductos.findViewById(R.id.recyclerViewCatalagoProductos);
         recyclerViewCatalagoProductos.setHasFixedSize(true);
         recyclerViewCatalagoProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         /*section - getCatalagoProductos*/
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -601,11 +569,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
 
-
-
-
-
-
         Button btnAgregarProductoNo = (Button) layoutCatalagoProductos.findViewById(R.id.btnAgregarProductoNo);
         btnAgregarProductoNo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -614,10 +577,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
     }
-
-
-
-
 
     public void pedidoActualizarSurtido(String idPedido){
         btnReimpresionTicket.setVisibility(View.VISIBLE);
@@ -634,7 +593,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
         final Cursor record = db.rawQuery(sql, null);
@@ -642,14 +600,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         if (record.moveToFirst()) {
 
             strIP = record.getString(record.getColumnIndex("ip"));
-
         }
 
         getHora();
         getFecha();
       //  getUbicacion();
 
-        BASEURL = "http://"+ strIP+ ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -658,7 +615,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.up_pedido(String.valueOf(((Sessions)getActivity().getApplicationContext()).getSesIdPedido()), strHora, strFecha,
+        Call call = service.up_pedido(pedidoID, strHora, strFecha,
                 "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
                 19, 21, "b01020c8-4ab1-49b1-9ae1-87b2ec84465d", "null",
                 "1bcd4387-9f14-43cb-84c8-e2fb46ac67f2", "Up_1",
@@ -669,7 +626,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onResponse(Call call, Response response) {
 
-
                 if (response.isSuccessful()) {
                     ObjetoRes resObj = (ObjetoRes) response.body();
                     if (resObj.geterror().equals("false")) {
@@ -678,11 +634,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         }
                         Toast.makeText(getActivity(), "Hora:"+strHora + "Fecha:"+ strFecha + "Latitude:"+strLatitude + "Longitude"+strLongitude
                                 + resObj.getMessage(), Toast.LENGTH_SHORT).show();
-
-
-
-
-
                     }
                     if (resObj.geterror().equals("true")) {
                         if (dialog.isShowing()) {
@@ -690,18 +641,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         }
                         Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-
                 }
-
             }
             @Override
             public void onFailure(Call call, Throwable t) {
                 if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
-
             }
-
         });
     }
 
@@ -755,7 +702,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case PICTURE_RESULT:
-                if (requestCode == PICTURE_RESULT)
+                if (requestCode == PICTURE_RESULT) {
                     if (resultCode == Activity.RESULT_OK) {
                         try {
                             thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
@@ -765,6 +712,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                             e.printStackTrace();
                         }
                     }
+                }
         }
     }
     public String getRealPathFromURI(Uri contentUri) {
@@ -785,7 +733,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             Log.i(TAG, "You already have permission!");
             return true;
         }
-
         return false;
     }
 
@@ -795,18 +742,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void getFecha(){
-
         Calendar calendar = Calendar.getInstance();
-
         strFecha = String.valueOf(simpleDateFormatFecha.format(calendar.getTime()));
         Toast.makeText(getActivity(), "strFecha:" + strFecha, Toast.LENGTH_SHORT).show();
-
     }
 
-
     public void getImageFirma(){
-
-        BASEURL = "http://" + strIP + ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -832,32 +774,19 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         UsuarioInfo uss = new UsuarioInfo();
                         uss.setFotoFirma(decodedByte);
                         imgFirma.setImageBitmap(UsuarioInfo.getFotoFirma());
-
-
                     }else {
                         Toast.makeText(getActivity(), "No fue posible obtener la firma!", Toast.LENGTH_SHORT).show();
-
-
                     }
-
-
                 }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-
             }
         });
-
-
     }
+
     public static Bitmap decodeBase64(String input)
     {
-//        String imageDataBytes = input.substring(input.indexOf(",")+1);
-
-  //      InputStream stream = new ByteArrayInputStream(Base64.decode(imageDataBytes.getBytes(), Base64.DEFAULT));
-
-
         byte[] decodedBytes = Base64.decode(input.getBytes(), Base64.DEFAULT);
         BitmapFactory.Options options;
 
@@ -876,12 +805,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Bitmap bitmap = signaturePad.getSignatureBitmap();
 
-
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
         String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
-        BASEURL = "http://" + strIP + ":8060/glpservices/webresources/glpservices/";
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -906,14 +834,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onFailure(Call call, Throwable t) {
             }
         });
-
     }
 
     public void getUbicacion(){
         getLocation();
 
     }
-
 
     public void getLocation(){
 
@@ -927,35 +853,22 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 callSeguimiento();
             }else{
                 Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-
             }
-
         }
         catch(SecurityException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-
         }
-
-
     }
-
-
-
 
     public void callSeguimiento(){
         Toast.makeText(getActivity(), "Latitude: " + strLongitude + " Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
-
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
-        // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
         strLatitude = String.valueOf(location.getLatitude());
         strLongitude = String.valueOf(location.getLongitude());
-
-
     }
 
     @Override
@@ -965,15 +878,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
-
-
-
-
 }

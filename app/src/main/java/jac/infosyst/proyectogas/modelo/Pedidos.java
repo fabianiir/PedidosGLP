@@ -11,15 +11,6 @@ public class Pedidos {
 
     }
 
-   /* public ArrayList<Pedido> getPedidos() {
-        return pedidos;
-    }
-
-    public void setPedidos(ArrayList<Pedido> pedidos) {
-        this.pedidos = pedidos;
-    }
-*/
-
     private int Oid;
     private String nombre;
     private String placas;
@@ -84,5 +75,4 @@ public class Pedidos {
     public Pedido[] getpedido() {
         return pedido;
     }
-
 }

@@ -69,7 +69,6 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
     @Override
     public void handleResult(Result result) {
 
-
         Log.v("HandleResult", result.getText());
         AlertDialog.Builder builder= new AlertDialog.Builder(this);
         builder.setTitle("Resultado del Scan");
@@ -88,11 +87,7 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
             }
         }, 20000);
 
-
         Intent intent = new Intent(Escaner.this, MainActivity.class);
         startActivity(intent);
-
-
-
     }
 }

@@ -76,9 +76,6 @@ public class Configuracion extends AppCompatActivity{
             Log.i("Mensaje", "Se tiene permiso!");
         }
 
-
-
-
         edtIP = (EditText) findViewById(R.id.input_IP);
         edtTelefono = (EditText) findViewById(R.id.input_telefono);
         btnConfig = (Button) findViewById(R.id.btn_configuracion);
@@ -92,7 +89,6 @@ public class Configuracion extends AppCompatActivity{
                 //validate form
                 if(validateConfig(ipDominio, telefono)){
                     insertarConfiguracion();
-
                 }
             }
         });
@@ -122,17 +118,14 @@ public class Configuracion extends AppCompatActivity{
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-
         //Defining retrofit api service
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
         ConfiguracionModelo conf = new ConfiguracionModelo(strIP, strCelular);
 
-
         Call<Result> call = service.registroConfiguracion(
                 conf.getIP(),
                 conf.getCelular()
-
         );
 
         call.enqueue(new Callback<Result>() {
@@ -145,15 +138,12 @@ public class Configuracion extends AppCompatActivity{
 
                 final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-
-/*primera vez */
+                /*primera vez */
                 ContentValues values2 = new ContentValues();
 
                 values2.put("ip", strIP);
 
                 db.insert("config", null, values2);
-
-
 
                 ContentValues cv = new ContentValues();
                 cv.put("ip",strIP);
@@ -161,41 +151,11 @@ public class Configuracion extends AppCompatActivity{
 
                 db.update("config", cv, "id="+1, null);
                // Toast.makeText(Configuracion.this, "config java:" + strIP, Toast.LENGTH_SHORT).show();
-
                 /*poner if de la primera vezz*/
-
-
-
-
-
-
-                //  Toast.makeText(getApplicationContext(), "RESULTADO CONFIG: " + strIP, Toast.LENGTH_LONG).show();
-
-
-
-
-                // insertSqLite("x", strIP);
-
-                /*
-                ContentValues values = new ContentValues();
-
-                values.put("status", "1");
-                values.put("ip", strIP);
-
-                boolean createSuccessful = db.insert("config", null, values) > 0;
-                */
-
-
-
-               // db.close();
-              //  Toast.makeText(getApplicationContext(), "geo: " + createSuccessful, Toast.LENGTH_LONG).show();
-
-
                 ((Sessions)getApplication()).setSesstrIpServidor(strIP);
 
                 Intent intent = new Intent(Configuracion.this, LoginActivity.class);
                 startActivity(intent);
-
             }
 
             @Override
@@ -204,7 +164,6 @@ public class Configuracion extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(), "nnn:" +  t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
     }
 
 
@@ -222,20 +181,14 @@ public class Configuracion extends AppCompatActivity{
 
     public static  class SplashActivity extends Activity {
 
-
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_splash);
-//Permisos
-
+            //Permisos
 
             int PermisoAlmacenamiento = ContextCompat.checkSelfPermission(
                     this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-
-
-
             if (PermisoAlmacenamiento != PackageManager.PERMISSION_GRANTED) {
                 Log.i("Mensaje", "No se tiene permiso.");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 225);
@@ -243,17 +196,14 @@ public class Configuracion extends AppCompatActivity{
                 Log.i("Mensaje", "Se tiene permiso!");
             }
 
-
             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
 
             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-
             String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
 
-
             final int recordCount = db.rawQuery(sql, null).getCount();
-          //  Toast.makeText(getApplicationContext(), "CONTADOR: " + recordCount, Toast.LENGTH_LONG).show();
+            // Toast.makeText(getApplicationContext(), "CONTADOR: " + recordCount, Toast.LENGTH_LONG).show();
 
             SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
 
@@ -261,50 +211,13 @@ public class Configuracion extends AppCompatActivity{
             String email="";
             String checkEmpty = "";
             if (cursor.moveToFirst()) {
-
                 int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
                 String firstname = cursor.getString(cursor.getColumnIndex("status"));
                 email = cursor.getString(cursor.getColumnIndex("ip"));
               //  Toast.makeText(getApplicationContext(), "datos: " + id, Toast.LENGTH_LONG).show();
-
             }
 
             cursor.close();
-
-
-            /*
-            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
-
-            if (!hasDBVersionError()) {
-
-                sqLiteDBHelper.getWritableDatabase();
-
-                if (sqLiteDBHelper != null) {
-                    SQLiteDatabase sqLiteDatabase = sqLiteDBHelper.getWritableDatabase();
-                    Cursor c = sqLiteDatabase.query(SQLiteDBHelper.CONFSQLITE_TABLE_NAME, null, null, null,
-                            null, null, null);
-
-                    int idx = c.getColumnIndex("status");
-                    int ip = c.getColumnIndex("ipServidor");
-
-                    checkConfiguracionSqLite = idx;
-                    int idStatus = idx;
-
-                    Toast.makeText(getApplicationContext(), "IP: " + ip, Toast.LENGTH_LONG).show();
-
-                    statusConf = ip;
-
-
-                } else {
-                    Toast.makeText(getApplicationContext(), "Please create database first.", Toast.LENGTH_LONG).show();
-
-                }
-            }
-
-*/
-
-
-
 
             new Handler().postDelayed(new Runnable()
             {
@@ -313,76 +226,22 @@ public class Configuracion extends AppCompatActivity{
                     //email.equals("null");
                     if(recordCount == 0) {
 
-
-
                         /*cuando se le agrega un campo nuevo (sqlite sin valor)a una tabla ya existente, por default se le asigna un -1 */
                         Intent intent = new Intent(SplashActivity.this, Configuracion.class);
 
                         startActivity(intent);
-
-
                     }
 
-
                     else{
-
-
-
                         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                         startActivity(intent);
-
                     }
                 }
 
 
             }, 4000);
-
-
         }
-
-
     }
-
-/*
-    ObtenerIMEI();
-    public void ObtenerIMEI()
-    {
-        int permissionCheck = ContextCompat.checkSelfPermission( this, Manifest.permission.READ_PHONE_STATE );
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            Log.i("Mensaje", "No se tiene permiso.");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
-        } else {
-            Log.i("Mensaje", "Se tiene permiso!");
-        }
-
-
-        String myIMEI = "";
-
-        TelephonyManager mTelephony = (TelephonyManager) getApplication().getSystemService(Context.TELEPHONY_SERVICE);
-        if (mTelephony.getDeviceId() != null){
-            myIMEI = mTelephony.getDeviceId();
-
-            insertaImeiSqLite(myIMEI);
-        }
-
-    }
-
-    public void insertaImeiSqLite(String emai){
-        sqLiteDBHelper = new SQLiteDBHelper(Configuracion.this, DB_NAME, null, DB_VERSION);
-
-        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-
-        ContentValues values2 = new ContentValues();
-
-        values2.put("emai", emai);
-
-        db.insert("dispositivo", null, values2);
-        Toast.makeText(Configuracion.this, "SqlITE emai:" + emai, Toast.LENGTH_SHORT).show();
-
-    }
-
- */
 
     public void insertSqLite(String message, String ip) {
         sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
@@ -394,9 +253,6 @@ public class Configuracion extends AppCompatActivity{
            // selectConf(statusConf);
         }
     }
-
-
-
 
     private static boolean hasDBVersionError()
     {
@@ -440,14 +296,10 @@ public class Configuracion extends AppCompatActivity{
         {
             Toast.makeText(getApplicationContext(), "Please create database first.", Toast.LENGTH_LONG).show();
         }
-
     }
 
     public int selectConf(int idStatus){
-
-
         return idStatus;
-
     }
 
 }

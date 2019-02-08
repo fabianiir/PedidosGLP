@@ -6,7 +6,6 @@ import java.util.List;
 public class Pedido {
 
 /*nombres de variables exactos a los valores retorno php*/
-
     private String Oid;
     private String nombre;
     private String placas;
@@ -24,18 +23,7 @@ public class Pedido {
     private String ubicacion_lat;
     private String ubicacion_long;
 
-   // private List<ArrayList> productos = new ArrayList<>();
-
     private Producto[] productos;
-
-    //private Producto[] productos2;
-
-  //  private List<Producto> productos;
-
-//    private List<Producto> productos = new ArrayList<Producto>();
-
- //   private List<String> productos = new ArrayList<String>();
-
 
     public Pedido(String Oid, String nombre, String placas, String fecha_hora_programada, String cliente, String direccion,
             String cp, String telefono, String comentarios_cliente, String suma_iva, String total,String tipo_pedido,  String estatus
@@ -121,98 +109,6 @@ public class Pedido {
     public  String getubicacion_lat() { return  ubicacion_lat; }
 
     public  String getubicacion_long() { return  ubicacion_long; }
-
-
-
-/*
-    public List<String> getHobbies() {
-        return productos;
-    }
-
-    public void setHobbies(List<String> productos) {
-        this.productos = productos;
-    }
-*/
-
-
-    /*
-
-    public void setProductos(List<Producto> productos) {
-        this.productos = productos;
-    }
-
-    public  List<Producto>getListproductos(){
-        return productos;
-    }
-
-
-    public Producto[] get2productos(){
-        return productos2;
-    }
-
-*/
-
-    /*
-    private int id;
-    private String cliente;
-    private String descripcion;
-    private String direccion;
-    private String estatus;
-    private String detalle;
-    private String firmaUrl;
-    private double total;
-
-
-    public Pedido(int id, String cliente, String descripcion, String direccion, String estatus
-                        , String detalle, String firmaUrl, double total) {
-        this.id = id;
-        this.cliente = cliente;
-        this.descripcion = descripcion;
-        this.direccion = direccion;
-        this.estatus = estatus;
-        this.detalle = detalle;
-        this.firmaUrl = firmaUrl;
-        this.total = total;
-
-    }
-
-
-    public int getId() {
-        return id;
-    }
-
-    public String getcliente() {
-        return cliente;
-    }
-
-    public String getdescripcion() {
-        return descripcion;
-    }
-
-    public String getdireccion(){
-        return direccion;
-    }
-
-    public String getestatus() {
-        return estatus;
-    }
-
-    public String getdetalleproducto() {
-        return detalle;
-    }
-
-    public String getfirmaurl () {
-        return firmaUrl ;
-    }
-
-    public double gettotal() {
-        return total;
-    }
-*/
-
-
-
-
 }
 
 

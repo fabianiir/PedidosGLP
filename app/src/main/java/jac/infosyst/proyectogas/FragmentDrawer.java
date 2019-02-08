@@ -69,11 +69,9 @@ public class FragmentDrawer extends Fragment {
     private static String DB_NAME = "proyectogas11.db";
     private static int DB_VERSION = 1;
 
-
-
     public FragmentDrawer() {
-
     }
+
     public void setDrawerListener (FragmentDrawerListener listener){
         this.drawerListener = listener;
     }
@@ -85,8 +83,6 @@ public class FragmentDrawer extends Fragment {
                 navItem.setTitle(titles[i]);
                 navItem.setimgMenu(icons[i]);
             data.add(navItem);
-
-
         }
 
             if(strUsuarioRol.equals("Operador")) {
@@ -97,59 +93,52 @@ public class FragmentDrawer extends Fragment {
 
         @Override
         public void onCreate (Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        // drawer labels
-        titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels);
-        icons = getActivity().getResources().getIntArray(R.array.nav_drawer_icons);
-        strUsuarioRol = ((Sessions)getActivity().getApplication()).getsesUsuarioRol();
-
+            super.onCreate(savedInstanceState);
+            // drawer labels
+            titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels);
+            icons = getActivity().getResources().getIntArray(R.array.nav_drawer_icons);
+            strUsuarioRol = ((Sessions)getActivity().getApplication()).getsesUsuarioRol();
         }
 
         @Override
         public View onCreateView (LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState){
-        // Inflating view layout
-        final View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
 
-        if(UsuarioInfo.getFoto() == null) {
-            Sessions strSess = new Sessions();
-            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
-            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            final View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
 
+            if(UsuarioInfo.getFoto() == null) {
+                Sessions strSess = new Sessions();
+                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-            String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+                String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
-            final int recordCount = db.rawQuery(sql, null).getCount();
-            //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
+                final int recordCount = db.rawQuery(sql, null).getCount();
 
+                final Cursor record = db.rawQuery(sql, null);
 
-            final Cursor record = db.rawQuery(sql, null);
+                if (record.moveToFirst()) {
+                    strIP = record.getString(record.getColumnIndex("ip"));
+                }
 
-            if (record.moveToFirst()) {
-                strIP = record.getString(record.getColumnIndex("ip"));
-            }
+                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
-            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+                final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 
-            final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
+                String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
 
+                final int recordCount3 = db.rawQuery(sql3, null).getCount();
+                //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
 
-            String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
+                SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
 
+                Cursor cursor3 = dbConn3.rawQuery(sql3, null);
 
-            final int recordCount3 = db.rawQuery(sql3, null).getCount();
-            //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
+                if (cursor3.moveToFirst()) {
+                    strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
+                }
 
-            SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
-
-            Cursor cursor3 = dbConn3.rawQuery(sql3, null);
-
-            if (cursor3.moveToFirst()) {
-                strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
-            }
-
-            BASEURL = "http://" + strIP + ":8060/glpservices/webresources/glpservices/";
+            BASEURL = strIP + "glpservices/webresources/glpservices/";
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASEURL)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -172,25 +161,20 @@ public class FragmentDrawer extends Fragment {
                             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
                             imageViewPerfil.setImageBitmap(UsuarioInfo.getFoto());
                         }
-
-
                     }
                 }
                 @Override
                 public void onFailure(Call call, Throwable t) {
-
                 }
             });
         } else{
             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
             imageViewPerfil.setImageBitmap(UsuarioInfo.getFoto());
         }
-
             TextView textViewInterno = (TextView) layout.findViewById(R.id.Nom_Operador);
             textViewInterno.setText(UsuarioInfo.getNombre());
 
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
-
         adapter = new NavigationDrawerAdapter(getActivity(), getData());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -203,13 +187,11 @@ public class FragmentDrawer extends Fragment {
 
             @Override
             public void onLongClick(View view, int position) {
-
             }
         }));
 
         return layout;
     }
-
 
         public void setUp ( int fragmentId, DrawerLayout drawerLayout,final Toolbar toolbar){
         containerView = getActivity().findViewById(fragmentId);
@@ -241,12 +223,10 @@ public class FragmentDrawer extends Fragment {
                 mDrawerToggle.syncState();
             }
         });
-
     }
 
         public static interface ClickListener {
             public void onClick(View view, int position);
-
             public void onLongClick(View view, int position);
         }
 
