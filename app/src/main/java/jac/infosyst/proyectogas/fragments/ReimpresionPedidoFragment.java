@@ -14,8 +14,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import java.io.IOException;
+import java.util.Calendar;
+
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.Sessions;
+
+import static jac.infosyst.proyectogas.fragments.SurtirPedidoFragment.simpleDateFormatFecha;
 
 
 @SuppressLint("ValidFragment")
@@ -45,16 +52,31 @@ public class ReimpresionPedidoFragment  extends Fragment {
         tvCanEstatus = (TextView) rootView.findViewById(R.id.tvCanEstatus);
         tvCanTotal = (TextView) rootView.findViewById(R.id.tvCanTotal);
 
-        tvCanNombreOperador.setText("Nombre: " + ((Sessions)getActivity().getApplicationContext()).getSesCliente());
-        tvCanDireccion.setText("Direccion: " + ((Sessions)getActivity().getApplicationContext()).getsesDireccion());
+
+        final String nombCliente= ((Sessions)getActivity().getApplicationContext()).getSesCliente();
+        final String direcCliente = ((Sessions)getActivity().getApplicationContext()).getsesDireccion();
+        final String totalCliente = ((Sessions)getActivity().getApplicationContext()).getsesTotal();
+        Calendar calendar = Calendar.getInstance();
+        final String fecha = String.valueOf(simpleDateFormatFecha.format(calendar.getTime()));
+
+
+
+        tvCanNombreOperador.setText("Nombre: " + nombCliente);
+        tvCanDireccion.setText("Direccion: " + direcCliente);
+
         tvCanDescripcion.setText("Descripcion: " + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion());
         tvCanEstatus.setText("Estatus: " + ((Sessions)getActivity().getApplicationContext()).getsesEstatus());
-        tvCanTotal.setText("Total: " + ((Sessions)getActivity().getApplicationContext()).getsesTotal());
+        tvCanTotal.setText("Total: " + totalCliente);
 
         btnReimprimirPedido = (Button) rootView.findViewById(R.id.btnReimprimirPedido);
         btnReimprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    MainActivity.printData(nombCliente,direcCliente,totalCliente, UsuarioInfo.getNombre(),UsuarioInfo.getPlacas(),fecha);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 Toast.makeText(getActivity(), "Reimprimiendo Pedido" , Toast.LENGTH_SHORT).show();
 
