@@ -429,52 +429,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
 
+        getProductos();
 
-        BASEURL = strIP + "glpservices/webresources/glpservices/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        pedidoID = ((Sessions) getActivity().getApplicationContext()).getSesIdPedido();
-
-       Call call = service.getProductos( pedidoID,
-               strtoken);
-
-       call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()){
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                        if(resObj.getestatus().equals("Pendiente")){
-                            btnReimpresionTicket.setVisibility(View.GONE);
-                        }else {
-                            fabAgregarProducto.setEnabled(false);
-                            btnReimpresionTicket.setVisibility(View.VISIBLE);
-                            signaturePad.setEnabled(false);
-                            btnGuardar.setEnabled(false);
-                            btnLimpiar.setEnabled(false);
-                            getImageFirma();
-                        }
-                        textViewTotal.setText("" + ((Sessions)getActivity().getApplicationContext()).getSesarrayPriceTotal());
-
-                        if(resObj.getproducto() != null){
-                            adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager());
-                            recyclerViewProductos.setAdapter(adapter);
-                        }else {
-                            Toast.makeText(getActivity(), "No Productos!", Toast.LENGTH_SHORT).show();
-                        }
-                } else {
-                    Toast.makeText(getActivity(), "error! " , Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
 
         final String strDescripcion2 = ((Sessions) getActivity().getApplication()).getsesDescripcion();
         final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
@@ -599,6 +556,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
+                Toast.makeText(getActivity(), "OK!", Toast.LENGTH_SHORT).show();
+                getProductos();
             }
         });
     }
@@ -859,6 +818,66 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
     }
+
+
+    public void getProductos() {
+        strtoken = "f1007875-8f2f-4aae-a7c6-d0c3901d13f9";
+
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        pedidoID = ((Sessions) getActivity().getApplicationContext()).getSesIdPedido();
+
+        Call call = service.getProductos(pedidoID,
+                strtoken);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if (resObj.getestatus().equals("Pendiente")) {
+                        btnReimpresionTicket.setVisibility(View.GONE);
+                        ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("visible");
+                        Toast.makeText(getActivity(), ((Sessions) getActivity().getApplicationContext()).getSesstrRestarProducto(), Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
+                        fabAgregarProducto.setEnabled(false);
+                        btnReimpresionTicket.setVisibility(View.VISIBLE);
+                        signaturePad.setEnabled(false);
+                        btnGuardar.setEnabled(false);
+                        btnLimpiar.setEnabled(false);
+                        getImageFirma();
+                    }
+                    textViewTotal.setText("Total $:" + resObj.getsumaTotal());
+                    Toast.makeText(getActivity(), "Total $:" + resObj.getsumaTotal(), Toast.LENGTH_SHORT).show();
+
+                    if (resObj.getproducto() != null) {
+                        adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager());
+                        recyclerViewProductos.setAdapter(adapter);
+                    } else {
+                        Toast.makeText(getActivity(), "No Productos!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
 
     public void getUbicacion(){
         getLocation();

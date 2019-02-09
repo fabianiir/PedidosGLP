@@ -278,4 +278,15 @@ public class Sessions  extends Application {
     public void setSesubicacion_longitude(String ubicacion_long) {
         this.ubicacion_long = ubicacion_long;
     }
+
+    private String strRestarProducto;
+
+    public String getSesstrRestarProducto() {
+        return strRestarProducto;
+    }
+
+    public void setSessstrRestarProducto(String strRestarProducto) {
+        this.strRestarProducto = strRestarProducto;
+    }
+
 }

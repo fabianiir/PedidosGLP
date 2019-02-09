@@ -111,9 +111,18 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
             public void onClick(View view) {
                 ((Sessions)mCtx.getApplicationContext()).setSesOidProducto(productos.get(position).getOidProducto());
 
-                Toast.makeText(mCtx, "Restar producto: " +  String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
 
-                restarProducto(String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(),  "f87b5f10-12d2-428d-8bf1-606150f73185");
+                if(((Sessions)mCtx.getApplicationContext()).getSesstrRestarProducto().equals("gone")){
+
+                    Toast.makeText(mCtx, "No se puede restar el Producto!", Toast.LENGTH_SHORT).show();
+                }else {
+
+                    Toast.makeText(mCtx, "Restar producto: " + String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
+
+                    restarProducto(String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(), "f87b5f10-12d2-428d-8bf1-606150f73185");
+                }
+
+
             }
         });
     }

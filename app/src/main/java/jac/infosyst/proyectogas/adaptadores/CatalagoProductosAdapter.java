@@ -98,8 +98,9 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
                 Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getIdProducto(), Toast.LENGTH_SHORT).show();
                 //storeSqLiteProductos(catalagoProductos.get(position).getprecio_unitario());
                 //holder.parentLayout.setVisibility(view.GONE);
-               sumarProducto(1, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
-                       catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
+               sumarProducto(1, (int) catalagoProductos.get(position).getprecio_unitario(), "bd88c0a6-91ce-4f81-95eb-b8ec8ebdfcfb",
+                       catalagoProductos.get(position).getIdProducto(), "f87b5f10-12d2-428d-8bf1-606150f73185");
+
             }
         });
     }
@@ -181,7 +182,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
                         Toast.makeText(mCtx, resObj.getMessage() , Toast.LENGTH_SHORT).show();
 
                     } else {
-                        Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mCtx, "ppp:" + resObj.getMessage()  , Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();

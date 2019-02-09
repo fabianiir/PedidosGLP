@@ -100,5 +100,18 @@ public class ObjetoRes {
     public Spinner[] getmotivoscancelacion() {
         return catalogo;
     }
+
+
+    private int total;
+
+    public int getsumaTotal() {
+        return total;
+    }
+
+    public void setsumaTotal(int sumaTotal) {
+        this.total = total;
+    }
+
+
 }
 
