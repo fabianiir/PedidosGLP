@@ -267,7 +267,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
             }
         });
 
-        strtoken = "f1007875-8f2f-4aae-a7c6-d0c3901d13f9";
+
         if (strtoken == null) {
             call = service.camion(Integer.parseInt(strcamion));
             call.enqueue(new Callback() {
@@ -392,7 +392,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     }
 
     public void actualizarPedidosSurtidos() {
-        strtoken = "f1007875-8f2f-4aae-a7c6-d0c3901d13f9";
+
 
         BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()

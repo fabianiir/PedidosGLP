@@ -151,7 +151,7 @@ public class FragmentDrawer extends Fragment {
                 public void onResponse(Call call, Response response) {
                     if (response.isSuccessful()) {
                         ObjetoRes resObj = (ObjetoRes) response.body();
-  /*
+
                         if (resObj.geterror().equals("false")) {
                          List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
                             archivo = arrayListImagen.get(0).getArchivo();
@@ -163,7 +163,7 @@ public class FragmentDrawer extends Fragment {
 
 
                         }
-                           */
+
                     }
                 }
                 @Override

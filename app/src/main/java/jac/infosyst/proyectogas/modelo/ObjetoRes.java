@@ -101,14 +101,6 @@ public class ObjetoRes {
         return catalogo;
     }
 
-    private int total;
 
-    public int getsumaTotal() {
-        return total;
-    }
-
-    public void setsumaTotal(int sumaTotal) {
-        this.total = total;
-    }
 }
 

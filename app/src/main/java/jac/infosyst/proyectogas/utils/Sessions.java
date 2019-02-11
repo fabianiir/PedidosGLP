@@ -280,13 +280,5 @@ public class Sessions  extends Application {
     }
 
 
-    private String strRestarProducto;
 
-    public String getSesstrRestarProducto() {
-        return strRestarProducto;
-    }
-
-    public void setSessstrRestarProducto(String strRestarProducto) {
-        this.strRestarProducto = strRestarProducto;
-    }
 }

@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     try{
-               //     FindBluetoothDevice();
+               FindBluetoothDevice();
                     //openBluetoothPrinter();
 
                 }catch (Exception ex){
