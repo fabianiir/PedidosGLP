@@ -51,7 +51,7 @@ public class Configuracion extends AppCompatActivity{
 
     EditText edtIP;
     EditText edtTelefono;
-    Button btnConfig;
+    Button btnConfig, btnMain;
 
     static int checkConfiguracionSqLite = 0;
     private static SQLiteDBHelper sqLiteDBHelper = null;
@@ -79,6 +79,7 @@ public class Configuracion extends AppCompatActivity{
         edtIP = (EditText) findViewById(R.id.input_IP);
         edtTelefono = (EditText) findViewById(R.id.input_telefono);
         btnConfig = (Button) findViewById(R.id.btn_configuracion);
+        btnMain = (Button) findViewById(R.id.btn_main);
 
 
         btnConfig.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +93,18 @@ public class Configuracion extends AppCompatActivity{
                 }
             }
         });
+
+        btnMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saltar_configuracion();
+            }
+        });
+    }
+
+    private void saltar_configuracion() {
+        Intent intent = new Intent(Configuracion.this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void insertarConfiguracion(){

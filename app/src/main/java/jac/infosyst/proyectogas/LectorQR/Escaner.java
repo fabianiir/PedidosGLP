@@ -69,25 +69,51 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
     @Override
     public void handleResult(Result result) {
 
-        Log.v("HandleResult", result.getText());
-        AlertDialog.Builder builder= new AlertDialog.Builder(this);
-        builder.setTitle("Resultado del Scan");
-        builder.setMessage(result.getText());
-         Chofer codigoQR = new Chofer();
-        codigoQR.setCamion(result.getText());
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        try{
+            Integer.parseInt(result.getText());
+
+            Log.v("HandleResult", result.getText());
+            AlertDialog.Builder builder= new AlertDialog.Builder(this);
+            builder.setTitle("Resultado del Scan");
+            builder.setMessage(result.getText());
+            Chofer codigoQR = new Chofer();
+            codigoQR.setCamion(result.getText());
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.show();
 
 
-        final Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            public void run() {
-                alertDialog.dismiss(); // when the task active then close the dialog
-                t.cancel(); // also just top the timer thread, otherwise, you may receive a crash report
-            }
-        }, 20000);
+            final Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                public void run() {
+                    alertDialog.dismiss(); // when the task active then close the dialog
+                    t.cancel(); // also just top the timer thread, otherwise, you may receive a crash report
+                }
+            }, 20000);
 
-        Intent intent = new Intent(Escaner.this, MainActivity.class);
-        startActivity(intent);
+            Intent intent = new Intent(Escaner.this, MainActivity.class);
+            startActivity(intent);
+        }catch (Exception e){
+            Log.v("HandleResult", result.getText());
+            AlertDialog.Builder builder= new AlertDialog.Builder(this);
+            builder.setTitle("Resultado no valido");
+            builder.setMessage(result.getText());
+            Chofer codigoQR = new Chofer();
+            codigoQR.setCamion(result.getText());
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+
+            final Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                public void run() {
+                    alertDialog.dismiss(); // when the task active then close the dialog
+                    t.cancel(); // also just top the timer thread, otherwise, you may receive a crash report
+                }
+            }, 20000);
+
+            Intent intent = new Intent(Escaner.this, Escaner.class);
+            startActivity(intent);
+        }
+
     }
 }

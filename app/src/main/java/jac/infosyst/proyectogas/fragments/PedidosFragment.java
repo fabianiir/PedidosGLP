@@ -364,19 +364,20 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 public void onResponse(Call call, Response response) {
                     if (response.isSuccessful()) {
                         ObjetoRes resObj = (ObjetoRes) response.body();
+                        if(resObj != null) {
+                            if (resObj.geterror().equals("false")) {
 
-                        if (resObj.geterror().equals("false")) {
+                                if (resObj.getpedido() != null) {
+                                    Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
+                                    adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
+                                    recyclerViewPedidos.setAdapter(adapter);
 
-                            if (resObj.getpedido() != null) {
-                                Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
-                                adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
-                                recyclerViewPedidos.setAdapter(adapter);
-
+                                } else {
+                                    Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
-                                Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), " no hay datos!" + strchofer + "/" + strtoken, Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(getActivity(), " no hay datos!" + strchofer +"/"+ strtoken, Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();

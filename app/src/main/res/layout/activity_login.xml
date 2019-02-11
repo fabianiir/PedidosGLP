@@ -81,11 +81,11 @@
                 android:background="@drawable/ic_ajustes"
                 android:padding="12dp"
                 android:textColor="@android:color/background_light"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
 
 
-                />
+                app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
 
     </LinearLayout>
