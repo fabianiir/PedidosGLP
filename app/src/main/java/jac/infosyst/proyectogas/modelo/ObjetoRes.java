@@ -102,5 +102,15 @@ public class ObjetoRes {
     }
 
 
+    private int total;
+
+    public int getsumaTotal() {
+        return total;
+    }
+
+    public void setsumaTotal(int sumaTotal) {
+        this.total = total;
+    }
+
 }
 
