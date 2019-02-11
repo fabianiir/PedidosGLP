@@ -151,16 +151,19 @@ public class FragmentDrawer extends Fragment {
                 public void onResponse(Call call, Response response) {
                     if (response.isSuccessful()) {
                         ObjetoRes resObj = (ObjetoRes) response.body();
-
+  /*
                         if (resObj.geterror().equals("false")) {
-                            List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
+                         List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
                             archivo = arrayListImagen.get(0).getArchivo();
                             decodedByte = decodeBase64(archivo);
                             UsuarioInfo uss = new UsuarioInfo();
                             uss.setFoto(decodedByte);
                             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
                             imageViewPerfil.setImageBitmap(UsuarioInfo.getFoto());
+
+
                         }
+                           */
                     }
                 }
                 @Override

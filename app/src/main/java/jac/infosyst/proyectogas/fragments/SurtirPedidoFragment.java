@@ -554,6 +554,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
+                Toast.makeText(getActivity(), "OK!", Toast.LENGTH_SHORT).show();
+                getProductos();
             }
         });
     }
