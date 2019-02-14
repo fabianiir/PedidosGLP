@@ -61,7 +61,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
     /*firma*/
     RelativeLayout mContent;
-    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar;
+    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar, btnLlamar;
 
     Button mClear, mGetSign, mCancel;
     File file;
@@ -137,6 +137,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         String strDetalle = ((Sessions) getActivity().getApplication()).getsesDetalleProducto();
         String strFirma = ((Sessions) getActivity().getApplication()).getsesFirmaURL();
         String strTotal = ((Sessions) getActivity().getApplication()).getsesTotal();
+        final String strTelefono = ((Sessions) getActivity().getApplication()).getsestelefono();
         Producto[] producto = ((Sessions) getActivity().getApplication()).getSesDetalleProductoSurtir();
 
         textViewObservaciones = (TextView) rootView.findViewById(R.id.textViewObservaciones);
@@ -187,6 +188,14 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             }
         });
 
+        btnLlamar = (Button) rootView.findViewById(R.id.btnLlamar);
+        btnLlamar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickLlamada(v, strTelefono);
+            }
+        });
+
         btnComoLlegar = (Button) rootView.findViewById(R.id.btnComoLlegar);
         btnComoLlegar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,7 +227,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         imageViewIncidencia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // Toast.makeText(getActivity(), "dentro de toma de foto" + strDescripcion2, Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), "dentro de toma de foto" + strDescripcion2, Toast.LENGTH_SHORT).show();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     //Check permissions for Android 6.0+
                     if (!checkExternalStoragePermission()) {
@@ -250,19 +259,19 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         }
 
         return rootView;
-        }
+    }
 
-        public void iraSurtirPedido() {
+    public void iraSurtirPedido() {
 
-            SurtirPedidoFragment spf = new SurtirPedidoFragment();
+        SurtirPedidoFragment spf = new SurtirPedidoFragment();
 
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.container_body, spf);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container_body, spf);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
-        }
+    }
 
     /*foto incidencia*/
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -332,8 +341,12 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
         strLatitude = String.valueOf(location.getLatitude());
         strLongitude = String.valueOf(location.getLongitude());
+    }
 
-
+    public void onClickLlamada(View v, String numTelefono) {
+        Intent i = new Intent(Intent.ACTION_CALL);
+        i.setData(Uri.parse("tel:" + numTelefono));
+        startActivity(i);
     }
 
     @Override
@@ -351,8 +364,3 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
     }
 }
-
-
-
-
-

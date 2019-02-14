@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -91,6 +92,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     private PopupWindow POPUP_WINDOW_CATALAGOPRODUCTOS = null;
+    Button btnRestar;
 
     View layout, layoutCatalagoProductos;
     LayoutInflater layoutInflater, layoutInflaterCatalagoProductos;
@@ -203,14 +205,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         if (cursor3.moveToFirst()) {
             strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
-
         }
 
-      //  strtoken
-                ((Sessions)getActivity().getApplicationContext()).setsessToken(strtoken);
-
-
-
+        //  strtoken
+        ((Sessions)getActivity().getApplicationContext()).setsessToken(strtoken);
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
         final int recordCount = dbConn3.rawQuery(sql, null).getCount();
@@ -220,14 +218,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
-
         }
 
-    //    checkPedidoPendiente();
+        //    checkPedidoPendiente();
 
         Toast.makeText(getActivity(), "ticket:" + ((Sessions)getActivity().getApplication()).getSesIdPedido(), Toast.LENGTH_SHORT).show();
-
-
 
         strIdPedido = ((Sessions)getActivity().getApplication()).getSesIdPedido();
         String strCliente = ((Sessions)getActivity().getApplication()).getSesCliente();
@@ -278,21 +273,17 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
         btnGuardar = (Button)rootView.findViewById(R.id.btnGuardar);
 
-
         //Asignacion de variables para impresora
-        imprCliente=strCliente;
-        imprDireccion=strDireccion;
-        imprTotal= strTotal;
+        imprCliente = strCliente;
+        imprDireccion = strDireccion;
+        imprTotal = strTotal;
         imprChofer = UsuarioInfo.getNombre();
-        imprUnidad= UsuarioInfo.getPlacas();
-
-
+        imprUnidad = UsuarioInfo.getPlacas();
 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mostrarConfirmacion("Confirmar?");
-
             }
         });
         btnReimpresionTicket = (Button)rootView.findViewById(R.id.btnReimpresionTicket);
@@ -301,18 +292,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
 
-
-
                 try
                 {
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
                     MainActivity.printData(imprCliente,imprDireccion, imprTotal, imprChofer, imprUnidad,strFecha,true);
 
-                   // Intent intent = new Intent(getActivity(), Impresora.class);
-
+                    // Intent intent = new Intent(getActivity(), Impresora.class);
                     // startActivity(intent);
-
-
                 }
                 catch (Exception ex)
                 {
@@ -331,9 +317,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         recyclerViewProductos = (RecyclerView) rootView.findViewById(R.id.recyclerViewProductos);
         recyclerViewProductos.setHasFixedSize(true);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerViewProductos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getProductos();
+            }
+        });
 
         Toast.makeText(getActivity(), "dato:" + ((Sessions)getActivity().getApplicationContext()).getsessToken() , Toast.LENGTH_SHORT).show();
-
 
         btnLimpiar = (Button) rootView.findViewById(R.id.btnLimpiarFirmar);
 
@@ -341,8 +332,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         signaturePad = (SignaturePad) rootView.findViewById(R.id.signaturePad);
         signaturePad.setEnabled(true);
         signaturePad.setOnSignedListener(new SignaturePad.OnSignedListener() {
-
-
 
             @Override
             public void onStartSigning() {
@@ -362,8 +351,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 //Event triggered when the pad is cleared
                 // btnFirmar.setEnabled(false);
                 btnLimpiar.setEnabled(false);
-
-
 
             }
         });
@@ -435,13 +422,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
 
         imgFirma=(ImageView)rootView.findViewById(R.id.imgFirma);
-
         // Inflate the layout for this fragment
         return rootView;
     }
 
     public void mostrarConfirmacion(String mensaje){
-      //  Toast.makeText(getActivity(), "Pedido guardado!", Toast.LENGTH_SHORT).show();
+        //  Toast.makeText(getActivity(), "Pedido guardado!", Toast.LENGTH_SHORT).show();
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
@@ -486,6 +472,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void mostrarCatalagoProductos(String mensaje){
+        getProductos();
+
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
@@ -554,7 +542,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
-
+                getProductos();
             }
         });
     }
@@ -585,7 +573,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         getHora();
         getFecha();
-      //  getUbicacion();
+        //  getUbicacion();
 
         BASEURL = strIP + "glpservices/webresources/glpservices/";
 
@@ -665,7 +653,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void limpiarFirmaImagen(){
-
         try {
             File f=new File(directory , "firmaLimpia.jpg");
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
@@ -872,7 +859,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     public void getUbicacion(){
         getLocation();
-
     }
 
     public void getLocation(){
@@ -882,7 +868,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
             if (location != null){
                 callSeguimiento();
             }else{
