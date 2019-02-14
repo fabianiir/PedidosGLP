@@ -67,6 +67,7 @@ public class Configuracion extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracion);
 
+
         int permissionCheck = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.READ_PHONE_STATE );
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -243,11 +244,13 @@ public class Configuracion extends AppCompatActivity{
                         Intent intent = new Intent(SplashActivity.this, Configuracion.class);
 
                         startActivity(intent);
+                        finish();
                     }
 
                     else{
                         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                 }
 
