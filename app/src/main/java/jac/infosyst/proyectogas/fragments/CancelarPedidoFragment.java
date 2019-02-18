@@ -3,39 +3,20 @@ package jac.infosyst.proyectogas.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.location.Location;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import jac.infosyst.proyectogas.Configuracion;
-import jac.infosyst.proyectogas.LectorQR.Escaner;
-import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.R;
-import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
-import jac.infosyst.proyectogas.modelo.CatalagoProducto;
-import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ModeloSpinner;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Pedido;
-import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.modelo.Productos;
-import jac.infosyst.proyectogas.modelo.Usuario;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -50,27 +31,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView;
 
-import com.github.gcacace.signaturepad.views.SignaturePad;
-
 import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import jac.infosyst.proyectogas.modelo.Spinners;
 
 
 @SuppressLint("ValidFragment")
 
 public class CancelarPedidoFragment  extends Fragment {
 
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     TextView tvCanNombreOperador, tvCanDireccion, tvCanDescripcion;
     EditText textViewObservaciones;
     Button btnAceptarCancelarPedido;
@@ -105,7 +80,9 @@ public class CancelarPedidoFragment  extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userService = ApiUtils.getUserService();
+        synchronized (userService = userService) {
+
+        }
     }
 
     @Override
@@ -118,10 +95,10 @@ public class CancelarPedidoFragment  extends Fragment {
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
 
-        userService = ApiUtils.getUserService();
+        userService = userService;
         dialog = new ProgressDialog(getActivity());
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 

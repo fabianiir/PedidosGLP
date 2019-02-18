@@ -18,9 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import jac.infosyst.proyectogas.FragmentDrawer;
-import jac.infosyst.proyectogas.LectorQR.Escaner;
-import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
@@ -41,12 +38,10 @@ import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.ObjetoRes3;
-import jac.infosyst.proyectogas.modelo.Pedido;
-import jac.infosyst.proyectogas.modelo.Usuario;
 import jac.infosyst.proyectogas.modelo.UsuarioInfo;
+import jac.infosyst.proyectogas.utils.RetrofitClient;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -66,6 +61,9 @@ import android.location.Location;
 
 
 public class PedidosFragment extends Fragment implements LocationListener {
+
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerViewPedidos;
     private RecyclerView.Adapter adapter;
@@ -118,7 +116,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
         ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
 
         Sessions strSess = new Sessions();
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
 
@@ -135,7 +133,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
             strIP = record.getString(record.getColumnIndex("ip"));
         }
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 
@@ -154,7 +152,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
             //  Toast.makeText(getActivity(), "usuario: " + strchofer + strtoken , Toast.LENGTH_LONG).show();
         }
         objSessions = new Sessions();
-        userService = ApiUtils.getUserService();
+        userService = RetrofitClient.getClient(BASEURL).create(ServicioUsuario.class);
 
         swipeRefreshLayout= (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
@@ -305,7 +303,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                         ObjetoRes obj_bitacora = (ObjetoRes) response.body();
                                         if (obj_bitacora.geterror().equals("false")) {
 
-                                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+                                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
                                             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
                                             ContentValues values1 = new ContentValues();
@@ -452,12 +450,12 @@ public class PedidosFragment extends Fragment implements LocationListener {
     }
 
     public void obtenerDatosUsuario(){
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
 
         if(sqLiteDBHelper!=null) {
             // Create the database tables again, this time because database version increased so the onUpgrade() method is invoked.
             SQLiteDatabase sqLiteDatabase = sqLiteDBHelper.getWritableDatabase();
-            Cursor cursor = sqLiteDatabase.query(SQLiteDBHelper.USUARIOS_TABLE_NAME, null, null, null, null, null, null);
+            Cursor cursor = sqLiteDatabase.query(SQLiteDBHelper.Usuario_Table, null, null, null, null, null, null);
 
             boolean hasRecord = cursor.moveToFirst();
             if(hasRecord)

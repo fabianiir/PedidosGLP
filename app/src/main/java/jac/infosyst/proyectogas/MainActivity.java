@@ -53,7 +53,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity
      //   implements NavigationView.OnNavigationItemSelectedListener {
     implements FragmentDrawer.FragmentDrawerListener{
-
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private static String TAG = MainActivity.class.getSimpleName();
 
     private Toolbar mToolbar;
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity
 
         strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
 
-        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
 

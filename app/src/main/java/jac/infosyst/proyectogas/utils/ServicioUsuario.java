@@ -74,28 +74,9 @@ public interface ServicioUsuario {
 
   @FormUrlEncoded
   @POST("config")
-  Call<Result> registroConfiguracion(
+  Call<ObjetoRes> registroConfiguracion(
           @Field("public_ip") String ip,
           @Field("phone") String celular);
-
-  @FormUrlEncoded
-  @POST("actualizarPedido.php/{idPedido}")
-  Call<Result> actualizarPedido(
-          @Path("idPedido") int idPedido);
-
-  @FormUrlEncoded
-  @POST("obtenerProductos.php/{idPedido}")
-  Call<Productos> getProductos(@Field("idPedido") String idPedido);
-
-
-  @FormUrlEncoded
-  @POST("actualizarProducto.php/{idProducto}")
-  Call<Result> actualizarProducto(
-          @Field("idProducto") int idProducto);
-
-  @FormUrlEncoded
-  @POST("obtenerProductos.php/{idPedido}")
-  Call<Spinners> getProductos2(@Field("idPedido") int idPedido);
 
   @FormUrlEncoded
   @POST("cat_motcanc")

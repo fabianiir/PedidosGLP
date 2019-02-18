@@ -1,40 +1,24 @@
 package jac.infosyst.proyectogas.adaptadores;
 
 
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
-import jac.infosyst.proyectogas.FragmentDrawer;
-import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
-import jac.infosyst.proyectogas.fragments.PedidosFragment;
-import jac.infosyst.proyectogas.fragments.SurtirPedidoFragment;
-import jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Pedido;
-import jac.infosyst.proyectogas.modelo.Pedidos;
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.utils.ApiUtils;
-import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -47,10 +31,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.List;
 import java.util.ArrayList;
 
-import jac.infosyst.proyectogas.fragments.SurtirPedidoFragment;
-
 public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewHolder> {
 
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private List<Producto> productos;
     private Context mCtx;
     FragmentManager f_manager;
@@ -151,7 +135,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     }
 
     public void restarProducto(String idProducto, int cantidad, boolean surtido, int precio, String token){
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx , DATABASE_NAME, null, DATABASE_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";

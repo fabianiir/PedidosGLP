@@ -2,21 +2,15 @@
 package jac.infosyst.proyectogas.adaptadores;
 
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
@@ -25,16 +19,8 @@ import android.widget.Toast;
 import jac.infosyst.proyectogas.R;
 
 
-import jac.infosyst.proyectogas.FragmentDrawer;
-import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
-import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
-import jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Pedido;
-import jac.infosyst.proyectogas.modelo.Pedidos;
-import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -45,13 +31,13 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
 
 
 public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProductosAdapter.ViewHolder> {
 
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private List<CatalagoProducto> catalagoProductos;
     private Context mCtx;
     FragmentManager f_manager;
@@ -131,7 +117,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
     public void storeSqLiteProductos(double price){
         Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
 
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         ContentValues productosVal = new ContentValues();
@@ -148,7 +134,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
     public void sumarProducto(int cantidad, int precio, String pedidoId, String productoId, String token){
 
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
 
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
@@ -197,30 +183,6 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
         });
 
-    }
-
-    public void restarProducto(int idProducto){
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call<Result> call = service.actualizarProducto(idProducto);
-
-        call.enqueue(new Callback<Result>() {
-            @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
-                Toast.makeText(mCtx, response.body().getMessage(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(Call<Result> call, Throwable t) {
-                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }
 

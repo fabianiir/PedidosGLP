@@ -32,6 +32,15 @@ public class ObjetoRes {
         this.error = error;
     }
 
+    private  String configuracion_id;
+
+    public void setConfiguracion_id(String configuracion_id) {
+        this.configuracion_id = configuracion_id;
+    }
+
+    public String getConfiguracion_id() {
+        return configuracion_id;
+    }
 
     private String Admin;
 

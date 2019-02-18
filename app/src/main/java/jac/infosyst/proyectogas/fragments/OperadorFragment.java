@@ -42,6 +42,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OperadorFragment  extends Fragment {
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private TextView textViewInterno;
     private ImageView imageViewPerfil;
 
@@ -101,7 +103,7 @@ public class OperadorFragment  extends Fragment {
     }
 
     public void insertaImeiSqLite(String emai){
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 

@@ -47,6 +47,7 @@
         android:layout_marginRight="8dp"
         android:background="@color/colorAccent"
         android:text="Ingresar"
-        android:textColor="@color/BotonGris" />
+        android:textColor="@color/BotonGris"
+        android:visibility="gone" />
 
 </RelativeLayout>

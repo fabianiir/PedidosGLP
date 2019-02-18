@@ -18,7 +18,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -40,14 +39,12 @@ import android.widget.Toast;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,10 +63,8 @@ import jac.infosyst.proyectogas.modelo.ObjetoRes2;
 import jac.infosyst.proyectogas.modelo.Pedido;
 
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.modelo.Usuario;
 import jac.infosyst.proyectogas.modelo.UsuarioInfo;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
-import jac.infosyst.proyectogas.utils.ApiUtils;
+import jac.infosyst.proyectogas.utils.RetrofitClient;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -83,12 +78,10 @@ import android.support.design.widget.FloatingActionButton;
 
 import java.util.Calendar;
 
-
-import android.util.Base64;
-
 public class SurtirPedidoFragment  extends Fragment implements LocationListener {
     private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle, textViewFirma, textViewTotal;
-
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     private PopupWindow POPUP_WINDOW_CATALAGOPRODUCTOS = null;
@@ -189,10 +182,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
 
-        userService = ApiUtils.getUserService();
+        userService = RetrofitClient.getClient(BASEURL).create(ServicioUsuario.class);
         dialog = new ProgressDialog(getActivity());
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 
@@ -559,7 +552,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";

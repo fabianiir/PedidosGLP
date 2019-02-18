@@ -33,13 +33,6 @@
         <activity
             android:name=".LectorNFC.NFC"
             android:screenOrientation="portrait" />
-        <!--
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        -->
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait"
@@ -66,7 +59,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -82,5 +74,4 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
     </application>
-
 </manifest>

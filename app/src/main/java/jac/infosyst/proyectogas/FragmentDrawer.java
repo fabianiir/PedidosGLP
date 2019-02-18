@@ -45,6 +45,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FragmentDrawer extends Fragment {
 
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private static String TAG = FragmentDrawer.class.getSimpleName();
     private RecyclerView recyclerView;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -108,7 +110,7 @@ public class FragmentDrawer extends Fragment {
 
             if(UsuarioInfo.getFoto() == null) {
                 Sessions strSess = new Sessions();
-                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
                 final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
                 String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
@@ -121,7 +123,7 @@ public class FragmentDrawer extends Fragment {
                     strIP = record.getString(record.getColumnIndex("ip"));
                 }
 
-                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
+                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
 
                 final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 
