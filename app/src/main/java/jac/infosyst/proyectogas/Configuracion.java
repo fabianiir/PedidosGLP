@@ -2,6 +2,7 @@ package jac.infosyst.proyectogas;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,6 +36,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import android.support.v4.app.Fragment;
 
 import  jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
 
@@ -47,11 +49,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Configuracion extends AppCompatActivity{
+public class Configuracion extends AppCompatActivity {
 
     EditText edtIP;
     EditText edtTelefono;
-    Button btnConfig, btnMain;
+    Button btnConfig;
 
     static int checkConfiguracionSqLite = 0;
     private static SQLiteDBHelper sqLiteDBHelper = null;
@@ -61,7 +63,7 @@ public class Configuracion extends AppCompatActivity{
     private static int  statusConf ;
 
     String strIP = "";
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +82,7 @@ public class Configuracion extends AppCompatActivity{
         edtIP = (EditText) findViewById(R.id.input_IP);
         edtTelefono = (EditText) findViewById(R.id.input_telefono);
         btnConfig = (Button) findViewById(R.id.btn_configuracion);
-        btnMain = (Button) findViewById(R.id.btn_main);
+
 
 
         btnConfig.setOnClickListener(new View.OnClickListener() {
@@ -95,18 +97,10 @@ public class Configuracion extends AppCompatActivity{
             }
         });
 
-        btnMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saltar_configuracion();
-            }
-        });
+
     }
 
-    private void saltar_configuracion() {
-        Intent intent = new Intent(Configuracion.this, MainActivity.class);
-        startActivity(intent);
-    }
+
 
     private void insertarConfiguracion(){
         sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);

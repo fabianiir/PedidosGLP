@@ -88,17 +88,6 @@
                 android:text="Guardar"
                 android:textColor="@android:color/background_light" />
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_main"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
-                android:background="@color/BotonGris"
-                android:padding="12dp"
-                android:text="Entrar"
-                android:textColor="@color/colorPrimary" />
-
 
         </LinearLayout>
     </ScrollView>

@@ -27,7 +27,7 @@ public class NFC extends AppCompatActivity {
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
     private TextView text;
-    private  Button btnNFCIngresar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,15 +47,7 @@ public class NFC extends AppCompatActivity {
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
 
-        btnNFCIngresar = (Button) findViewById(R.id.btn_IngresarNFC);
 
-        btnNFCIngresar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(NFC.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override

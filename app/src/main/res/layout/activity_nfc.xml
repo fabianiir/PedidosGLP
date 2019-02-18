@@ -31,22 +31,4 @@
         android:textStyle="bold"
         app:fontFamily="@font/roboto" />
 
-    <Button
-        android:id="@+id/btn_IngresarNFC"
-        android:layout_width="384dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:background="@color/colorAccent"
-        android:text="Ingresar"
-        android:textColor="@color/BotonGris" />
-
 </RelativeLayout>

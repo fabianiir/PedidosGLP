@@ -209,7 +209,7 @@ public class LoginActivity extends AppCompatActivity{
                             if (resObj.getAdmin().equals("true")) {
 
                                 ((Sessions) getApplication()).setsesUsuarioRol("Admin");
-                                Intent intent = new Intent(LoginActivity.this, Configuracion.class);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("username", pusername);
                                 startActivity(intent);
                                 String sqlEmai = "SELECT * FROM dispositivo WHERE id = 1 ORDER BY id DESC limit 1";
