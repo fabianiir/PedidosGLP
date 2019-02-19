@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,6 +56,7 @@ public class Configuracion extends AppCompatActivity {
     EditText edtTelefono;
     Button btnConfig;
 
+    String BASEURL;
     static int checkConfiguracionSqLite = 0;
     private static SQLiteDBHelper sqLiteDBHelper = null;
     private static String DB_NAME = "proyectogas17.db";
@@ -100,8 +102,6 @@ public class Configuracion extends AppCompatActivity {
 
     }
 
-
-
     private void insertarConfiguracion(){
         sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
 
@@ -120,58 +120,67 @@ public class Configuracion extends AppCompatActivity {
                 .setLenient()
                 .create();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
-              //  .client(client)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
 
-        //Defining retrofit api service
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+        try{
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(BASEURL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
-        ConfiguracionModelo conf = new ConfiguracionModelo(strIP, strCelular);
+            //Defining retrofit api service
+            ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call<Result> call = service.registroConfiguracion(
-                conf.getIP(),
-                conf.getCelular()
-        );
+            ConfiguracionModelo conf = new ConfiguracionModelo(strIP, strCelular);
 
-        call.enqueue(new Callback<Result>() {
-            @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
-                progressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
+            Call<Result> call = service.registroConfiguracion(
+                    conf.getIP(),
+                    conf.getCelular()
+            );
 
-                sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
+            call.enqueue(new Callback<Result>() {
+                @Override
+                public void onResponse(Call<Result> call, Response<Result> response) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
 
-                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                    sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
 
-                /*primera vez */
-                ContentValues values2 = new ContentValues();
+                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-                values2.put("ip", strIP);
+                    /*primera vez */
+                    ContentValues values2 = new ContentValues();
 
-                db.insert("config", null, values2);
+                    values2.put("ip", strIP);
 
-                ContentValues cv = new ContentValues();
-                cv.put("ip",strIP);
+                    db.insert("config", null, values2);
+
+                    ContentValues cv = new ContentValues();
+                    cv.put("ip",strIP);
 
 
-                db.update("config", cv, "id="+1, null);
-               // Toast.makeText(Configuracion.this, "config java:" + strIP, Toast.LENGTH_SHORT).show();
-                /*poner if de la primera vezz*/
-                ((Sessions)getApplication()).setSesstrIpServidor(strIP);
+                    db.update("config", cv, "id="+1, null);
+                    // Toast.makeText(Configuracion.this, "config java:" + strIP, Toast.LENGTH_SHORT).show();
+                    /*poner if de la primera vezz*/
+                    ((Sessions)getApplication()).setSesstrIpServidor(strIP);
 
-                Intent intent = new Intent(Configuracion.this, LoginActivity.class);
-                startActivity(intent);
-            }
+                    Intent intent = new Intent(Configuracion.this, LoginActivity.class);
+                    startActivity(intent);
+                }
 
-            @Override
-            public void onFailure(Call<Result> call, Throwable t) {
-                progressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), "nnn:" +  t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<Result> call, Throwable t) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "nnn:" +  t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }catch (Exception ex){
+            progressDialog.dismiss();
+            Toast toast = Toast.makeText(getApplicationContext(), "La URL: " + BASEURL + "no es valida.", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+
+        }
     }
 
 

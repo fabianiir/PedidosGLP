@@ -24,7 +24,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -62,6 +64,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     /*firma*/
     RelativeLayout mContent;
     Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar, btnLlamar;
+    ListView listView;
 
     Button mClear, mGetSign, mCancel;
     File file;
@@ -140,6 +143,22 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         final String strTelefono = ((Sessions) getActivity().getApplication()).getsestelefono();
         Producto[] producto = ((Sessions) getActivity().getApplication()).getSesDetalleProductoSurtir();
 
+        ArrayList arrayListProductos = new ArrayList();
+
+        if(producto != null && producto.length != 0){
+            for (int i=0; i < producto.length; i++)
+                arrayListProductos.add(producto[i].getdescripcion() +
+                "\nCantidad: " + producto[i].getCantidad() + "\nPrecio: " + producto[i].getPrecio());
+        }else
+            arrayListProductos.add("N/A");
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, arrayListProductos);
+
+        listView = (ListView) rootView.findViewById(R.id.lvProductos);
+
+        listView.setAdapter(arrayAdapter);
+
+
         textViewObservaciones = (TextView) rootView.findViewById(R.id.textViewObservaciones);
         imageViewIncidencia = (ImageView) rootView.findViewById(R.id.imageViewIncidencia);
 
@@ -174,7 +193,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         textViewEstatus = (TextView) rootView.findViewById(R.id.tvEstatus);
         textViewEstatus.setText("Estatus: " + strEstatus);
         textViewDetalle = (TextView) rootView.findViewById(R.id.tvDetalle);
-        textViewDetalle.setText("Detalle Producto: " + strDetalle);
+        textViewDetalle.setText("Detalle Producto: ");
         textViewFirma = (TextView) rootView.findViewById(R.id.tvFirma);
         textViewFirma.setText("Firma: " + strFirma);
         textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
@@ -216,48 +235,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 }
             }
         });
-
-        signaturePad = (SignaturePad) rootView.findViewById(R.id.signaturePad);
-        signaturePad.setEnabled(false);
-
-        final String strDescripcion2 = ((Sessions) getActivity().getApplication()).getsesDescripcion();
-        final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
-
-        imageViewIncidencia = (ImageView) rootView.findViewById(R.id.imageViewIncidencia);
-        imageViewIncidencia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Toast.makeText(getActivity(), "dentro de toma de foto" + strDescripcion2, Toast.LENGTH_SHORT).show();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    //Check permissions for Android 6.0+
-                    if (!checkExternalStoragePermission()) {
-                        return;
-                    }
-                }
-
-                values = new ContentValues();
-                values.put(MediaStore.Images.Media.TITLE, "incidencia" + "123");
-                values.put(MediaStore.Images.Media.DESCRIPTION, "tomada en: " + System.currentTimeMillis());
-                imageUri = getActivity().getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, PICTURE_RESULT);
-            }
-        });
-
-        try {
-            File f=new File(directory , "firma.jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            imgFirma=(ImageView)rootView.findViewById(R.id.imgFirma);
-            imgFirma.setImageBitmap(b);
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-
         return rootView;
     }
 
@@ -322,7 +299,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
             if (location != null){
-                callSeguimiento();
             }else{
                 Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
             }
@@ -331,10 +307,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             e.printStackTrace();
             Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
         }
-    }
-    public void callSeguimiento(){
-        Toast.makeText(getActivity(), "Ir a Latitude: " + strLongitude + ", Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
-
     }
     @Override
     public void onLocationChanged(Location location) {

@@ -121,14 +121,9 @@ public class PedidosFragment extends Fragment implements LocationListener {
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-
-
-
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
         final int recordCount = db.rawQuery(sql, null).getCount();
-        //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
-
         final Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
@@ -144,14 +139,12 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
 
         final int recordCount3 = db.rawQuery(sql3, null).getCount();
-        //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
         Cursor cursor3 = dbConn3.rawQuery(sql3, null);
 
         if (cursor3.moveToFirst()) {
             strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
-            //  Toast.makeText(getActivity(), "usuario: " + strchofer + strtoken , Toast.LENGTH_LONG).show();
         }
         objSessions = new Sessions();
         userService = ApiUtils.getUserService();
@@ -330,7 +323,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                                         if (resObj.geterror().equals("false")) {
 
                                                             if (resObj.getpedido() != null) {
-                                                                Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
                                                                 adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                                                                 recyclerViewPedidos.setAdapter(adapter);
                                                             } else {
@@ -386,7 +378,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                             if (resObj.geterror().equals("false")) {
 
                                 if (resObj.getpedido() != null) {
-                                    Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
                                     adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                                     recyclerViewPedidos.setAdapter(adapter);
 
@@ -430,7 +421,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                     if (resObj.geterror().equals("false")) {
 
                         if (resObj.getpedido() != null) {
-                            Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
                             adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                             recyclerViewPedidos.setAdapter(adapter);
 
@@ -524,12 +514,10 @@ public class PedidosFragment extends Fragment implements LocationListener {
         catch(SecurityException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-
         }
     }
 
     public void callSeguimiento(){
-        Toast.makeText(getActivity(), "Latitude: " + strLongitude + " Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
     }
 
 

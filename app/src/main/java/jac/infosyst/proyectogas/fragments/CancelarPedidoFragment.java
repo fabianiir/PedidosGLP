@@ -16,7 +16,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,9 +144,9 @@ public class CancelarPedidoFragment  extends Fragment {
         tvCanDireccion = (TextView) rootView.findViewById(R.id.tvCanDireccion);
         tvCanDescripcion = (TextView) rootView.findViewById(R.id.tvCanDescripcion);
 
-        tvCanNombreOperador.setText("Nombre: " + ((Sessions)getActivity().getApplicationContext()).getSesCliente());
-        tvCanDireccion.setText("Direccion: " + ((Sessions)getActivity().getApplicationContext()).getsesDireccion());
-        tvCanDescripcion.setText("Descripcion: " + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion());
+        tvCanNombreOperador.setText(Html.fromHtml("<b>Nombre: </b>"+ ((Sessions)getActivity().getApplicationContext()).getSesCliente()));
+        tvCanDireccion.setText(Html.fromHtml("<b>Direccion: </b>" + ((Sessions)getActivity().getApplicationContext()).getsesDireccion()));
+        tvCanDescripcion.setText(Html.fromHtml("<b>Descripcion: </b>" + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion()));
 
         idPedido = ((Sessions)getActivity().getApplicationContext()).getSesIdPedido();
 
@@ -156,8 +159,6 @@ public class CancelarPedidoFragment  extends Fragment {
 
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id)
             {
-                Toast.makeText(adapterView.getContext(),
-                        (String) adapterView.getItemAtPosition(pos), Toast.LENGTH_SHORT).show();
             }
             public void onNothingSelected(AdapterView<?> parent)
             {
@@ -193,6 +194,13 @@ public class CancelarPedidoFragment  extends Fragment {
             @Override
             public void onResponse(Call call, Response response) {
                 Toast.makeText(getActivity(), "Pedido Cancelado", Toast.LENGTH_SHORT).show();
+                PedidosFragment spf = new PedidosFragment();
+
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, spf);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
 
             @Override
@@ -213,7 +221,6 @@ public class CancelarPedidoFragment  extends Fragment {
             public void onResponse(Call call, Response response) {
                 if(response.isSuccessful()){
                     ObjetoRes resObj = (ObjetoRes) response.body();
-                    // Toast.makeText(LoginActivity.this, "Respuesta: " + resObj.geterror(), Toast.LENGTH_SHORT).show();
                     if(resObj.geterror().equals("false")){
                         ArrayList<jac.infosyst.proyectogas.modelo.Spinner> latLngData = new ArrayList<jac.infosyst.proyectogas.modelo.Spinner>();
                         latLngData.addAll(Arrays.asList(resObj.getmotivoscancelacion()));
@@ -230,10 +237,8 @@ public class CancelarPedidoFragment  extends Fragment {
                         }
                         String text = builder.toString();
 
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, list);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, list);
                         spinner.setAdapter(adapter);
-
-                        Toast.makeText(getActivity(), "Respuesta: " + resObj.getmotivoscancelacion(), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }

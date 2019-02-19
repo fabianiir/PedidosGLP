@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -95,17 +95,6 @@
                 app:fontFamily="@font/roboto" />
 
             <TextView
-                android:id="@+id/tvDetalle"
-                android:layout_width="fill_parent"
-
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-
-                android:text="Datos Cliente"
-                android:textSize="18dp"
-                app:fontFamily="@font/roboto" />
-
-            <TextView
                 android:id="@+id/tvFirma"
                 android:layout_width="fill_parent"
 
@@ -129,73 +118,24 @@
 
                 app:fontFamily="@font/roboto" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/tvDetalle"
+                android:layout_width="fill_parent"
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/relativeLayout"
-            android:layout_width="match_parent"
-            android:layout_height="233dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
-
-
-            <ImageView
-                android:id="@+id/imageViewIncidencia"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-
-                android:layout_marginTop="20dp"
-                android:src="@drawable/ic_menu_camera"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"></ImageView>
-
-
-            <EditText
-                android:id="@+id/textViewObservaciones"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:background="@color/colorBlanco"
-                android:hint="Observaciones:"
-                android:inputType="textMultiLine"
-                android:lines="4"
-                android:maxLines="10"
-                android:scrollbars="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageViewIncidencia" />
+                android:layout_alignParentTop="true"
 
+                android:text="Datos Cliente"
+                android:textSize="18dp"
+                app:fontFamily="@font/roboto" />
 
-        </android.support.constraint.ConstraintLayout>
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:id="@+id/lvProductos"></ListView>
 
-
-        <!--
-        <LinearLayout
-            android:layout_width="400dp" android:layout_height="450dp"
-            android:orientation="vertical"
-            android:paddingLeft="24dp"
-            android:paddingTop="300dp"
-            android:paddingRight="24dp">
-
-
-        <RelativeLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Firmar"
-            />
         </LinearLayout>
-    -->
+
 
 
         <android.support.constraint.ConstraintLayout
@@ -208,53 +148,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
-
-            <ImageView
-                android:id="@+id/imgFirma"
-                android:layout_width="match_parent"
-                android:layout_height="164dp"
-                android:layout_marginTop="16dp"
-                android:src="@android:color/transparent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/signaturePad" />
-
-            <com.github.gcacace.signaturepad.views.SignaturePad
-                android:id="@+id/signaturePad"
-                android:layout_width="match_parent"
-                android:layout_height="164dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-<!--
-            <Button
-                android:id="@+id/btnFirmar"
-                android:layout_width="103dp"
-                android:layout_height="53dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:text="Firmar"
-                android:visibility="invisible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnComoLlegar" />
-                -->
-
-
-            <!--
-            <Button
-                android:id="@+id/btnLimpiarFirmar"
-                android:layout_width="100dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:text="Limpiar"
-                app:layout_constraintEnd_toStartOf="@+id/btnFirmar"
-               app:layout_constraintTop_toBottomOf="@+id/btnComoLlegar" />
--->
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
             <Button
                 android:id="@+id/btnSurtirPedido"
@@ -265,8 +159,7 @@
                 android:text="Surtir"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/signaturePad" />
+                app:layout_constraintStart_toStartOf="parent"/>
 
             <Button
                 android:id="@+id/btnComoLlegar"
@@ -296,4 +189,4 @@
 
     </android.support.constraint.ConstraintLayout>
 
-</ScrollView>
+</LinearLayout>

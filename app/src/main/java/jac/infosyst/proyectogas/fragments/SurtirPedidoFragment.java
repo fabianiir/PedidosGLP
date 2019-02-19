@@ -283,7 +283,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mostrarConfirmacion("Confirmar?");
+                if (!signaturePad.isEmpty()) {
+                    mostrarConfirmacion("Confirmar?");
+                } else {
+                    Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         btnReimpresionTicket = (Button)rootView.findViewById(R.id.btnReimpresionTicket);
@@ -463,7 +467,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
                 try {
-                    MainActivity.printData(imprCliente, imprDireccion,imprTotal, imprChofer, imprUnidad,strFecha,false);
+                    MainActivity.printData(imprCliente, imprDireccion, imprTotal, imprChofer, imprUnidad, strFecha, false);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -770,37 +774,42 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     public void putImageFirma(){
         //encode image to base64 string
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Bitmap bitmap = signaturePad.getSignatureBitmap();
+        if(!signaturePad.isEmpty()) {
+            Bitmap bitmap = signaturePad.getSignatureBitmap();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+            byte[] imageBytes = baos.toByteArray();
+            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
-        BASEURL = strIP + "glpservices/webresources/glpservices/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+            BASEURL = strIP + "glpservices/webresources/glpservices/";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(BASEURL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.in_foto(pedidoID, imageString, 3, strtoken);
+            Call call = service.in_foto(pedidoID, imageString, 3, strtoken);
 
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) {
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                    if (resObj.geterror().equals("false")) {
-                        Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
-                    }else {
-                        Toast.makeText(getActivity(), "No fue posible guardar la firma!", Toast.LENGTH_SHORT).show();
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if (response.isSuccessful()) {
+                        ObjetoRes resObj = (ObjetoRes) response.body();
+                        if (resObj.geterror().equals("false")) {
+                            Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "No fue posible guardar la firma!", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-            }
-        });
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                }
+            });
+        }else{
+            Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void getProductos() {
