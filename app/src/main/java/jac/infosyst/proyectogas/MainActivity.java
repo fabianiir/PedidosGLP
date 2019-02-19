@@ -4,24 +4,19 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.ClipData;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -34,8 +29,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.UUID;
-
-import jac.infosyst.proyectogas.FragmentDrawer;
 
 import jac.infosyst.proyectogas.ImpresoraBluetooth.UnicodeFormatter;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
@@ -71,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     String strIP = "";
 
 
-///Variables Impresora
+// region variables impresora
     BluetoothAdapter bluetoothAdapter;
     BluetoothSocket bluetoothSocket;
     BluetoothDevice bluetoothDevice;
@@ -84,7 +77,7 @@ public class MainActivity extends AppCompatActivity
     byte[] readBuffer;
     int readBufferPosition;
     volatile boolean stopWorker;
-
+//endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
 
-
+//region Ejecucion hilo Impresora
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -106,7 +99,7 @@ public class MainActivity extends AppCompatActivity
 
             }
             }).start();
-
+//endregion
 
         objSessions = new Sessions();
 
@@ -212,9 +205,12 @@ public class MainActivity extends AppCompatActivity
 
                 break;
             case 3:
-                if (strRolUsuario.equals("Administrador")) {
+                if (strRolUsuario.equals("Admin")) {
 
-                    Intent i = new Intent(MainActivity.this, Configuracion.class);
+
+
+
+           Intent i = new Intent(MainActivity.this, Configuracion.class);
                     startActivity(i);
                     ((Activity) MainActivity.this).overridePendingTransition(0, 0);
                 }
@@ -227,13 +223,11 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case 4:
-                if (strRolUsuario.equals("Administrador")) {
+                if (strRolUsuario.equals("Admin")) {
                     title = getString(R.string.title_pedidosrealizados);
                     fragment = new PedidosFragment();
 
-                    Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(i2);
-                    ((Activity) MainActivity.this).overridePendingTransition(0,0);
+
                 }
                 if(strRolUsuario.equals("Operador")){
                     Log.v(TAG,"token: " + position);
