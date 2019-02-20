@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,6 +36,7 @@ import jac.infosyst.proyectogas.ImpresoraBluetooth.UnicodeFormatter;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.modelo.Producto;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -425,9 +428,6 @@ public class MainActivity extends AppCompatActivity
     public static void printData(String cliente, String direccion, String total,String chofer, String unidad, String fecha, boolean reImpresion) throws  IOException{
         try{
 
-
-
-
             String BILL = "";
 
             BILL = "             SONIGAS S.A. DE C.V.    \n"
@@ -463,10 +463,10 @@ if(reImpresion){
 
 
             BILL = BILL
-                    + "CLIENTE:"+cliente.toUpperCase()+" \n";
+                    + "CLIENTE:" + cliente.toUpperCase()+" \n";
 
             BILL = BILL
-                    + "DOMICILIO: "+direccion.toUpperCase()+"\n";
+                    + "DOMICILIO: " + direccion.toUpperCase()+"\n";
 
 
 
@@ -480,9 +480,12 @@ if(reImpresion){
             BILL = BILL + "\n";
             BILL = BILL
                     + "-----------------------------------------------";
-            BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "GAS L.P.", "300", "10", "$300.00");
-            BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "GAS L.P.", "10", "50", "$500.00");
+            Producto[] producto = Sessions.getImpProductos() ;
 
+            if(producto != null && producto.length != 0){
+                for (int i=0; i < producto.length; i++)
+                    BILL = BILL + "\n" +String.format("%1$-10s %2$10s %3$11s %4$10s", producto[i].getdescripcion(), producto[i].getCantidad(), "0", producto[i].getPrecio());
+            }
 
             BILL = BILL
                     + "\n-----------------------------------------------";
@@ -493,9 +496,12 @@ if(reImpresion){
 
             }
 
-            BILL = BILL + "                         SUBTOTAL:" + "   " + "$800.00" + "\n";
-            BILL = BILL + "                            I.V.A.:" + "   " + "$128.00" + "\n";
-            BILL = BILL + "                             TOTAL:" + "   " + "$"+total+ ".00\n";
+            double subtotal = (Double.parseDouble(total)/1.16);
+            double IVA = Double.parseDouble(total) - subtotal;
+
+            BILL = BILL + "                          SUBTOTAL:" + "   $" + String.valueOf(subtotal) + "\n";
+            BILL = BILL + "                            I.V.A.:" + "   $" + String.valueOf(IVA) + "\n";
+            BILL = BILL + "                             TOTAL:" + "   $" + String.valueOf(Double.parseDouble(total)) + "\n";
 
             BILL = BILL
                     + "-----------------------------------------------\n\n";

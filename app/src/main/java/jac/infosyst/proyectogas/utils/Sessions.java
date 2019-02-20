@@ -96,16 +96,21 @@ public class Sessions  extends Application {
         this.sesTotal = sesTotal;
     }
 
-
-
     private Producto[] sesDetalleProductoSurtir;
 
     public Producto[] getSesDetalleProductoSurtir() {
         return sesDetalleProductoSurtir;
     }
 
-    public void setSesDetalleProductoSurtir(Producto[] sesDetalleProductoSurtir) { this.sesDetalleProductoSurtir = sesDetalleProductoSurtir; }
+    public void setSesDetalleProductoSurtir(Producto[] sesDetalleProductoSurtir) { this.sesDetalleProductoSurtir = sesDetalleProductoSurtir; setImpProductos(sesDetalleProductoSurtir);}
 
+    public static  Producto[] impProductos;
+
+    public static Producto[] getImpProductos(){ return impProductos; }
+
+    public static void setImpProductos(Producto[] impProductos) {
+        Sessions.impProductos = impProductos;
+    }
 
     private int idProducto;
 
