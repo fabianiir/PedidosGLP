@@ -186,6 +186,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_surtir_pedido, container, false);
+
+        MainActivity.setFragmentController(2);
+
 // path to /data/data/yourapp/app_data/imageDir
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);

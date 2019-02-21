@@ -46,6 +46,8 @@ public class ReimpresionPedidoFragment  extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_reimpresion_pedido, container, false);
 
+        MainActivity.setFragmentController(1);
+
         tvCanNombreOperador = (TextView) rootView.findViewById(R.id.tvCanNombreOperador);
         tvCanDireccion = (TextView) rootView.findViewById(R.id.tvCanDireccion);
         tvCanDescripcion = (TextView) rootView.findViewById(R.id.tvCanDescripcion);

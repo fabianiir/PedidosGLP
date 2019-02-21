@@ -14,7 +14,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +25,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -55,6 +61,8 @@ public class MainActivity extends AppCompatActivity
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
 
+    private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
+    View layout;
    // Bundle bundle;
     PedidosFragment pedidoObj;
 
@@ -80,7 +88,80 @@ public class MainActivity extends AppCompatActivity
     byte[] readBuffer;
     int readBufferPosition;
     volatile boolean stopWorker;
-//endregion
+
+    public static int fragmentController;
+
+    public static int getFragmentController() {
+        return fragmentController;
+    }
+
+    public static void setFragmentController(int fragmentController) {
+        MainActivity.fragmentController = fragmentController;
+    }
+
+    @Override
+    public void onBackPressed(){
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            switch (fragmentController){
+                case 0:
+                    LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    layout = layoutInflater.inflate(R.layout.layout_popup, null);
+
+                    DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+                    int width = displayMetrics.widthPixels;
+                    int height = displayMetrics.heightPixels;
+
+                    layout.setVisibility(View.VISIBLE);
+                    POPUP_WINDOW_CONFIRMACION = new PopupWindow(this);
+                    POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                    POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                    POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                    POPUP_WINDOW_CONFIRMACION.setFocusable(true);
+
+                    POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
+
+                    POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+
+                    TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                    txtMessage.setText("¿Desea cerrar la aplicación?");
+
+                    Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                    btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                        }
+                    });
+
+                    Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                    btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.putExtra("EXIT", true);
+                            startActivity(intent);
+                        }
+                    });
+                    break;
+                case 1:
+                    super.onBackPressed();
+                    break;
+                case 2:
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,16 +218,6 @@ public class MainActivity extends AppCompatActivity
         drawerFragment.setDrawerListener(this);
 
         displayView(0);
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override

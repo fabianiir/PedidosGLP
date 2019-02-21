@@ -74,7 +74,7 @@ public class Configuracion extends AppCompatActivity {
             finish();
         }
         else{
-
+            MainActivity.setFragmentController(0);
         }
     }
 

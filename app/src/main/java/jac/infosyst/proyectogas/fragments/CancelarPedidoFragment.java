@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import jac.infosyst.proyectogas.Configuracion;
 import jac.infosyst.proyectogas.LectorQR.Escaner;
 import jac.infosyst.proyectogas.LoginActivity;
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
@@ -116,6 +117,7 @@ public class CancelarPedidoFragment  extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_cancelar_pedidos, container, false);
 
+        MainActivity.setFragmentController(1);
 
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);

@@ -119,6 +119,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
 
+        MainActivity.setFragmentController(0);
+
         Sessions strSess = new Sessions();
         sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
