@@ -92,6 +92,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     private PopupWindow POPUP_WINDOW_CATALAGOPRODUCTOS = null;
+    private PopupWindow cantidad=null;
     Button btnRestar;
 
     View layout, layoutCatalagoProductos;
@@ -282,7 +283,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 if (!signaturePad.isEmpty()) {
-                    mostrarConfirmacion("Confirmar?");
+                    mostrarConfirmacion("¿Desea Confirmar?");
                 } else {
                     Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
                 }
@@ -463,6 +464,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     public void mostrarCatalagoProductos(String mensaje){
         getProductos();
+
+
+
+
+
+
+
 
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;

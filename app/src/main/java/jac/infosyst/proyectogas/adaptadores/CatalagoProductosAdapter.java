@@ -1,9 +1,13 @@
 
 package jac.infosyst.proyectogas.adaptadores;
 
+
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
@@ -11,16 +15,22 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
 
@@ -48,12 +58,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+import static jac.infosyst.proyectogas.R.id.tv_cantidad;
+
+
 public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProductosAdapter.ViewHolder> {
 
     private List<CatalagoProducto> catalagoProductos;
     private Context mCtx;
     FragmentManager f_manager;
     private static final String TAG = "CatalagoProductosAdapter";
+    private PopupWindow POPUP_WINDOW_CANTIDAD;
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
     private static String DB_NAME = "proyectogas17.db";
@@ -91,13 +106,56 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
         holder.btnAgregarCatalagoProducto.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
 
-                Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getIdProducto(), Toast.LENGTH_SHORT).show();
-                //storeSqLiteProductos(catalagoProductos.get(position).getprecio_unitario());
-                //holder.parentLayout.setVisibility(view.GONE);
-                sumarProducto(1, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
-                        catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mCtx);
+
+                final LayoutInflater inflater = (LayoutInflater) mCtx.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+
+View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
+                final EditText cantidad= (EditText) viewAlert.findViewById(R.id.tv_cantidad);
+                builder.setView(viewAlert).setPositiveButton("Aceptar",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                if (!cantidad.getText().toString().isEmpty())
+                                {
+
+
+                                    int cantidadProducto = Integer.parseInt(cantidad.getText().toString());
+                                    Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getIdProducto(), Toast.LENGTH_SHORT).show();
+                                    sumarProducto( cantidadProducto, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
+                                            catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
+
+
+                                }
+                                else{
+                                    dialog.dismiss();
+                                }
+
+                                 }
+                        }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+
+                    }
+                });
+
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+
+
+
+
+
+
+
             }
         });
     }
@@ -136,7 +194,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
         productosVal.put("precio", price);
         productosVal.put("Oid", String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido()));
         productosVal.put("activo", "uno");
-        
+
         db.insert("productos", null, productosVal);
     }
 
