@@ -62,17 +62,32 @@ public class Configuracion extends AppCompatActivity {
     private static String DB_NAME = "proyectogas17.db";
     private static int DB_VERSION = 1;
 
-    private static int  statusConf ;
+    boolean fromSplash = false;
+
+    private static int  statusConf;
 
     String strIP = "";
+
+    @Override
+    public void onBackPressed() {
+        if(fromSplash){
+            finish();
+        }
+        else{
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracion);
 
+        if (getIntent().getBooleanExtra("SPLASH", false)) {
+            fromSplash = true;
+        }
 
-        int permissionCheck = ContextCompat.checkSelfPermission(
+            int permissionCheck = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.READ_PHONE_STATE );
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             Log.i("Mensaje", "No se tiene permiso.");
@@ -243,10 +258,11 @@ public class Configuracion extends AppCompatActivity {
                     //email.equals("null");
                     if(recordCount == 0) {
 
-                        /*cuando se le agrega un campo nuevo (sqlite sin valor)a una tabla ya existente, por default se le asigna un -1 */
-                        Intent intent = new Intent(SplashActivity.this, Configuracion.class);
-
+                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("SPLASH", true);
                         startActivity(intent);
+
                         finish();
                     }
 

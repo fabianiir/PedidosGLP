@@ -293,20 +293,15 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         btnReimpresionTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 try
                 {
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
-                    MainActivity.printData(imprCliente,imprDireccion, strTotal, imprChofer, imprUnidad,strFecha,true);
-
-                    // Intent intent = new Intent(getActivity(), Impresora.class);
-                    // startActivity(intent);
+                    MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad,strFecha,true);
                 }
                 catch (Exception ex)
                 {
                     ex.printStackTrace();
                 }
-
             }
         });
 
@@ -458,7 +453,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
                 try {
-                    MainActivity.printData(imprCliente, imprDireccion, strTotal, imprChofer, imprUnidad, strFecha, false);
+                    MainActivity.printData(imprCliente, imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad, strFecha, false);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

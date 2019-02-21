@@ -59,7 +59,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     private static final String TAG = "ProductoAdapter";
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas16.db";
+    private static String DB_NAME = "proyectogas17.db";
     private static int DB_VERSION = 1;
 
     ArrayList<Double> listPriceTotal;
@@ -119,7 +119,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                     Toast.makeText(mCtx, "Restar producto: " + String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
 
-                    restarProducto(String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(), "f87b5f10-12d2-428d-8bf1-606150f73185");
+                    restarProducto(String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(), String.valueOf(((Sessions) mCtx.getApplicationContext()).getsessToken()));
                 }
 
             }

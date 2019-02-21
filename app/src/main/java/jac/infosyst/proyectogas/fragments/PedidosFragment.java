@@ -2,8 +2,10 @@ package jac.infosyst.proyectogas.fragments;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -312,8 +314,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                             db.insert("usuario", null, values1);
 
                                             call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
-
-                                            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
                                             call.enqueue(new Callback() {
                                                 @Override
                                                 public void onResponse(Call call, Response response) {
@@ -341,6 +341,20 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                                 }
                                             });
                                         }else{
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                            builder.setMessage("IMEI no registrado, se cerrará la aplicación")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int id) {
+                                                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                            intent.putExtra("EXIT", true);
+                                                            startActivity(intent);
+                                                        }
+                                                    });
+                                            AlertDialog alert = builder.create();
+                                            alert.show();
+
                                             Toast.makeText(getActivity(), "obj_bitacora.geterror().equals.true!", Toast.LENGTH_SHORT).show();
 
                                         }

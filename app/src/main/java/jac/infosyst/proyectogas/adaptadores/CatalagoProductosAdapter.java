@@ -1,7 +1,6 @@
 
 package jac.infosyst.proyectogas.adaptadores;
 
-
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -48,7 +47,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-
 
 public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProductosAdapter.ViewHolder> {
 
@@ -127,7 +125,6 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
         LinearLayout parentLayout;
     }
 
-
     public void storeSqLiteProductos(double price){
         Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
 
@@ -139,12 +136,9 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
         productosVal.put("precio", price);
         productosVal.put("Oid", String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido()));
         productosVal.put("activo", "uno");
-
-
+        
         db.insert("productos", null, productosVal);
     }
-
-
 
     public void sumarProducto(int cantidad, int precio, String pedidoId, String productoId, String token){
 
@@ -194,9 +188,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
         });
-
     }
 
     public void restarProducto(int idProducto){

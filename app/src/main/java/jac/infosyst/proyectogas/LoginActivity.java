@@ -70,6 +70,10 @@ public class LoginActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
+
         ObtenerIMEI();
         Log.v("TAG","chyno");
         dialog = new ProgressDialog(LoginActivity.this);
