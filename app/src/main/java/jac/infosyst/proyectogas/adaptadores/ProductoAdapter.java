@@ -46,6 +46,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.zip.Inflater;
 
 import jac.infosyst.proyectogas.fragments.SurtirPedidoFragment;
 
@@ -68,26 +69,34 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     String strIP = "";
 
     private Fragment fragment;
+    private boolean pendiente;
 
-    public ProductoAdapter(List<Producto> productos, Context mCtx, FragmentManager f_manager) {
+    public ProductoAdapter(List<Producto> productos, Context mCtx, FragmentManager f_manager, boolean pendiente) {
         this.productos = productos;
         this.mCtx = mCtx;
         this.f_manager = f_manager;
+        this.pendiente = pendiente;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_productos, parent, false);
-        return new ViewHolder(v);
+        if(pendiente){
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_productos, parent, false);
+            return new ViewHolder(v);
+        } else {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_productosdisable, parent, false);
+            return new ViewHolder(v);
+        }
     }
 
     @Override
     public void onBindViewHolder(ProductoAdapter.ViewHolder holder, final int position) {
         final Producto producto = productos.get(position);
-        holder.textViewProducto.setText(""+producto.getdescripcion());
-        holder.textViewPrecio.setText("$"+producto.getPrecio());
-        holder.textViewCantidad.setText("Can:"+producto.getCantidad());
+        holder.textViewProducto.setText("" + producto.getdescripcion());
+        holder.textViewPrecio.setText("$" + producto.getPrecio());
+        holder.textViewCantidad.setText("Can:" + producto.getCantidad());
 
         holder.btnRestarProducto.setTag(producto.getOidProducto());
 

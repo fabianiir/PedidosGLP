@@ -181,6 +181,7 @@ public class Configuracion extends AppCompatActivity {
 
                     Intent intent = new Intent(Configuracion.this, LoginActivity.class);
                     startActivity(intent);
+                    finish();
                 }
 
                 @Override
@@ -258,11 +259,10 @@ public class Configuracion extends AppCompatActivity {
                     //email.equals("null");
                     if(recordCount == 0) {
 
-                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                        Intent intent = new Intent(SplashActivity.this, Configuracion.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra("SPLASH", true);
                         startActivity(intent);
-
                         finish();
                     }
 

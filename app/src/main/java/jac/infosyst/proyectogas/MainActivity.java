@@ -1,10 +1,13 @@
 package jac.infosyst.proyectogas;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -35,14 +38,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import jac.infosyst.proyectogas.ImpresoraBluetooth.UnicodeFormatter;
+import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
+import jac.infosyst.proyectogas.modelo.Camion;
+import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
+import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.modelo.ObjetoRes3;
 import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -209,8 +220,6 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
-
         drawerFragment = (FragmentDrawer)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
 
@@ -280,16 +289,11 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 3:
                 if (strRolUsuario.equals("Admin")) {
-
-
-
-
-           Intent i = new Intent(MainActivity.this, Configuracion.class);
+                    Intent i = new Intent(MainActivity.this, Configuracion.class);
                     startActivity(i);
                     ((Activity) MainActivity.this).overridePendingTransition(0, 0);
                 }
                 if(strRolUsuario.equals("Operador")){
-
                     title = getString(R.string.title_pedidosrealizados);
                     fragment = new PedidosFragment();
                 }
@@ -300,19 +304,42 @@ public class MainActivity extends AppCompatActivity
                 if (strRolUsuario.equals("Admin")) {
                     title = getString(R.string.title_pedidosrealizados);
                     fragment = new PedidosFragment();
-
-
                 }
                 if(strRolUsuario.equals("Operador")){
                     Log.v(TAG,"token: " + position);
-                   // insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
 
+                    /*BASEURL = strIP+ "glpservices/webresources/glpservices/";
+                    final String[] strReturnToken = new String[1];
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl(BASEURL)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+
+                    final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+                    Call call;
+                    call = service.bitacora(true, strimei, strchofer, arrayListCamion.get(0).getId(), null);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            if (response.isSuccessful()) {
+                                ObjetoRes obj_bitacora = (ObjetoRes) response.body();
+                                if (obj_bitacora.geterror().equals("false")) {
+                                    } else {
+                                        }
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "response.success.bitacora!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call call, Throwable t) {
+                                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });*/
                     Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(i2);
                     ((Activity) MainActivity.this).overridePendingTransition(0,0);
-
                 }
-
                 break;
 
             case 5:
@@ -413,8 +440,6 @@ public class MainActivity extends AppCompatActivity
 
             ex.printStackTrace();
         }
-
-
     }
 
     // Open Bluetooth Printer
@@ -482,18 +507,13 @@ public class MainActivity extends AppCompatActivity
                             stopWorker=true;
                         }
                     }
-
                 }
             });
-
             thread.start();
         }catch (Exception ex){
             ex.printStackTrace();
         }
     }
-
-
-
 
     // Printing Text to Bluetooth Printer //
     public static void printData(String cliente, String direccion, String total,String chofer, String unidad, String fecha, boolean reImpresion) throws  IOException{
@@ -596,8 +616,6 @@ if(reImpresion){
             int n_width = 2;
             outputStream.write(intToByteArray(n_width));
 
-
-
            // lblPrinterName.setText("Imprimiendo Ticket...");
         }catch (Exception ex){
             ex.printStackTrace();
@@ -617,7 +635,6 @@ if(reImpresion){
         }
     }
 
-
     public static byte intToByteArray(int value) {
         byte[] b = ByteBuffer.allocate(4).putInt(value).array();
 
@@ -625,9 +642,6 @@ if(reImpresion){
             System.out.println("Selva  [" + k + "] = " + "0x"
                     + UnicodeFormatter.byteToHex(b[k]));
         }
-
         return b[3];
     }
-
-
 }

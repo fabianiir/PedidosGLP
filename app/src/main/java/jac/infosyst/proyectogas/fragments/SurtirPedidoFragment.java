@@ -98,6 +98,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     View layout, layoutCatalagoProductos;
     LayoutInflater layoutInflater, layoutInflaterCatalagoProductos;
     String strIdPedido;
+    FloatingActionButton favplus;
 
     private RecyclerView recyclerViewProductos, recyclerViewCatalagoProductos, recyclerViewPedidosHide;
     private RecyclerView.Adapter adapter, adapterCatalago;
@@ -274,6 +275,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         textViewFirma.setText("Firma: " + strFirma);
         textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
         btnGuardar = (Button)rootView.findViewById(R.id.btnGuardar);
+        favplus = (FloatingActionButton) rootView.findViewById(R.id.fabAgregarProducto);
 
         //Asignacion de variables para impresora
         imprCliente = strCliente;
@@ -321,7 +323,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         recyclerViewProductos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getProductos();
+                getProductos(true);
             }
         });
 
@@ -384,7 +386,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             // signaturePad.setEnabled(false);
             // btnLimpiar.setEnabled(false);
             // btnGuardar.setEnabled(false);
-
         }
 
 
@@ -410,7 +411,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
 
-        getProductos();
+        getProductos(true);
 
         final String strDescripcion2 = ((Sessions) getActivity().getApplication()).getsesDescripcion();
         final String strIdPedido2 = ((Sessions) getActivity().getApplication()).getSesIdPedido();
@@ -421,7 +422,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void mostrarConfirmacion(String mensaje){
-        getProductos();
+        getProductos(true);
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
@@ -453,7 +454,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 putImageFirma();
-                pedidoActualizarSurtido("d9da86d7-0fee-43c9-b969-94779d106231");
+                pedidoActualizarSurtido();
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
                 try {
@@ -466,14 +467,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void mostrarCatalagoProductos(String mensaje){
-        getProductos();
-
-
-
-
-
-
-
+        getProductos(true);
 
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
@@ -543,18 +537,21 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 POPUP_WINDOW_CATALAGOPRODUCTOS.dismiss();
-                getProductos();
+                getProductos(true);
             }
         });
     }
 
-    public void pedidoActualizarSurtido(String idPedido){
-        btnReimpresionTicket.setVisibility(View.VISIBLE);
+    public void pedidoActualizarSurtido(){
+
         fabAgregarProducto.setEnabled(false);
         signaturePad.setEnabled(false);
         btnLimpiar.setEnabled(false);
         btnGuardar.setEnabled(false);
+        favplus.setEnabled(false);
+        getProductos(false);
 
+        btnReimpresionTicket.setVisibility(View.VISIBLE);
         dialog.setMax(10);
         dialog.setMessage("Actualizando Pedido....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -575,7 +572,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         getHora();
         getFecha();
         //  getUbicacion();
-
         BASEURL = strIP + "glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -587,7 +583,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         Call call = service.up_pedido(pedidoID, strHora, strFecha,
                 "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
-                19, 21, "b01020c8-4ab1-49b1-9ae1-87b2ec84465d", "null",
+                19, 21, "", "null",
                 Estatus.getSurtidoId(), "Up_1", strtoken);
 
         call.enqueue(new Callback() {
@@ -803,7 +799,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         }
     }
 
-    public void getProductos() {
+    public void getProductos(final boolean pendiente) {
         BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -822,11 +818,21 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onResponse(Call call, Response response) {
                 if (response.isSuccessful()) {
                     ObjetoRes resObj = (ObjetoRes) response.body();
-                    if (resObj.getestatus().equals("Pendiente")) {
-                        btnReimpresionTicket.setVisibility(View.GONE);
-                        ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("visible");
+                    if(pendiente){
+                        if (resObj.getestatus().equals("Pendiente")) {
+                            btnReimpresionTicket.setVisibility(View.GONE);
+                            ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("visible");
 
-                    } else {
+                        } else {
+                            ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
+                            fabAgregarProducto.setEnabled(false);
+                            btnReimpresionTicket.setVisibility(View.VISIBLE);
+                            signaturePad.setEnabled(false);
+                            btnGuardar.setEnabled(false);
+                            btnLimpiar.setEnabled(false);
+                            getImageFirma();
+                        }
+                    }else{
                         ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
                         fabAgregarProducto.setEnabled(false);
                         btnReimpresionTicket.setVisibility(View.VISIBLE);
@@ -838,7 +844,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     strTotal = String.valueOf(resObj.getsumaTotal());
                     textViewTotal.setText("Total $:" + resObj.getsumaTotal());
                     if (resObj.getproducto() != null) {
-                        adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager());
+                        adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager(), pendiente);
                         Sessions sessions = new Sessions();
                         sessions.setSesDetalleProductoSurtir(resObj.getproducto());
                         recyclerViewProductos.setAdapter(adapter);
