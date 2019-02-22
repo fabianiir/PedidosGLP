@@ -79,7 +79,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     int tiempoActualizarPedidos = 30000;
     int tipoPedidos, idPedido;
     String strtext;
-    Button btnAtenderPedido, btnCancelarPedido, btnImprimirPedido;
+    Button btnAtenderPedido,  btnImprimirPedido;
     FragmentManager f_manager;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
@@ -190,18 +190,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }
             }
         });
-        btnCancelarPedido = (Button) rootView.findViewById(R.id.btnCancelarPedido);
-        btnCancelarPedido.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CancelarPedidoFragment cpf = new CancelarPedidoFragment(getActivity().getBaseContext());
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container_body, cpf);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        });
+
         btnImprimirPedido = (Button) rootView.findViewById(R.id.btnImprimirPedido);
         btnImprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -220,7 +209,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         if(strNameTittle.equals("Pedidos")){
             btnAtenderPedido.setVisibility(View.VISIBLE);
-            btnCancelarPedido.setVisibility(View.VISIBLE);
+
             btnImprimirPedido.setVisibility(View.GONE);
             tipoPedidos = 0;
 
@@ -228,7 +217,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
         }
         if(strNameTittle.equals("Pedidos Realizados")){
             btnAtenderPedido.setVisibility(View.GONE);
-            btnCancelarPedido.setVisibility(View.GONE);
+
             btnImprimirPedido.setVisibility(View.VISIBLE);
             tipoPedidos = 1;
 

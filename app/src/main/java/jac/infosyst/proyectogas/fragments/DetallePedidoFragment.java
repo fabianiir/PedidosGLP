@@ -64,7 +64,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
     /*firma*/
     RelativeLayout mContent;
-    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar, btnLlamar;
+    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar, btnLlamar,btnCancelarPedido;
     ListView listView;
 
     Button mClear, mGetSign, mCancel;
@@ -217,6 +217,23 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 onClickLlamada(v, strTelefono);
             }
         });
+
+        btnCancelarPedido = (Button) rootView.findViewById(R.id.btnCancelarPedido);
+        btnCancelarPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CancelarPedidoFragment cpf = new CancelarPedidoFragment(getActivity().getBaseContext());
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, cpf);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+
+
+
+
 
         btnComoLlegar = (Button) rootView.findViewById(R.id.btnComoLlegar);
         btnComoLlegar.setOnClickListener(new View.OnClickListener() {

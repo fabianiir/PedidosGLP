@@ -185,6 +185,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnComoLlegar" />
 
+            <Button
+                android:id="@+id/btnCancelarPedido"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="16dp"
+
+                android:background="@color/colorAccent"
+                android:text="Cancelar"
+                android:textColor="@color/BotonGris"
+                app:layout_constraintTop_toBottomOf="@+id/btnLlamar" />
+
         </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>
