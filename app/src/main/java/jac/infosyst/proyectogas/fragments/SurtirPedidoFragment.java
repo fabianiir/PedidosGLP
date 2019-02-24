@@ -2,10 +2,12 @@ package jac.infosyst.proyectogas.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -303,6 +305,24 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 {
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
                     MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad,strFecha,true);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("¿Se imprimio el ticket?");
+                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                            btnReimpresionTicket.setVisibility(View.GONE);
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            btnReimpresionTicket.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+
                 }
                 catch (Exception ex)
                 {
@@ -459,6 +479,25 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 POPUP_WINDOW_CONFIRMACION.dismiss();
                 try {
                     MainActivity.printData(imprCliente, imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad, strFecha, false);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("¿Se imprimio el ticket?");
+                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            btnReimpresionTicket.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+
+
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -551,7 +590,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         favplus.setEnabled(false);
         getProductos(false);
 
-        btnReimpresionTicket.setVisibility(View.VISIBLE);
+
         dialog.setMax(10);
         dialog.setMessage("Actualizando Pedido....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -826,7 +865,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         } else {
                             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
                             fabAgregarProducto.setEnabled(false);
-                            btnReimpresionTicket.setVisibility(View.VISIBLE);
+
                             signaturePad.setEnabled(false);
                             btnGuardar.setEnabled(false);
                             btnLimpiar.setEnabled(false);
@@ -835,7 +874,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     }else{
                         ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
                         fabAgregarProducto.setEnabled(false);
-                        btnReimpresionTicket.setVisibility(View.VISIBLE);
+
                         signaturePad.setEnabled(false);
                         btnGuardar.setEnabled(false);
                         btnLimpiar.setEnabled(false);
