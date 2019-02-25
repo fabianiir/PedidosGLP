@@ -93,8 +93,9 @@ public class PedidosFragment extends Fragment implements LocationListener {
     String strIP = "";
     String strchofer = "";
     String strtoken = "";
-    String strcamion= Chofer.getCamion();
-    String strimei=Chofer.getImei();
+    String strcamion = Chofer.getCamion();
+    String strimei = Chofer.getImei();
+    String strcamionid;
 
     LocationManager locationManager;
     String strLatitude = "";
@@ -197,7 +198,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
             public void onClick(View v) {
                 ReimpresionPedidoFragment rpf = new ReimpresionPedidoFragment(getActivity().getBaseContext());
                 FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.container_body, rpf);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -271,7 +272,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             }
         });
 
-
         if (strtoken == null) {
             call = service.camion(Integer.parseInt(strcamion));
             call.enqueue(new Callback() {
@@ -283,6 +283,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                             List<Camion> arrayListCamion = Arrays.asList(obj_camion.getcamion());
                             UsuarioInfo uss = new UsuarioInfo();
                             uss.setPlacas(arrayListCamion.get(0).getplacas());
+                            strcamionid = arrayListCamion.get(0).getId();
                             call = service.bitacora(true, strimei, strchofer, arrayListCamion.get(0).getId(), null);
                             call.enqueue(new Callback() {
                                 @Override
@@ -290,6 +291,11 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                     if (response.isSuccessful()) {
                                         ObjetoRes obj_bitacora = (ObjetoRes) response.body();
                                         if (obj_bitacora.geterror().equals("false")) {
+
+                                            ((Sessions)getActivity().getApplicationContext()).setStrImei(strimei);
+                                            ((Sessions)getActivity().getApplicationContext()).setStrChoferId(strchofer);
+                                            ((Sessions)getActivity().getApplicationContext()).setStrCamionId(strcamionid);
+                                            ((Sessions)getActivity().getApplicationContext()).setsessToken(obj_bitacora.gettoken());
 
                                             sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
                                             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -345,9 +351,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                                     });
                                             AlertDialog alert = builder.create();
                                             alert.show();
-
-                                            Toast.makeText(getActivity(), "obj_bitacora.geterror().equals.true!", Toast.LENGTH_SHORT).show();
-
                                         }
                                     }else{
                                         Toast.makeText(getActivity(), "response.success.bitacora!", Toast.LENGTH_SHORT).show();

@@ -85,7 +85,6 @@ public class MainActivity extends AppCompatActivity
     private int DB_VERSION = 1;
     String strIP = "";
 
-
 // region variables impresora
     BluetoothAdapter bluetoothAdapter;
     BluetoothSocket bluetoothSocket;
@@ -307,48 +306,28 @@ public class MainActivity extends AppCompatActivity
                 }
                 if(strRolUsuario.equals("Operador")){
                     Log.v(TAG,"token: " + position);
+                    String strImei, strChofer, strCamion, strToken;
 
-                    /*BASEURL = strIP+ "glpservices/webresources/glpservices/";
-                    final String[] strReturnToken = new String[1];
-                    Retrofit retrofit = new Retrofit.Builder()
-                            .baseUrl(BASEURL)
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .build();
+                    strImei = ((Sessions)getApplicationContext()).getStrImei();
+                    strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
+                    strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
+                    strToken = ((Sessions)getApplicationContext()).getsessToken();
 
-                    final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-                    Call call;
-                    call = service.bitacora(true, strimei, strchofer, arrayListCamion.get(0).getId(), null);
-                    call.enqueue(new Callback() {
-                        @Override
-                        public void onResponse(Call call, Response response) {
-                            if (response.isSuccessful()) {
-                                ObjetoRes obj_bitacora = (ObjetoRes) response.body();
-                                if (obj_bitacora.geterror().equals("false")) {
-                                    } else {
-                                        }
-                                    } else {
-                                        Toast.makeText(MainActivity.this, "response.success.bitacora!", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call call, Throwable t) {
-                                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });*/
-                    Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(i2);
-                    ((Activity) MainActivity.this).overridePendingTransition(0,0);
+                    insertBitacora(false, strImei, strChofer, strCamion ,strToken);
                 }
                 break;
 
             case 5:
                 Log.v(TAG,"token: " + position);
-              //  insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
 
-                Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(i2);
-                ((Activity) MainActivity.this).overridePendingTransition(0,0);
+                String strImei, strChofer, strCamion, strToken;
+
+                strImei = ((Sessions)getApplicationContext()).getStrImei();
+                strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
+                strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
+                strToken = ((Sessions)getApplicationContext()).getsessToken();
+
+                insertBitacora(false, strImei, strChofer, strCamion ,strToken);
                 break;
 
             default:
@@ -388,6 +367,10 @@ public class MainActivity extends AppCompatActivity
                     if(resObj.geterror().equals("false")){
 
                         Log.d(TAG,"token: " + resObj.gettoken());
+
+                        Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
+                        startActivity(i2);
+                        ((Activity) MainActivity.this).overridePendingTransition(0,0);
                     } else {
                         Toast.makeText(getApplicationContext(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -398,7 +381,16 @@ public class MainActivity extends AppCompatActivity
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                builder.setMessage("EL cierre de sesión no puede alcanzar el servidor, intente de nuevo")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         });
     }
@@ -407,7 +399,6 @@ public class MainActivity extends AppCompatActivity
     void FindBluetoothDevice(){
 
         try{
-
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
@@ -416,7 +407,6 @@ public class MainActivity extends AppCompatActivity
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBT,0);
-
             }
 
             Set<BluetoothDevice> pairedDevice = bluetoothAdapter.getBondedDevices();

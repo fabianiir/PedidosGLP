@@ -293,4 +293,34 @@ public class Sessions  extends Application {
     public void setSessstrRestarProducto(String strRestarProducto) {
         this.strRestarProducto = strRestarProducto;
     }
+
+    private String strChoferId;
+
+    public String getStrChoferId() {
+        return strChoferId;
+    }
+
+    public void setStrChoferId(String strChoferId) {
+        this.strChoferId = strChoferId;
+    }
+
+    private String strImei;
+
+    public String getStrImei() {
+        return strImei;
+    }
+
+    public void setStrImei(String strImei) {
+        this.strImei = strImei;
+    }
+
+    private String strCamionId;
+
+    public String getStrCamionId() {
+        return strCamionId;
+    }
+
+    public void setStrCamionId(String strCamionId) {
+        this.strCamionId = strCamionId;
+    }
 }
