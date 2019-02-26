@@ -37,7 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -49,11 +50,12 @@ import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
 import jac.infosyst.proyectogas.modelo.Camion;
 import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
+import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.ObjetoRes3;
+import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -66,8 +68,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity
      //   implements NavigationView.OnNavigationItemSelectedListener {
     implements FragmentDrawer.FragmentDrawerListener{
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "proyectoGas";
     private static String TAG = MainActivity.class.getSimpleName();
 
     private Toolbar mToolbar;
@@ -82,9 +82,8 @@ public class MainActivity extends AppCompatActivity
     private String BASEURL = "";
     Sessions objSessions;
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas17.db";
-    private int DB_VERSION = 1;
     String strIP = "";
+    String Imei = "";
 
 // region variables impresora
     BluetoothAdapter bluetoothAdapter;
@@ -177,56 +176,295 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-
-//region Ejecucion hilo Impresora
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try{
-               FindBluetoothDevice();
-                    //openBluetoothPrinter();
-
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
-            }
-            }).start();
-//endregion
-
-        objSessions = new Sessions();
-
-        strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
-
-        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM configuracion";
 
-
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
-
-        final int recordCount = db.rawQuery(sql, null).getCount();
-
-        final Cursor record = db.rawQuery(sql, null);
+        Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
-            objSessions.setSesstrIpServidor(strIP);
+            Imei = record.getString(record.getColumnIndex("imei"));
         }
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        boolean admin = false;
 
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        sql = "SELECT * FROM usuario";
 
-        drawerFragment = (FragmentDrawer)
-                getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        record = db.rawQuery(sql, null);
 
-        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
-        drawerFragment.setDrawerListener(this);
+        if (record.moveToFirst()) {
+            admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
+        }
 
-        displayView(0);
+        String strcamion = Chofer.getCamion();
+
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+        if (!admin) {
+            Call call = service.camion(Integer.parseInt(strcamion));
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if (response.isSuccessful()) {
+                        ObjetoRes obj_camion = (ObjetoRes) response.body();
+                        if (obj_camion.geterror().equals("false")) {
+                            List<Camion> arrayListCamion = Arrays.asList(obj_camion.getcamion());
+
+                            String oid = "", nombre = "", foto = "", camion = "";
+                            boolean admin = false;
+
+                            String sql = "SELECT * FROM usuario";
+
+                            Cursor record = db.rawQuery(sql, null);
+
+                            if (record.moveToFirst()) {
+                                oid = record.getString(record.getColumnIndex("oid"));
+                                nombre = record.getString(record.getColumnIndex("nombre"));
+                                camion = record.getString(record.getColumnIndex("camion"));
+                                foto = record.getString(record.getColumnIndex("foto"));
+                                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
+                            }
+
+                            ContentValues values = new ContentValues();
+                            values.put("nombre", nombre);
+                            values.put("placas", arrayListCamion.get(0).getplacas());
+                            values.put("camion", arrayListCamion.get(0).getId());
+                            values.put("foto", foto);
+                            values.put("token", "");
+                            values.put("admin", admin);
+
+                            db.update(SQLiteDBHelper.Usuario_Table, values, "oid = ?" , new String[] { oid });
+
+                            sql = "SELECT * FROM usuario";
+
+                            record = db.rawQuery(sql, null);
+
+                            if (record.moveToFirst()) {
+                                oid = record.getString(record.getColumnIndex("oid"));
+                                camion = record.getString(record.getColumnIndex("camion"));
+                            }
+
+                            call = service.bitacora(true, Imei, oid, camion, null);
+                            call.enqueue(new Callback() {
+                                @Override
+                                public void onResponse(Call call, Response response) {
+                                    if (response.isSuccessful()) {
+                                        ObjetoRes obj_bitacora = (ObjetoRes) response.body();
+                                        if (obj_bitacora.geterror().equals("false")) {
+
+                                            String oid = "", nombre = "", placas = "", foto = "", token = "", camion = "";
+                                            boolean admin = false;
+
+                                            String sql = "SELECT * FROM usuario";
+
+                                            Cursor record = db.rawQuery(sql, null);
+
+                                            if (record.moveToFirst()) {
+                                                oid = record.getString(record.getColumnIndex("oid"));
+                                                nombre = record.getString(record.getColumnIndex("nombre"));
+                                                placas = record.getString(record.getColumnIndex("placas"));
+                                                camion = record.getString(record.getColumnIndex("camion"));
+                                                foto = record.getString(record.getColumnIndex("foto"));
+                                                token = record.getString(record.getColumnIndex("token"));
+                                                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
+                                            }
+
+                                            ContentValues values = new ContentValues();
+                                            values.put("oid", oid);
+                                            values.put("nombre", nombre);
+                                            values.put("placas", placas);
+                                            values.put("camion", camion);
+                                            values.put("foto", foto);
+                                            values.put("token", obj_bitacora.gettoken());
+                                            values.put("admin", admin);
+
+                                            db.update(SQLiteDBHelper.Usuario_Table, values, "oid = ?" , new String[] { oid });
+
+                                            record = db.rawQuery(sql, null);
+
+                                            if (record.moveToFirst()) {
+                                                oid = record.getString(record.getColumnIndex("oid"));
+                                                nombre = record.getString(record.getColumnIndex("nombre"));
+                                                placas = record.getString(record.getColumnIndex("placas"));
+                                                camion = record.getString(record.getColumnIndex("camion"));
+                                                foto = record.getString(record.getColumnIndex("foto"));
+                                                token = record.getString(record.getColumnIndex("token"));
+                                                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
+                                            }
+
+                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrImei(Imei);
+                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
+                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
+                                            ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+
+
+                                            call = service.getPedidos(oid, "Pendiente", token);
+                                            call.enqueue(new Callback() {
+                                                @Override
+                                                public void onResponse(Call call, Response response) {
+                                                    if (response.isSuccessful()) {
+                                                        ObjetoRes resObj = (ObjetoRes) response.body();
+
+                                                        if (resObj.geterror().equals("false")) {
+                                                            if (resObj.getpedido() != null) {
+                                                                List<Pedido> list =  Arrays.asList(resObj.getpedido());
+
+                                                                for (Pedido pedido: list) {
+
+                                                                    ContentValues values = new ContentValues();
+                                                                    values.put("oid", pedido.getOid());
+                                                                    String datetime = pedido.getfechaprogramada();
+                                                                    datetime.replace('T',' ');
+                                                                    values.put("fecha_hora_programada", datetime);
+                                                                    values.put("cliente", pedido.getcliente());
+                                                                    values.put("direccion", pedido.getdireccion());
+                                                                    values.put("cp", pedido.getcp());
+                                                                    values.put("telefono", pedido.gettelefono());
+                                                                    values.put("lat", pedido.getubicacion_lat());
+                                                                    values.put("lon", pedido.getubicacion_long());
+                                                                    values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                                                    if(pedido.getsuma_iva() == null)
+                                                                    {
+                                                                        values.put("suma_iva", 0);
+                                                                    }else{
+                                                                        values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
+                                                                    }
+                                                                    if(pedido.gettotal() == null)
+                                                                    {
+                                                                        values.put("total", 0);
+                                                                    }else{
+                                                                        values.put("total", Double.parseDouble(pedido.gettotal()));
+                                                                    }
+                                                                    values.put("empresa", pedido.getEmpresa());
+                                                                    values.put("tipo_pedido", pedido.gettipo_pedido());
+                                                                    values.put("forma_pago", pedido.getForma_pago());
+                                                                    values.put("estatus", pedido.getestatus());
+                                                                    db.insert(SQLiteDBHelper.Pedidos_Table,null, values);
+
+                                                                    if(pedido.getHobbies() != null) {
+
+                                                                        List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+
+                                                                        for (Producto producto : listproductos) {
+                                                                            ContentValues valuesProd = new ContentValues();
+                                                                            valuesProd.put("oid", producto.getOidProducto());
+                                                                            valuesProd.put("cantidad", producto.getCantidad());
+                                                                            valuesProd.put("surtido", producto.getsurtido());
+                                                                            valuesProd.put("precio", producto.getPrecio());
+                                                                            valuesProd.put("descripcion", producto.getdescripcion());
+                                                                            valuesProd.put("pedido", producto.getIdProducto());
+                                                                            db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                            } else {
+                                                                Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        } else {
+                                                            Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    } else {
+                                                        Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    setContentView(R.layout.activity_main);
+
+//region Ejecucion hilo Impresora
+                                                    new Thread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            try{
+                                                                FindBluetoothDevice();
+                                                                //openBluetoothPrinter();
+
+                                                            }catch (Exception ex){
+                                                                ex.printStackTrace();
+                                                            }
+
+                                                        }
+                                                    }).start();
+                                                //endregion
+
+                                                    objSessions = new Sessions();
+
+                                                    strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
+
+                                                    sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+
+                                                    String sql = "SELECT * FROM configuracion";
+
+                                                    Cursor record = db.rawQuery(sql, null);
+
+                                                    if (record.moveToFirst()) {
+                                                        strIP = record.getString(record.getColumnIndex("ip"));
+                                                        objSessions.setSesstrIpServidor(strIP);
+                                                    }
+
+                                                    mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+                                                    setSupportActionBar(mToolbar);
+                                                    getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+                                                    drawerFragment = (FragmentDrawer)
+                                                            getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+
+                                                    drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+                                                    drawerFragment.setDrawerListener(MainActivity.this);
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call call, Throwable t) {
+                                                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        } else {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                                            builder.setMessage("IMEI no registrado, se cerrará la aplicación")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int id) {
+                                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                            intent.putExtra("EXIT", true);
+                                                            startActivity(intent);
+                                                        }
+                                                    });
+                                            AlertDialog alert = builder.create();
+                                            alert.show();
+                                        }
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "response.success.bitacora!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call call, Throwable t) {
+                                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getApplicationContext(), "camion.error.true!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                    }
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else {
+        }
     }
 
     @Override
@@ -347,32 +585,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     public void insertBitacora(boolean evento, String emai, String chofer_id, String camion_id , String token){
 
-        BASEURL = strIP + "glpservices/webresources/glpservices/";
+                        BASEURL = strIP + "glpservices/webresources/glpservices/";
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+                        Retrofit retrofit = new Retrofit.Builder()
+                                .baseUrl(BASEURL)
+                                .addConverterFactory(GsonConverterFactory.create())
+                                .build();
 
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+                        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.bitacora(evento, emai, chofer_id , camion_id , token);
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()){
-                    ObjetoRes resObj = (ObjetoRes) response.body();
+                        Call call = service.bitacora(evento, emai, chofer_id , camion_id , token);
+                        call.enqueue(new Callback() {
+                            @Override
+                            public void onResponse(Call call, Response response) {
+                                if(response.isSuccessful()){
+                                    ObjetoRes resObj = (ObjetoRes) response.body();
 
-                    if(resObj.geterror().equals("false")){
+                                    if(resObj.geterror().equals("false")){
 
-                        Log.d(TAG,"token: " + resObj.gettoken());
+                                        Log.d(TAG,"token: " + resObj.gettoken());
 
-                        Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(i2);
-                        ((Activity) MainActivity.this).overridePendingTransition(0,0);
-                    } else {
+                                        Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
+                                        startActivity(i2);
+                                        ((Activity) MainActivity.this).overridePendingTransition(0,0);
+                                    } else {
                         Toast.makeText(getApplicationContext(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }

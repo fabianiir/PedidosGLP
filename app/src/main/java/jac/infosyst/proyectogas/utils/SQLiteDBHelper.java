@@ -51,8 +51,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     private static final String Usuario_Colum1 = "oid";
     private static final String Usuario_Colum2 = "nombre";
     private static final String Usuario_Colum3 = "placas";
-    private static final String Usuario_Colum4 = "foto";
-    private static final String Usuario_Colum5 = "token";
+    private static final String Usuario_Colum4 = "camion";
+    private static final String Usuario_Colum5 = "foto";
+    private static final String Usuario_Colum6 = "token";
+    private static final String Usuario_Colum7 = "admin";
     //endregion
 
     //region Productos
@@ -112,13 +114,13 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     //endregion
 
     //region Synchro
-        String Synchro_Table = "synchro";
-        String Synchro_Colum1 = "id";
-        String Synchro_Colum2 = "fecha";
-        String Synchro_Colum3 = "chofer";
+    private static final String Synchro_Table = "synchro";
+    private static final String Synchro_Colum1 = "id";
+    private static final String Synchro_Colum2 = "fecha";
+    private static final String Synchro_Colum3 = "chofer";
     //endregion
 
-    public SQLiteDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    public SQLiteDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -126,125 +128,123 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
 
         String createConfig_Table = "CREATE TABLE " + Config_Table + " (" +
-                Config_Colum1 + "TEXT PRIMARY KEY, " +
-                Config_Colum2 + "TEXT, " +
-                Config_Colum3 + "TEXT, " +
-                Config_Colum4 + "TEXT" +
+                Config_Colum1 + " TEXT PRIMARY KEY, " +
+                Config_Colum2 + " TEXT, " +
+                Config_Colum3 + " TEXT, " +
+                Config_Colum4 + " TEXT" +
                 ")";
         db.execSQL(createConfig_Table);
 
         String createCat_Estatus_Table = "CREATE TABLE " + CatEstatus_Table + " (" +
-                CatEstatus_Colum1 + "TEXT PRIMARY KEY, " +
-                CatEstatus_Colum2 + "TEXT" +
+                CatEstatus_Colum1 + " TEXT PRIMARY KEY, " +
+                CatEstatus_Colum2 + " TEXT" +
                 ")";
         db.execSQL(createCat_Estatus_Table);
 
         String createCat_Motv_Table = "CREATE TABLE " + CatMotCanc_Table + " (" +
-                CatMotCanc_Colum1 + "TEXT PRIMARY KEY, " +
-                CatMotCanc_Colum2 + "TEXT" +
+                CatMotCanc_Colum1 + " TEXT PRIMARY KEY, " +
+                CatMotCanc_Colum2 + " TEXT" +
                 ")";
         db.execSQL(createCat_Motv_Table);
 
         String createCat_Productos_Table = "CREATE TABLE " + CatProductos_Table + " (" +
-                Config_Colum1 + "TEXT PRIMARY KEY, " +
-                Config_Colum2 + "TEXT, " +
-                Config_Colum3 + "TEXT, " +
-                Config_Colum4 + "DOUBLE" +
+                CatProductos_Colum1 + " TEXT PRIMARY KEY, " +
+                CatProductos_Colum2 + " TEXT, " +
+                CatProductos_Colum3 + " TEXT, " +
+                CatProductos_Colum4 + " DOUBLE" +
                 ")";
         db.execSQL(createCat_Productos_Table);
 
         String createCat_Tpago_Table = "CREATE TABLE " + CatTpago_Table + " (" +
-                CatTpago_Colum1 + "TEXT PRIMARY KEY, " +
-                CatTpago_Colum2 + "TEXT" +
+                CatTpago_Colum1 + " TEXT PRIMARY KEY, " +
+                CatTpago_Colum2 + " TEXT" +
                 ")";
         db.execSQL(createCat_Tpago_Table);
 
         String createUsuario_Table = "CREATE TABLE " + Usuario_Table + " (" +
-                Usuario_Colum1 + "TEXT PRIMARY KEY, " +
-                Usuario_Colum2 + "TEXT, " +
-                Usuario_Colum3 + "TEXT, " +
-                Usuario_Colum4 + "TEXT, " +
-                Usuario_Colum5 + "TEXT" +
+                Usuario_Colum1 + " TEXT PRIMARY KEY, " +
+                Usuario_Colum2 + " TEXT, " +
+                Usuario_Colum3 + " TEXT, " +
+                Usuario_Colum4 + " TEXT, " +
+                Usuario_Colum5 + " TEXT, " +
+                Usuario_Colum6 + " TEXT, " +
+                Usuario_Colum7 + " BOOLEAN" +
                 ")";
         db.execSQL(createUsuario_Table);
 
         String createProductos_Table = "CREATE TABLE " + Productos_Table + " (" +
-                Productos_Colum1 + "TEXT PRIMARY KEY, " +
-                Productos_Colum2 + "INTEGER, " +
-                Productos_Colum3 + "BOOL, " +
-                Productos_Colum4 + "DOUBLE, " +
-                Productos_Colum5 + "TEXT, " +
-                Productos_Colum6 + "TEXT" +
+                Productos_Colum1 + " TEXT PRIMARY KEY, " +
+                Productos_Colum2 + " INTEGER, " +
+                Productos_Colum3 + " BOOL, " +
+                Productos_Colum4 + " DOUBLE, " +
+                Productos_Colum5 + " TEXT, " +
+                Productos_Colum6 + " TEXT" +
                 ")";
         db.execSQL(createProductos_Table);
 
         String createProductos_Mod_Table = "CREATE TABLE " + Productos_Mod_Table + " (" +
-                Productos_Mod_Colum1 + "TEXT PRIMARY KEY, " +
-                Productos_Mod_Colum2 + "INTEGER, " +
-                Productos_Mod_Colum3 + "BOOL, " +
-                Productos_Mod_Colum4 + "DOUBLE, " +
-                Productos_Mod_Colum5 + "TEXT, " +
-                Productos_Mod_Colum6 + "TEXT, " +
-                Productos_Mod_Colum7 + "TEXT" +
+                Productos_Mod_Colum1 + " TEXT PRIMARY KEY, " +
+                Productos_Mod_Colum2 + " INTEGER, " +
+                Productos_Mod_Colum3 + " BOOL, " +
+                Productos_Mod_Colum4 + " DOUBLE, " +
+                Productos_Mod_Colum5 + " TEXT, " +
+                Productos_Mod_Colum6 + " TEXT, " +
+                Productos_Mod_Colum7 + " TEXT" +
                 ")";
         db.execSQL(createProductos_Mod_Table);
 
         String createPedidos_Table = "CREATE TABLE " + Pedidos_Table + " (" +
-                Pedidos_Colum1 + "TEXT PRIMARY KEY, " +
-                Pedidos_Colum2 + "DATETIME, " +
-                Pedidos_Colum3 + "TEXT, " +
-                Pedidos_Colum4 + "TEXT, " +
-                Pedidos_Colum5 + "TEXT, " +
-                Pedidos_Colum6 + "TEXT, " +
-                Pedidos_Colum7 + "TEXT, " +
-                Pedidos_Colum8 + "TEXT, " +
-                Pedidos_Colum9 + "TEXT, " +
-                Pedidos_Colum10 + "DOUBLE, " +
-                Pedidos_Colum11 + "DOUBLE, " +
-                Pedidos_Colum12 + "TEXT, " +
-                Pedidos_Colum13 + "TEXT, " +
-                Pedidos_Colum14 + "TEXT, " +
-                Pedidos_Colum15 + "TEXT" +
+                Pedidos_Colum1 + " TEXT PRIMARY KEY, " +
+                Pedidos_Colum2 + " DATETIME, " +
+                Pedidos_Colum3 + " TEXT, " +
+                Pedidos_Colum4 + " TEXT, " +
+                Pedidos_Colum5 + " TEXT, " +
+                Pedidos_Colum6 + " TEXT, " +
+                Pedidos_Colum7 + " TEXT, " +
+                Pedidos_Colum8 + " TEXT, " +
+                Pedidos_Colum9 + " TEXT, " +
+                Pedidos_Colum10 + " DOUBLE, " +
+                Pedidos_Colum11 + " DOUBLE, " +
+                Pedidos_Colum12 + " TEXT, " +
+                Pedidos_Colum13 + " TEXT, " +
+                Pedidos_Colum14 + " TEXT, " +
+                Pedidos_Colum15 + " TEXT" +
                 ")";
         db.execSQL(createPedidos_Table);
 
         String createPedidos_Mod_Table = "CREATE TABLE " + Pedidos_Mod_Table + " (" +
-                Pedidos_Mod_Colum1 + "TEXT PRIMARY KEY, " +
-                Pedidos_Mod_Colum2 + "TEXT, " +
-                Pedidos_Mod_Colum3 + "TEXT, " +
-                Pedidos_Mod_Colum4 + "TEXT, " +
-                Pedidos_Mod_Colum5 + "DOUBLE, " +
-                Pedidos_Mod_Colum6 + "DOUBLE, " +
-                Pedidos_Mod_Colum7 + "TEXT, " +
-                Pedidos_Mod_Colum8 + "TEXT, " +
-                Pedidos_Mod_Colum9 + "TEXT, " +
-                Pedidos_Mod_Colum10 + "TEXT, " +
-                Pedidos_Mod_Colum11 + "TEXT, " +
-                Pedidos_Mod_Colum12 + "TEXT" +
+                Pedidos_Mod_Colum1 + " TEXT PRIMARY KEY, " +
+                Pedidos_Mod_Colum2 + " TEXT, " +
+                Pedidos_Mod_Colum3 + " TEXT, " +
+                Pedidos_Mod_Colum4 + " TEXT, " +
+                Pedidos_Mod_Colum5 + " DOUBLE, " +
+                Pedidos_Mod_Colum6 + " DOUBLE, " +
+                Pedidos_Mod_Colum7 + " TEXT, " +
+                Pedidos_Mod_Colum8 + " TEXT, " +
+                Pedidos_Mod_Colum9 + " TEXT, " +
+                Pedidos_Mod_Colum10 + " TEXT, " +
+                Pedidos_Mod_Colum11 + " TEXT, " +
+                Pedidos_Mod_Colum12 + " TEXT" +
                 ")";
         db.execSQL(createPedidos_Mod_Table);
 
         String synchro_Table = "CREATE TABLE " + Synchro_Table + " (" +
-                Synchro_Colum1 + "TEXT PRIMARY KEY, " +
-                Synchro_Colum2 + "DATE, " +
-                Synchro_Colum3 + "TEXT " +
+                Synchro_Colum1 + " TEXT PRIMARY KEY, " +
+                Synchro_Colum2 + " DATE, " +
+                Synchro_Colum3 + " TEXT " +
                 ")";
         db.execSQL(synchro_Table);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE " + Config_Table);
         db.execSQL("DROP TABLE " + CatEstatus_Table);
         db.execSQL("DROP TABLE " + CatMotCanc_Table);
         db.execSQL("DROP TABLE " + CatProductos_Table);
         db.execSQL("DROP TABLE " + CatTpago_Table);
         db.execSQL("DROP TABLE " + Usuario_Table);
         db.execSQL("DROP TABLE " + Productos_Table);
-        db.execSQL("DROP TABLE " + Productos_Mod_Table);
         db.execSQL("DROP TABLE " + Pedidos_Table);
-        db.execSQL("DROP TABLE " + Pedidos_Mod_Table);
-        db.execSQL("DROP TABLE " + Synchro_Table);
         onCreate(db);
     }
 }

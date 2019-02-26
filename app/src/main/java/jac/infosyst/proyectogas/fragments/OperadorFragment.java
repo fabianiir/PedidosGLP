@@ -1,20 +1,16 @@
 package jac.infosyst.proyectogas.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,35 +18,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import java.util.List;
-
+import jac.infosyst.proyectogas.FragmentDrawer;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
-import jac.infosyst.proyectogas.modelo.Imagen;
-import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Usuario;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
-import jac.infosyst.proyectogas.utils.ServicioUsuario;
-import jac.infosyst.proyectogas.utils.Sessions;
-import me.dm7.barcodescanner.core.ViewFinderView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OperadorFragment  extends Fragment {
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "proyectoGas";
-    private TextView textViewInterno;
-    private ImageView imageViewPerfil;
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas11.db";
-    private static int DB_VERSION = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,51 +38,44 @@ public class OperadorFragment  extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_operador, container, false);
 
-        textViewInterno = (TextView) rootView.findViewById(R.id.Nom_Operador);
-        textViewInterno.setText(UsuarioInfo.getNombre());
+        String foto = "", placas = "", nombre = "", imei = "", telefono = "";
+
+        sqLiteDBHelper = new SQLiteDBHelper(getContext());
+        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM usuario";
+        Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            nombre = record.getString(record.getColumnIndex("nombre"));
+            placas = record.getString(record.getColumnIndex("placas"));
+            foto = record.getString(record.getColumnIndex("foto"));
+        }
+
+        sql = "SELECT * FROM configuracion";
+        record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            imei = record.getString(record.getColumnIndex("imei"));
+            telefono = record.getString(record.getColumnIndex("telefono"));
+        }
+
+        TextView textViewInterno;
+
+        textViewInterno  = (TextView) rootView.findViewById(R.id.Nom_Operador);
+        textViewInterno.setText(nombre);
 
         textViewInterno = (TextView) rootView.findViewById(R.id.Nom_Unidad);
-        textViewInterno.setText(UsuarioInfo.getPlacas());
+        textViewInterno.setText(placas);
 
-        imageViewPerfil = (ImageView) rootView.findViewById(R.id.profile_image) ;
-        imageViewPerfil.setImageBitmap(UsuarioInfo.getFoto());
-        ObtenerIMEI(rootView);
+        ImageView imageViewPerfil = (ImageView) rootView.findViewById(R.id.profile_image) ;
+        imageViewPerfil.setImageBitmap(FragmentDrawer.decodeBase64(foto));
 
-        return rootView;
-    }
+        textViewInterno = (TextView) rootView.findViewById(R.id.tvTelefonoOperador2);
+        textViewInterno.setText(telefono);
 
-    public View ObtenerIMEI(View rootView)
-    {
-        int permissionCheck = ContextCompat.checkSelfPermission(
-                getContext(), Manifest.permission.READ_PHONE_STATE );
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            Log.i("Mensaje", "No se tiene permiso.");
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
-        } else {
-            Log.i("Mensaje", "Se tiene permiso!");
-        }
-
-        String myIMEI = "";
-
-        TelephonyManager mTelephony = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-        if (mTelephony.getDeviceId() != null){
-            myIMEI = mTelephony.getDeviceId();
-
-            final TextView textView= (TextView) rootView.findViewById(R.id.tvIMEIOperador2);
-            textView.setText(myIMEI);
-            insertaImeiSqLite(myIMEI);
-        }
+        textViewInterno = (TextView) rootView.findViewById(R.id.tvIMEIOperador2);
+        textViewInterno.setText(imei);
 
         return rootView;
-    }
-
-    public void insertaImeiSqLite(String emai){
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
-
-        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-        ContentValues values2 = new ContentValues();
-        values2.put("emai", emai);
-        db.insert("dispositivo", null, values2);
     }
 }

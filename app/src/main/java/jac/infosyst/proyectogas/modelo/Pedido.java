@@ -19,6 +19,8 @@ public class Pedido {
     private String total;
     private String tipo_pedido;
     private String estatus;
+    private String empresa;
+    private String forma_pago;
 
     private String ubicacion_lat;
     private String ubicacion_long;
@@ -27,7 +29,7 @@ public class Pedido {
 
     public Pedido(String Oid, String nombre, String placas, String fecha_hora_programada, String cliente, String direccion,
             String cp, String telefono, String comentarios_cliente, String suma_iva, String total,String tipo_pedido,  String estatus
-           , Producto[] productos, String ubicacion_lat,String ubicacion_long
+           , Producto[] productos, String ubicacion_lat,String ubicacion_long, String empresa, String forma_pago
                 ) {
         this.Oid = Oid;
         this.nombre = nombre;
@@ -45,7 +47,8 @@ public class Pedido {
         this.productos = productos;
         this.ubicacion_lat = ubicacion_lat;
         this.ubicacion_long = ubicacion_long;
-
+        this.empresa = empresa;
+        this.forma_pago = forma_pago;
     }
 
 
@@ -96,6 +99,13 @@ public class Pedido {
 
     public  String getestatus () { return  estatus; }
 
+    public String getEmpresa() {
+        return empresa;
+    }
+
+    public String getForma_pago() {
+        return forma_pago;
+    }
 
     public Producto[] getHobbies() {
         return productos;

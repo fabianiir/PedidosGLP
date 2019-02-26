@@ -43,7 +43,6 @@ import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Pedidos;
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -187,7 +186,7 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
     public void storeSqLiteProductos(double price){
         Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
 
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         ContentValues productosVal = new ContentValues();
@@ -202,7 +201,7 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
 
     public void sumarProducto(int cantidad, int precio, String pedidoId, String productoId, String token){
 
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
 
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
@@ -250,30 +249,4 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
             }
         });
     }
-
-    public void restarProducto(int idProducto){
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call<Result> call = service.actualizarProducto(idProducto);
-
-        call.enqueue(new Callback<Result>() {
-            @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
-                Toast.makeText(mCtx, response.body().getMessage(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(Call<Result> call, Throwable t) {
-                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 }
-
-

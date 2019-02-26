@@ -144,7 +144,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     }
 
     public void restarProducto(String idProducto, int cantidad, boolean surtido, int precio, String token){
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx , DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";

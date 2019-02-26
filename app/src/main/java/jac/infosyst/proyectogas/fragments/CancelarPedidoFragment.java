@@ -39,7 +39,6 @@ import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Producto;
 import jac.infosyst.proyectogas.modelo.Productos;
 import jac.infosyst.proyectogas.modelo.Usuario;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -128,7 +127,7 @@ public class CancelarPedidoFragment  extends Fragment {
         userService = userService;
         dialog = new ProgressDialog(getActivity());
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 

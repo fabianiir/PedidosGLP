@@ -3,7 +3,8 @@ package jac.infosyst.proyectogas.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,7 +20,7 @@ import java.util.Calendar;
 
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.Sessions;
 
 import static jac.infosyst.proyectogas.fragments.SurtirPedidoFragment.simpleDateFormatFecha;
@@ -75,7 +76,19 @@ public class ReimpresionPedidoFragment  extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                    MainActivity.printData(nombCliente,direcCliente,totalCliente, UsuarioInfo.getNombre(),UsuarioInfo.getPlacas(),fecha,true);
+
+                    String placas = "", nombre = "";
+
+                    SQLiteDBHelper sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                    SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                    String sql = "SELECT * FROM usuario";
+                    Cursor record = db.rawQuery(sql, null);
+
+                    if (record.moveToFirst()) {
+                        nombre = record.getString(record.getColumnIndex("nombre"));
+                        placas = record.getString(record.getColumnIndex("placas"));
+                    }
+                    MainActivity.printData(nombCliente,direcCliente,totalCliente,nombre,placas,fecha,true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

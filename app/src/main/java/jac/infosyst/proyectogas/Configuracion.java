@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -56,15 +55,10 @@ public class Configuracion extends AppCompatActivity {
     EditText edtTelefono;
     Button btnConfig;
 
-    String BASEURL;
-    static int checkConfiguracionSqLite = 0;
+    String Base_Url;
     private static SQLiteDBHelper sqLiteDBHelper = null;
 
     boolean fromSplash = false;
-
-    private static int  statusConf;
-
-    String strIP = "";
 
     @Override
     public void onBackPressed() {
@@ -116,7 +110,7 @@ public class Configuracion extends AppCompatActivity {
 
     private void insertarConfiguracion(final String dominio, final String telefono){
 
-        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -144,29 +138,22 @@ public class Configuracion extends AppCompatActivity {
                 if(response.isSuccessful()) {
                     progressDialog.dismiss();
                     ObjetoRes resObj = (ObjetoRes) response.body();
-                    sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+                    sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
                     final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
                     /*primera vez */
-                    ContentValues values2 = new ContentValues();
-                    values2.put("oid", resObj.getConfiguracion_id());
-                    values2.put("ip", dominio);
-                    values2.put("telefono", telefono);
-                    values2.put("imei", ObtenerIMEI());
+                    ContentValues values = new ContentValues();
+                    values.put("oid", resObj.getConfiguracion_id());
+                    values.put("ip", dominio);
+                    values.put("telefono", telefono);
+                    values.put("imei", ObtenerIMEI());
 
-                    db.insert(SQLiteDBHelper.Config_Table, null, values2);
-
-                    ContentValues cv = new ContentValues();
-                    cv.put("oid", resObj.getConfiguracion_id());
-                    cv.put("ip", dominio);
-                    cv.put("telefono", telefono);
-                    cv.put("imei", ObtenerIMEI());
-
-                //db.update(SQLiteDBHelper.Config_Table, cv, "oid = " + resObj.getConfiguracion_id() , null);
+                    db.insert(SQLiteDBHelper.Config_Table, null, values);
                 //poner if de la primera vez
-                ((Sessions)getApplication()).setSesstrIpServidor(dominio);
+                ((Sessions)getApplication()).setStrDominio(dominio);
 
-                    Intent intent = new Intent(Configuracion.this, LoginActivity.class);
+                Intent intent = new Intent(Configuracion.this, LoginActivity.class);
                     startActivity(intent);
+                    finish();
                 }
             }
 
@@ -208,7 +195,7 @@ public class Configuracion extends AppCompatActivity {
                 Log.i("Mensaje", "Se tiene permiso!");
             }
 
-            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
             String sql = "SELECT * FROM " + SQLiteDBHelper.Config_Table;
             final int recordCount = db.rawQuery(sql, null).getCount();

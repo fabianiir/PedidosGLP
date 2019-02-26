@@ -65,7 +65,6 @@ import jac.infosyst.proyectogas.modelo.ObjetoRes2;
 import jac.infosyst.proyectogas.modelo.Pedido;
 
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.RetrofitClient;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -193,7 +192,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         userService = RetrofitClient.getClient(BASEURL).create(ServicioUsuario.class);
         dialog = new ProgressDialog(getActivity());
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 
@@ -276,8 +275,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         imprCliente = strCliente;
         imprDireccion = strDireccion;
         imprTotal = strTotal;
-        imprChofer = UsuarioInfo.getNombre();
-        imprUnidad = UsuarioInfo.getPlacas();
+        imprChofer = "";
+        imprUnidad = "";
 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -296,8 +295,20 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onClick(View v) {
                 try
                 {
+                    String placas = "", nombre = "";
+
+                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                    SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                    String sql = "SELECT * FROM usuario";
+                    Cursor record = db.rawQuery(sql, null);
+
+                    if (record.moveToFirst()) {
+                        nombre = record.getString(record.getColumnIndex("nombre"));
+                        placas = record.getString(record.getColumnIndex("placas"));
+                    }
+
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
-                    MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad,strFecha,true);
+                    MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), nombre, placas, strFecha,true);
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("¿Se imprimio el ticket?");
                     builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -589,7 +600,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
@@ -762,9 +773,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         signaturePad.setVisibility(View.GONE);
 
                         decodedByte = decodeBase64(archivo);
-                        UsuarioInfo uss = new UsuarioInfo();
-                        uss.setFotoFirma(decodedByte);
-                        imgFirma.setImageBitmap(UsuarioInfo.getFotoFirma());
+
+                        imgFirma.setImageBitmap(decodedByte);
                     }else {
                         Toast.makeText(getActivity(), "No fue posible obtener la firma!", Toast.LENGTH_SHORT).show();
                     }

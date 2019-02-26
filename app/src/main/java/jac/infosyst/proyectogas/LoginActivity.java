@@ -5,23 +5,19 @@ package jac.infosyst.proyectogas;
  */
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Usuario;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 
 
@@ -47,19 +43,13 @@ import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity{
 
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "proyectoGas";
     private EditText edtUsername, edtPassword;
     private Button btnLogin;
     private ProgressDialog dialog;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
 
-    private int DB_VERSION = 1;
-    private String DB_NAME = "proyectoGas.db";
-
     private String BASEURL = "";
-    private String strEmai = "";
     private String strIP = "";
 
     private Sessions objSessions;
@@ -74,7 +64,6 @@ public class LoginActivity extends AppCompatActivity{
             finish();
         }
 
-        ObtenerIMEI();
         Log.v("TAG","chyno");
         dialog = new ProgressDialog(LoginActivity.this);
 
@@ -116,27 +105,16 @@ public class LoginActivity extends AppCompatActivity{
 
     private void login(final String pusername, String ppassword) {
 
-        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM configuracion";
 
-        final int recordCount = db.rawQuery(sql, null).getCount();
         final Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
             objSessions.setSesstrIpServidor(strIP);
         }
-
-        SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
-        Cursor cursor = dbConn.rawQuery(sql, null);
-
-        if (cursor.moveToFirst()) {
-            int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
-            String firstname = cursor.getString(cursor.getColumnIndex("status"));
-        }
-
-        cursor.close();
 
         BASEURL = strIP + "glpservices/webresources/glpservices/";
 
@@ -163,35 +141,32 @@ public class LoginActivity extends AppCompatActivity{
                     if (resObj.geterror().equals("false")) {
                         Toast.makeText(LoginActivity.this, "Bienvenido! ", Toast.LENGTH_SHORT).show();
                         List<Usuario> arrayListUsuario = Arrays.asList(resObj.getuser());
+
+                        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        /*primera vez */
+
+                        ContentValues values = new ContentValues();
+                        values.put("oid", arrayListUsuario.get(0).getId());
+                        values.put("nombre", arrayListUsuario.get(0).getnombre());
+                        values.put("placas", "");
+                        values.put("camion", "");
+                        values.put("foto", "");
+                        values.put("token", resObj.gettoken());
+                        values.put("admin", Boolean.parseBoolean(resObj.getAdmin()));
+                        db.insert(SQLiteDBHelper.Usuario_Table, null, values);
+
                         objSessions.setsessIDuser(arrayListUsuario.get(0).getId());
-                        UsuarioInfo uss = new UsuarioInfo();
-                        uss.setNombre(arrayListUsuario.get(0).getnombre());
-                        uss.setOid(arrayListUsuario.get(0).getId());
                         if (resObj.getAdmin().equals("true")) {
                             ((Sessions) getApplication()).setsesUsuarioRol("Admin");
                             Intent intent = new Intent(LoginActivity.this, Configuracion.class);
-                            intent.putExtra("username", pusername);
                             startActivity(intent);
-                            String sqlEmai = "SELECT * FROM dispositivo WHERE id = 1 ORDER BY id DESC limit 1";
-                            final Cursor recordEmai = db.rawQuery(sqlEmai, null);
-                            if (recordEmai.moveToFirst()) {
-                                strEmai = recordEmai.getString(recordEmai.getColumnIndex("emai"));
-                                Toast.makeText(LoginActivity.this, "Sqlite strEmai:" + strEmai, Toast.LENGTH_SHORT).show();
-                            }
+
                         }else if (resObj.getAdmin().equals("false")) {
                             ((Sessions) getApplication()).setsesUsuarioRol("Operador");
                             Intent intent = new Intent(LoginActivity.this, Escaner.class);
-                            intent.putExtra("username", pusername);
                             startActivity(intent);
                         }
-                        ContentValues cv = new ContentValues();
-                        cv.put("ip",strIP);
-                        db.update("config", cv, "id=" + 1, null);
-                        ContentValues values2 = new ContentValues();
-                        values2.put("Oid", arrayListUsuario.get(0).getId());
-                        values2.put("token", ((ObjetoRes) response.body()).gettoken());
-                        db.insert("usuario", null, values2);
-                        finish();
                     } else {
                         Toast.makeText(LoginActivity.this, resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -213,29 +188,5 @@ public class LoginActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
-    }
-
-    public void ObtenerIMEI()
-    {
-        int permissionCheck = ContextCompat.checkSelfPermission( this, Manifest.permission.READ_PHONE_STATE );
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            Log.i("Mensaje", "No se tiene permiso.");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
-        } else {
-            Log.i("Mensaje", "Se tiene permiso!");
-        }
-        Chofer myIMEI = new Chofer();
-        TelephonyManager mTelephony = (TelephonyManager) getApplication().getSystemService(Context.TELEPHONY_SERVICE);
-        if (mTelephony.getDeviceId() != null){
-            myIMEI.setImei(mTelephony.getDeviceId());
-        }
-    }
-
-    public void insertaImeiSqLite(String emai){
-        sqLiteDBHelper = new SQLiteDBHelper(LoginActivity.this, DATABASE_NAME, null, DATABASE_VERSION);
-        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-        ContentValues values2 = new ContentValues();
-        values2.put("emai", emai);
-        db.insert("dispositivo", null, values2);
     }
 }
