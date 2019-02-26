@@ -1,46 +1,59 @@
 package jac.infosyst.proyectogas;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.ClipData;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import jac.infosyst.proyectogas.FragmentDrawer;
-
 import jac.infosyst.proyectogas.ImpresoraBluetooth.UnicodeFormatter;
+import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
+import jac.infosyst.proyectogas.modelo.Camion;
+import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
+import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.modelo.ObjetoRes3;
+import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -60,6 +73,8 @@ public class MainActivity extends AppCompatActivity
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
 
+    private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
+    View layout;
    // Bundle bundle;
     PedidosFragment pedidoObj;
 
@@ -71,11 +86,11 @@ public class MainActivity extends AppCompatActivity
     private int DB_VERSION = 1;
     String strIP = "";
 
-
-///Variables Impresora
+// region variables impresora
     BluetoothAdapter bluetoothAdapter;
     BluetoothSocket bluetoothSocket;
     BluetoothDevice bluetoothDevice;
+    Boolean DispositivoEncontrado=false;
 
     static OutputStream outputStream;
     InputStream inputStream;
@@ -85,6 +100,79 @@ public class MainActivity extends AppCompatActivity
     int readBufferPosition;
     volatile boolean stopWorker;
 
+    public static int fragmentController;
+
+    public static int getFragmentController() {
+        return fragmentController;
+    }
+
+    public static void setFragmentController(int fragmentController) {
+        MainActivity.fragmentController = fragmentController;
+    }
+
+    @Override
+    public void onBackPressed(){
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            switch (fragmentController){
+                case 0:
+                    LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    layout = layoutInflater.inflate(R.layout.layout_popup, null);
+
+                    DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+                    int width = displayMetrics.widthPixels;
+                    int height = displayMetrics.heightPixels;
+
+                    layout.setVisibility(View.VISIBLE);
+                    POPUP_WINDOW_CONFIRMACION = new PopupWindow(this);
+                    POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                    POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                    POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                    POPUP_WINDOW_CONFIRMACION.setFocusable(true);
+
+                    POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
+
+                    POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+
+                    TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                    txtMessage.setText("¿Desea cerrar la aplicación?");
+
+                    Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                    btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                        }
+                    });
+
+                    Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                    btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.putExtra("EXIT", true);
+                            startActivity(intent);
+                        }
+                    });
+                    break;
+                case 1:
+                    super.onBackPressed();
+                    break;
+                case 2:
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +180,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
 
-
+//region Ejecucion hilo Impresora
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -106,7 +194,7 @@ public class MainActivity extends AppCompatActivity
 
             }
             }).start();
-
+//endregion
 
         objSessions = new Sessions();
 
@@ -132,8 +220,6 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
-
         drawerFragment = (FragmentDrawer)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
 
@@ -144,20 +230,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        menu.getItem(0).setIcon(ContextCompat.getDrawable(this,R.drawable.ic_printer_disable));
+      if(DispositivoEncontrado==false) {
+      }  menu.getItem(0).setIcon(ContextCompat.getDrawable(this,R.drawable.ic_printer_disable));
 
 
         return true;
@@ -172,7 +249,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            item.setIcon(ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_printer));
+            if(DispositivoEncontrado==true)
+            {
+                item.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_printer));
+            }
             Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_SHORT).show();
 
             return true;
@@ -205,15 +285,15 @@ public class MainActivity extends AppCompatActivity
             case 2:
                 fragment = new MapsActivity();
                 title = getString(R.string.title_mapa);
+
                 break;
             case 3:
-                if (strRolUsuario.equals("Administrador")) {
+                if (strRolUsuario.equals("Admin")) {
                     Intent i = new Intent(MainActivity.this, Configuracion.class);
                     startActivity(i);
                     ((Activity) MainActivity.this).overridePendingTransition(0, 0);
                 }
                 if(strRolUsuario.equals("Operador")){
-
                     title = getString(R.string.title_pedidosrealizados);
                     fragment = new PedidosFragment();
                 }
@@ -221,33 +301,34 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case 4:
-                if (strRolUsuario.equals("Administrador")) {
+                if (strRolUsuario.equals("Admin")) {
                     title = getString(R.string.title_pedidosrealizados);
                     fragment = new PedidosFragment();
-
-                    Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(i2);
-                    ((Activity) MainActivity.this).overridePendingTransition(0,0);
                 }
                 if(strRolUsuario.equals("Operador")){
                     Log.v(TAG,"token: " + position);
-                   // insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
+                    String strImei, strChofer, strCamion, strToken;
 
-                    Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(i2);
-                    ((Activity) MainActivity.this).overridePendingTransition(0,0);
+                    strImei = ((Sessions)getApplicationContext()).getStrImei();
+                    strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
+                    strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
+                    strToken = ((Sessions)getApplicationContext()).getsessToken();
 
+                    insertBitacora(false, strImei, strChofer, strCamion ,strToken);
                 }
-
                 break;
 
             case 5:
                 Log.v(TAG,"token: " + position);
-              //  insertBitacora(false, "emai", objSessions.getsessIDuser(), objSessions.getsessIDcamion() , objSessions.getsessToken() );
 
-                Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(i2);
-                ((Activity) MainActivity.this).overridePendingTransition(0,0);
+                String strImei, strChofer, strCamion, strToken;
+
+                strImei = ((Sessions)getApplicationContext()).getStrImei();
+                strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
+                strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
+                strToken = ((Sessions)getApplicationContext()).getsessToken();
+
+                insertBitacora(false, strImei, strChofer, strCamion ,strToken);
                 break;
 
             default:
@@ -287,6 +368,10 @@ public class MainActivity extends AppCompatActivity
                     if(resObj.geterror().equals("false")){
 
                         Log.d(TAG,"token: " + resObj.gettoken());
+
+                        Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
+                        startActivity(i2);
+                        ((Activity) MainActivity.this).overridePendingTransition(0,0);
                     } else {
                         Toast.makeText(getApplicationContext(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -297,7 +382,16 @@ public class MainActivity extends AppCompatActivity
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                builder.setMessage("EL cierre de sesión no puede alcanzar el servidor, intente de nuevo")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         });
     }
@@ -306,11 +400,10 @@ public class MainActivity extends AppCompatActivity
     void FindBluetoothDevice(){
 
         try{
-
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
-                //lblPrinterName.setText("Dispositivo Bluetooth no encontrado");
+                DispositivoEncontrado=false;
             }
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -325,6 +418,7 @@ public class MainActivity extends AppCompatActivity
                     // My Bluetooth printer name is MTP-3
                     if(pairedDev.getName().equals("MTP-3")){
                         bluetoothDevice=pairedDev;
+                        DispositivoEncontrado=true;
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
                     }
@@ -337,8 +431,6 @@ public class MainActivity extends AppCompatActivity
 
             ex.printStackTrace();
         }
-
-
     }
 
     // Open Bluetooth Printer
@@ -406,25 +498,17 @@ public class MainActivity extends AppCompatActivity
                             stopWorker=true;
                         }
                     }
-
                 }
             });
-
             thread.start();
         }catch (Exception ex){
             ex.printStackTrace();
         }
     }
 
-
-
-
     // Printing Text to Bluetooth Printer //
     public static void printData(String cliente, String direccion, String total,String chofer, String unidad, String fecha, boolean reImpresion) throws  IOException{
         try{
-
-
-
 
             String BILL = "";
 
@@ -461,10 +545,10 @@ if(reImpresion){
 
 
             BILL = BILL
-                    + "CLIENTE:"+cliente.toUpperCase()+" \n";
+                    + "CLIENTE:" + cliente.toUpperCase()+" \n";
 
             BILL = BILL
-                    + "DOMICILIO: "+direccion.toUpperCase()+"\n";
+                    + "DOMICILIO: " + direccion.toUpperCase()+"\n";
 
 
 
@@ -478,9 +562,12 @@ if(reImpresion){
             BILL = BILL + "\n";
             BILL = BILL
                     + "-----------------------------------------------";
-            BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "GAS L.P.", "300", "10", "$300.00");
-            BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "GAS L.P.", "10", "50", "$500.00");
+            Producto[] producto = Sessions.getImpProductos() ;
 
+            if(producto != null && producto.length != 0){
+                for (int i=0; i < producto.length; i++)
+                    BILL = BILL + "\n" +String.format("%1$-10s %2$10s %3$11s %4$10s", producto[i].getdescripcion(), producto[i].getCantidad(), "0", producto[i].getPrecio());
+            }
 
             BILL = BILL
                     + "\n-----------------------------------------------";
@@ -491,9 +578,12 @@ if(reImpresion){
 
             }
 
-            BILL = BILL + "                         SUBTOTAL:" + "   " + "$800.00" + "\n";
-            BILL = BILL + "                            I.V.A.:" + "   " + "$128.00" + "\n";
-            BILL = BILL + "                             TOTAL:" + "   " + "$"+total+ ".00\n";
+            double subtotal = (Double.parseDouble(total)/1.16);
+            double IVA = Double.parseDouble(total) - subtotal;
+
+            BILL = BILL + "                          SUBTOTAL:" + "   $" + String.valueOf(subtotal) + "\n";
+            BILL = BILL + "                            I.V.A.:" + "   $" + String.valueOf(IVA) + "\n";
+            BILL = BILL + "                             TOTAL:" + "   $" + String.valueOf(Double.parseDouble(total)) + "\n";
 
             BILL = BILL
                     + "-----------------------------------------------\n\n";
@@ -517,8 +607,6 @@ if(reImpresion){
             int n_width = 2;
             outputStream.write(intToByteArray(n_width));
 
-
-
            // lblPrinterName.setText("Imprimiendo Ticket...");
         }catch (Exception ex){
             ex.printStackTrace();
@@ -538,7 +626,6 @@ if(reImpresion){
         }
     }
 
-
     public static byte intToByteArray(int value) {
         byte[] b = ByteBuffer.allocate(4).putInt(value).array();
 
@@ -546,9 +633,6 @@ if(reImpresion){
             System.out.println("Selva  [" + k + "] = " + "0x"
                     + UnicodeFormatter.byteToHex(b[k]));
         }
-
         return b[3];
     }
-
-
 }

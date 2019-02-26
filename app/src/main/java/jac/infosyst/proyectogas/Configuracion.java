@@ -2,6 +2,7 @@ package jac.infosyst.proyectogas;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,15 +26,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
+import jac.infosyst.proyectogas.LectorQR.Escaner;
 import jac.infosyst.proyectogas.utils.Sessions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import android.support.v4.app.Fragment;
 
 import  jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
 
@@ -41,35 +46,46 @@ import com.google.gson.GsonBuilder;
 
 import com.squareup.okhttp.OkHttpClient;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class Configuracion extends AppCompatActivity{
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "proyectoGas";
+
+public class Configuracion extends AppCompatActivity {
 
     EditText edtIP;
     EditText edtTelefono;
     Button btnConfig;
 
+    String BASEURL;
     static int checkConfiguracionSqLite = 0;
     private static SQLiteDBHelper sqLiteDBHelper = null;
 
-    private static int  statusConf ;
-    String Base_Url;
-    
+    boolean fromSplash = false;
+
+    private static int  statusConf;
+
+    String strIP = "";
+
+    @Override
+    public void onBackPressed() {
+        if(fromSplash){
+            finish();
+        }
+        else{
+            MainActivity.setFragmentController(0);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracion);
-        int PermisoAlmacenamiento = ContextCompat.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (PermisoAlmacenamiento != PackageManager.PERMISSION_GRANTED) {
-            Log.i("Mensaje", "No se tiene permiso.");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 225);
-        } else {
-            Log.i("Mensaje", "Se tiene permiso!");
+
+        if (getIntent().getBooleanExtra("SPLASH", false)) {
+            fromSplash = true;
         }
 
-        int permissionCheck = ContextCompat.checkSelfPermission(
+            int permissionCheck = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.READ_PHONE_STATE );
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             Log.i("Mensaje", "No se tiene permiso.");
@@ -81,6 +97,8 @@ public class Configuracion extends AppCompatActivity{
         edtIP = (EditText) findViewById(R.id.input_IP);
         edtTelefono = (EditText) findViewById(R.id.input_telefono);
         btnConfig = (Button) findViewById(R.id.btn_configuracion);
+
+
 
         btnConfig.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +112,7 @@ public class Configuracion extends AppCompatActivity{
             }
         });
     }
+
 
     private void insertarConfiguracion(final String dominio, final String telefono){
 
@@ -114,8 +133,8 @@ public class Configuracion extends AppCompatActivity{
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        //Defining retrofit api service
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+            //Defining retrofit api service
+            ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
         Call call = service.registroConfiguracion(dominio, telefono);
 

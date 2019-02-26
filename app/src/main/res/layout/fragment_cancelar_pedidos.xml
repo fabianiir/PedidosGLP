@@ -99,9 +99,10 @@
 
         <Spinner
             android:id="@+id/spinnerMotivoCancelacion"
+            style="@style/AppTheme"
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            />
+            android:layout_height="100dp"
+            android:theme="@style/AppTheme" />
 
 
         <TextView

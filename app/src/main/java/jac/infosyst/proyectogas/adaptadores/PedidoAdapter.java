@@ -115,7 +115,6 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                 ((Sessions)mCtx.getApplicationContext()).setSesIdPedido(pedidos.get(position).getOid());
                 String strIdPedido = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido());
 
-                Toast.makeText(mCtx, "Se selecciono: " + strIdPedido, Toast.LENGTH_SHORT).show();
 
                 ((Sessions)mCtx.getApplicationContext()).setSesNombre(pedidos.get(position).getcliente());
                 ((Sessions)mCtx.getApplicationContext()).setSesCliente(pedidos.get(position).getcliente());

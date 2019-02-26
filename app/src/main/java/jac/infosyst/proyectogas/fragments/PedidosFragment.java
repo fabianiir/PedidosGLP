@@ -2,8 +2,10 @@ package jac.infosyst.proyectogas.fragments;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,6 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import jac.infosyst.proyectogas.FragmentDrawer;
+import jac.infosyst.proyectogas.LectorQR.Escaner;
+import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
@@ -38,10 +43,12 @@ import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.ObjetoRes3;
+import jac.infosyst.proyectogas.modelo.Pedido;
+import jac.infosyst.proyectogas.modelo.Usuario;
 import jac.infosyst.proyectogas.modelo.UsuarioInfo;
-import jac.infosyst.proyectogas.utils.RetrofitClient;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
+import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -61,9 +68,6 @@ import android.location.Location;
 
 
 public class PedidosFragment extends Fragment implements LocationListener {
-
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "proyectoGas";
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerViewPedidos;
     private RecyclerView.Adapter adapter;
@@ -75,7 +79,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     int tiempoActualizarPedidos = 30000;
     int tipoPedidos, idPedido;
     String strtext;
-    Button btnAtenderPedido, btnCancelarPedido, btnImprimirPedido;
+    Button btnAtenderPedido,  btnImprimirPedido;
     FragmentManager f_manager;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
@@ -89,8 +93,9 @@ public class PedidosFragment extends Fragment implements LocationListener {
     String strIP = "";
     String strchofer = "";
     String strtoken = "";
-    String strcamion= Chofer.getCamion();
-    String strimei=Chofer.getImei();
+    String strcamion = Chofer.getCamion();
+    String strimei = Chofer.getImei();
+    String strcamionid;
 
     LocationManager locationManager;
     String strLatitude = "";
@@ -115,25 +120,22 @@ public class PedidosFragment extends Fragment implements LocationListener {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
 
+        MainActivity.setFragmentController(0);
+
         Sessions strSess = new Sessions();
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-
-
 
         String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
 
         final int recordCount = db.rawQuery(sql, null).getCount();
-        //  Toast.makeText(getActivity(), "count:" + recordCount, Toast.LENGTH_SHORT).show();
-
         final Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
         }
 
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 
@@ -142,17 +144,15 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
 
         final int recordCount3 = db.rawQuery(sql3, null).getCount();
-        //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
         Cursor cursor3 = dbConn3.rawQuery(sql3, null);
 
         if (cursor3.moveToFirst()) {
             strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
-            //  Toast.makeText(getActivity(), "usuario: " + strchofer + strtoken , Toast.LENGTH_LONG).show();
         }
         objSessions = new Sessions();
-        userService = RetrofitClient.getClient(BASEURL).create(ServicioUsuario.class);
+        userService = ApiUtils.getUserService();
 
         swipeRefreshLayout= (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
@@ -191,25 +191,14 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }
             }
         });
-        btnCancelarPedido = (Button) rootView.findViewById(R.id.btnCancelarPedido);
-        btnCancelarPedido.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CancelarPedidoFragment cpf = new CancelarPedidoFragment(getActivity().getBaseContext());
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container_body, cpf);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        });
+
         btnImprimirPedido = (Button) rootView.findViewById(R.id.btnImprimirPedido);
         btnImprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ReimpresionPedidoFragment rpf = new ReimpresionPedidoFragment(getActivity().getBaseContext());
                 FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.container_body, rpf);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -221,7 +210,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         if(strNameTittle.equals("Pedidos")){
             btnAtenderPedido.setVisibility(View.VISIBLE);
-            btnCancelarPedido.setVisibility(View.VISIBLE);
+
             btnImprimirPedido.setVisibility(View.GONE);
             tipoPedidos = 0;
 
@@ -229,7 +218,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
         }
         if(strNameTittle.equals("Pedidos Realizados")){
             btnAtenderPedido.setVisibility(View.GONE);
-            btnCancelarPedido.setVisibility(View.GONE);
+
             btnImprimirPedido.setVisibility(View.VISIBLE);
             tipoPedidos = 1;
 
@@ -283,7 +272,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             }
         });
 
-
         if (strtoken == null) {
             call = service.camion(Integer.parseInt(strcamion));
             call.enqueue(new Callback() {
@@ -295,6 +283,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                             List<Camion> arrayListCamion = Arrays.asList(obj_camion.getcamion());
                             UsuarioInfo uss = new UsuarioInfo();
                             uss.setPlacas(arrayListCamion.get(0).getplacas());
+                            strcamionid = arrayListCamion.get(0).getId();
                             call = service.bitacora(true, strimei, strchofer, arrayListCamion.get(0).getId(), null);
                             call.enqueue(new Callback() {
                                 @Override
@@ -303,7 +292,12 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                         ObjetoRes obj_bitacora = (ObjetoRes) response.body();
                                         if (obj_bitacora.geterror().equals("false")) {
 
-                                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
+                                            ((Sessions)getActivity().getApplicationContext()).setStrImei(strimei);
+                                            ((Sessions)getActivity().getApplicationContext()).setStrChoferId(strchofer);
+                                            ((Sessions)getActivity().getApplicationContext()).setStrCamionId(strcamionid);
+                                            ((Sessions)getActivity().getApplicationContext()).setsessToken(obj_bitacora.gettoken());
+
+                                            sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
                                             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
                                             ContentValues values1 = new ContentValues();
@@ -317,8 +311,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                             db.insert("usuario", null, values1);
 
                                             call = userService.getPedidos(strchofer, "Pendiente", obj_bitacora.gettoken());
-
-                                            //  Call call = userService.getPedidos("255abae2-a6ed-43de-8aa3-b637f3490b8a", "Cancelado", "8342d5e8-1fa7-4e86-890d-763eb5a7a193");
                                             call.enqueue(new Callback() {
                                                 @Override
                                                 public void onResponse(Call call, Response response) {
@@ -328,7 +320,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                                         if (resObj.geterror().equals("false")) {
 
                                                             if (resObj.getpedido() != null) {
-                                                                Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
                                                                 adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                                                                 recyclerViewPedidos.setAdapter(adapter);
                                                             } else {
@@ -347,8 +338,19 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                                 }
                                             });
                                         }else{
-                                            Toast.makeText(getActivity(), "obj_bitacora.geterror().equals.true!", Toast.LENGTH_SHORT).show();
-
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                            builder.setMessage("IMEI no registrado, se cerrará la aplicación")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int id) {
+                                                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                            intent.putExtra("EXIT", true);
+                                                            startActivity(intent);
+                                                        }
+                                                    });
+                                            AlertDialog alert = builder.create();
+                                            alert.show();
                                         }
                                     }else{
                                         Toast.makeText(getActivity(), "response.success.bitacora!", Toast.LENGTH_SHORT).show();
@@ -384,7 +386,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                             if (resObj.geterror().equals("false")) {
 
                                 if (resObj.getpedido() != null) {
-                                    Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
                                     adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                                     recyclerViewPedidos.setAdapter(adapter);
 
@@ -428,7 +429,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                     if (resObj.geterror().equals("false")) {
 
                         if (resObj.getpedido() != null) {
-                            Toast.makeText(getActivity(), " != null", Toast.LENGTH_SHORT).show();
                             adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                             recyclerViewPedidos.setAdapter(adapter);
 
@@ -450,12 +450,12 @@ public class PedidosFragment extends Fragment implements LocationListener {
     }
 
     public void obtenerDatosUsuario(){
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
 
         if(sqLiteDBHelper!=null) {
             // Create the database tables again, this time because database version increased so the onUpgrade() method is invoked.
             SQLiteDatabase sqLiteDatabase = sqLiteDBHelper.getWritableDatabase();
-            Cursor cursor = sqLiteDatabase.query(SQLiteDBHelper.Usuario_Table, null, null, null, null, null, null);
+            Cursor cursor = sqLiteDatabase.query(SQLiteDBHelper.USUARIOS_TABLE_NAME, null, null, null, null, null, null);
 
             boolean hasRecord = cursor.moveToFirst();
             if(hasRecord)
@@ -522,12 +522,10 @@ public class PedidosFragment extends Fragment implements LocationListener {
         catch(SecurityException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-
         }
     }
 
     public void callSeguimiento(){
-        Toast.makeText(getActivity(), "Latitude: " + strLongitude + " Longitude:"  + strLongitude , Toast.LENGTH_SHORT).show();
     }
 
 

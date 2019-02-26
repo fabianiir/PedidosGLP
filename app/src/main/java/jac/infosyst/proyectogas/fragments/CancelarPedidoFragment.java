@@ -3,20 +3,43 @@ package jac.infosyst.proyectogas.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import jac.infosyst.proyectogas.Configuracion;
+import jac.infosyst.proyectogas.LectorQR.Escaner;
+import jac.infosyst.proyectogas.LoginActivity;
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
+import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
+import jac.infosyst.proyectogas.modelo.CatalagoProducto;
+import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ModeloSpinner;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.modelo.Pedido;
+import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.Productos;
+import jac.infosyst.proyectogas.modelo.Usuario;
+import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -31,21 +54,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView;
 
+import com.github.gcacace.signaturepad.views.SignaturePad;
+
 import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import jac.infosyst.proyectogas.modelo.Spinners;
 
 
 @SuppressLint("ValidFragment")
 
 public class CancelarPedidoFragment  extends Fragment {
 
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "proyectoGas";
     TextView tvCanNombreOperador, tvCanDireccion, tvCanDescripcion;
     EditText textViewObservaciones;
     Button btnAceptarCancelarPedido;
@@ -90,6 +119,7 @@ public class CancelarPedidoFragment  extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_cancelar_pedidos, container, false);
 
+        MainActivity.setFragmentController(1);
 
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
@@ -118,9 +148,9 @@ public class CancelarPedidoFragment  extends Fragment {
         tvCanDireccion = (TextView) rootView.findViewById(R.id.tvCanDireccion);
         tvCanDescripcion = (TextView) rootView.findViewById(R.id.tvCanDescripcion);
 
-        tvCanNombreOperador.setText("Nombre: " + ((Sessions)getActivity().getApplicationContext()).getSesCliente());
-        tvCanDireccion.setText("Direccion: " + ((Sessions)getActivity().getApplicationContext()).getsesDireccion());
-        tvCanDescripcion.setText("Descripcion: " + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion());
+        tvCanNombreOperador.setText(Html.fromHtml("<b>Nombre: </b>"+ ((Sessions)getActivity().getApplicationContext()).getSesCliente()));
+        tvCanDireccion.setText(Html.fromHtml("<b>Direccion: </b>" + ((Sessions)getActivity().getApplicationContext()).getsesDireccion()));
+        tvCanDescripcion.setText(Html.fromHtml("<b>Descripcion: </b>" + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion()));
 
         idPedido = ((Sessions)getActivity().getApplicationContext()).getSesIdPedido();
 
@@ -133,8 +163,6 @@ public class CancelarPedidoFragment  extends Fragment {
 
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id)
             {
-                Toast.makeText(adapterView.getContext(),
-                        (String) adapterView.getItemAtPosition(pos), Toast.LENGTH_SHORT).show();
             }
             public void onNothingSelected(AdapterView<?> parent)
             {
@@ -170,6 +198,13 @@ public class CancelarPedidoFragment  extends Fragment {
             @Override
             public void onResponse(Call call, Response response) {
                 Toast.makeText(getActivity(), "Pedido Cancelado", Toast.LENGTH_SHORT).show();
+                PedidosFragment spf = new PedidosFragment();
+
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, spf);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
 
             @Override
@@ -190,7 +225,6 @@ public class CancelarPedidoFragment  extends Fragment {
             public void onResponse(Call call, Response response) {
                 if(response.isSuccessful()){
                     ObjetoRes resObj = (ObjetoRes) response.body();
-                    // Toast.makeText(LoginActivity.this, "Respuesta: " + resObj.geterror(), Toast.LENGTH_SHORT).show();
                     if(resObj.geterror().equals("false")){
                         ArrayList<jac.infosyst.proyectogas.modelo.Spinner> latLngData = new ArrayList<jac.infosyst.proyectogas.modelo.Spinner>();
                         latLngData.addAll(Arrays.asList(resObj.getmotivoscancelacion()));
@@ -207,10 +241,8 @@ public class CancelarPedidoFragment  extends Fragment {
                         }
                         String text = builder.toString();
 
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, list);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, list);
                         spinner.setAdapter(adapter);
-
-                        Toast.makeText(getActivity(), "Respuesta: " + resObj.getmotivoscancelacion(), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
                     }

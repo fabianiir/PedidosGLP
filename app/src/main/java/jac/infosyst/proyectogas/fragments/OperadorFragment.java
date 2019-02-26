@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.modelo.Imagen;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
@@ -51,12 +52,10 @@ public class OperadorFragment  extends Fragment {
     private static String DB_NAME = "proyectogas11.db";
     private static int DB_VERSION = 1;
 
-    public OperadorFragment() {
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.setFragmentController(0);
     }
 
     @Override

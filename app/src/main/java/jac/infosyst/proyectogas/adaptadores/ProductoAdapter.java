@@ -30,6 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.zip.Inflater;
 
 public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewHolder> {
 
@@ -43,7 +44,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     private static final String TAG = "ProductoAdapter";
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas16.db";
+    private static String DB_NAME = "proyectogas17.db";
     private static int DB_VERSION = 1;
 
     ArrayList<Double> listPriceTotal;
@@ -52,26 +53,34 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     String strIP = "";
 
     private Fragment fragment;
+    private boolean pendiente;
 
-    public ProductoAdapter(List<Producto> productos, Context mCtx, FragmentManager f_manager) {
+    public ProductoAdapter(List<Producto> productos, Context mCtx, FragmentManager f_manager, boolean pendiente) {
         this.productos = productos;
         this.mCtx = mCtx;
         this.f_manager = f_manager;
+        this.pendiente = pendiente;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_productos, parent, false);
-        return new ViewHolder(v);
+        if(pendiente){
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_productos, parent, false);
+            return new ViewHolder(v);
+        } else {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_productosdisable, parent, false);
+            return new ViewHolder(v);
+        }
     }
 
     @Override
     public void onBindViewHolder(ProductoAdapter.ViewHolder holder, final int position) {
         final Producto producto = productos.get(position);
-        holder.textViewProducto.setText(""+producto.getdescripcion());
-        holder.textViewPrecio.setText("$"+producto.getPrecio());
-        holder.textViewCantidad.setText("Can:"+producto.getCantidad());
+        holder.textViewProducto.setText("" + producto.getdescripcion());
+        holder.textViewPrecio.setText("$" + producto.getPrecio());
+        holder.textViewCantidad.setText("Can:" + producto.getCantidad());
 
         holder.btnRestarProducto.setTag(producto.getOidProducto());
 
@@ -103,7 +112,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                     Toast.makeText(mCtx, "Restar producto: " + String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
 
-                    restarProducto(String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(), "f87b5f10-12d2-428d-8bf1-606150f73185");
+                    restarProducto(String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(), String.valueOf(((Sessions) mCtx.getApplicationContext()).getsessToken()));
                 }
 
             }

@@ -1,5 +1,6 @@
 package jac.infosyst.proyectogas.LectorNFC;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import jac.infosyst.proyectogas.LectorQR.Escaner;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.modelo.Chofer;
@@ -27,7 +29,14 @@ public class NFC extends AppCompatActivity {
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
     private TextView text;
-    private  Button btnNFCIngresar;
+    public static Activity NFCActivity = new Activity();
+
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(NFC.this, Escaner.class);
+        startActivity(intent);
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +44,8 @@ public class NFC extends AppCompatActivity {
         setContentView(R.layout.activity_nfc);
         text = (TextView) findViewById(R.id.text);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        NFCActivity = this;
 
         if (nfcAdapter == null) {
             Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
@@ -45,17 +56,6 @@ public class NFC extends AppCompatActivity {
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, this.getClass())
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-
-
-        btnNFCIngresar = (Button) findViewById(R.id.btn_IngresarNFC);
-
-        btnNFCIngresar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(NFC.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -130,6 +130,8 @@ public class NFC extends AppCompatActivity {
 
         Intent intent = new Intent(NFC.this, MainActivity.class);
         startActivity(intent);
+        finish();
+        Escaner.escanerActivity.finish();
     }
 
     private void showWirelessSettings() {
