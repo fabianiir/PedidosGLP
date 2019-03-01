@@ -85,6 +85,10 @@ public class ObjetoRes {
         return pedido;
     }
 
+    public void setPedido(Pedido[] pedido) {
+        this.pedido = pedido;
+    }
+
     private Producto[] productos;
 
     public Producto[] getproducto() {

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -33,7 +34,10 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import jac.infosyst.proyectogas.modelo.Camion;
 import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
@@ -42,6 +46,8 @@ import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.ObjetoRes3;
 import jac.infosyst.proyectogas.modelo.Pedido;
+import jac.infosyst.proyectogas.modelo.Pedidos;
+import jac.infosyst.proyectogas.modelo.Producto;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
@@ -60,6 +66,10 @@ import android.database.Cursor;
 import android.util.Log;
 
 import android.location.Location;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class PedidosFragment extends Fragment implements LocationListener {
@@ -153,13 +163,15 @@ public class PedidosFragment extends Fragment implements LocationListener {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                actualizarPedidosPendientes();
+                try {
+                    actualizarPedidosPendientes();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 swipeRefreshLayout.setRefreshing(false);
 
             }
         });
-
-
 
         recyclerViewPedidos = (RecyclerView) rootView.findViewById(R.id.recyclerViewPedidos);
         recyclerViewPedidos.setHasFixedSize(true);
@@ -219,14 +231,18 @@ public class PedidosFragment extends Fragment implements LocationListener {
         }
 
         if (tipoPedidos == 0){
-            actualizarPedidosPendientes();
+            try {
+                actualizarPedidosPendientes();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }else if(tipoPedidos == 1){
             actualizarPedidosSurtidos();
         }
         return rootView;
     }
 
-    public void actualizarPedidosPendientes() {
+    public void actualizarPedidosPendientes() throws JSONException {
         BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -236,20 +252,94 @@ public class PedidosFragment extends Fragment implements LocationListener {
         final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
         Call call;
 
-        String oid = "", nombre = "", placas = "", foto = "", token = "", camion = "";
         boolean admin = false;
 
-        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-        String sql = "SELECT * FROM pedido";
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
+        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-        Cursor record = db.rawQuery(sql, null);
+        String sql3 = "SELECT * FROM usuario";
 
-        if (record.moveToFirst()) {
-            oid = record.getString(record.getColumnIndex("oid"));
+        Cursor cursor3 = db.rawQuery(sql3, null);
+
+        if (cursor3.moveToFirst()) {
+            strchofer = cursor3.getString(cursor3.getColumnIndex("oid"));
+            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
 
-        //adapter = new PedidoAdapter(Arrays.asList(Pedido),getActivity(), getFragmentManager());
-        //recyclerViewPedidos.setAdapter(adapter);
+        String sqlPedido = "SELECT * FROM pedidos";
+
+        Cursor cursor = db.rawQuery(sqlPedido, null);
+
+        Pedido[] pedidos = new Pedido[cursor.getCount()];
+        int i = 0;
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            String sqlProducto = "SELECT * FROM productos WHERE pedido = '" + cursor.getString(cursor.getColumnIndex("oid")) + "'";
+            Cursor cursorPr = db.rawQuery(sqlProducto, null);
+            if(cursorPr.getCount() > 0) {
+                Producto[] productos = new Producto[cursorPr.getCount()];
+                int j = 0;
+                for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                    Producto producto = new Producto(cursorPr.getString(cursorPr.getColumnIndex("oid")),
+                            Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))),
+                            Boolean.parseBoolean(cursorPr.getString(cursorPr.getColumnIndex("surtido"))),
+                            Double.parseDouble(cursorPr.getString(cursorPr.getColumnIndex("precio"))),
+                            cursorPr.getString(cursorPr.getColumnIndex("descripcion")),
+                            cursorPr.getString(cursorPr.getColumnIndex("pedido")));
+                    if (producto != null) {
+                        productos[j] = producto;
+                    }
+                    j++;
+                }
+                Pedido pedido = new Pedido(cursor.getString(cursor.getColumnIndex("oid")),
+                        "",
+                        "",
+                        cursor.getString(cursor.getColumnIndex("fecha_hora_programada")),
+                        cursor.getString(cursor.getColumnIndex("cliente")),
+                        cursor.getString(cursor.getColumnIndex("direccion")),
+                        cursor.getString(cursor.getColumnIndex("cp")),
+                        cursor.getString(cursor.getColumnIndex("telefono")),
+                        cursor.getString(cursor.getColumnIndex("comentario_cliente")),
+                        cursor.getString(cursor.getColumnIndex("suma_iva")),
+                        cursor.getString(cursor.getColumnIndex("total")),
+                        cursor.getString(cursor.getColumnIndex("tipo_pedido")),
+                        cursor.getString(cursor.getColumnIndex("estatus")), productos,
+                        cursor.getString(cursor.getColumnIndex("lat")),
+                        cursor.getString(cursor.getColumnIndex("lon")),
+                        cursor.getString(cursor.getColumnIndex("empresa")),
+                        cursor.getString(cursor.getColumnIndex("forma_pago")));
+                if (pedido != null) {
+                    pedidos[i] = pedido;
+                }
+                i++;
+            }else{
+                Pedido pedido = new Pedido(cursor.getString(cursor.getColumnIndex("oid")),
+                        "",
+                        "",
+                        cursor.getString(cursor.getColumnIndex("fecha_hora_programada")),
+                        cursor.getString(cursor.getColumnIndex("cliente")),
+                        cursor.getString(cursor.getColumnIndex("direccion")),
+                        cursor.getString(cursor.getColumnIndex("cp")),
+                        cursor.getString(cursor.getColumnIndex("telefono")),
+                        cursor.getString(cursor.getColumnIndex("comentario_cliente")),
+                        cursor.getString(cursor.getColumnIndex("suma_iva")),
+                        cursor.getString(cursor.getColumnIndex("total")),
+                        cursor.getString(cursor.getColumnIndex("tipo_pedido")),
+                        cursor.getString(cursor.getColumnIndex("estatus")), null,
+                        cursor.getString(cursor.getColumnIndex("lat")),
+                        cursor.getString(cursor.getColumnIndex("lon")),
+                        cursor.getString(cursor.getColumnIndex("empresa")),
+                        cursor.getString(cursor.getColumnIndex("forma_pago")));
+                if (pedido != null) {
+                    pedidos[i] = pedido;
+                }
+                i++;
+            }
+        }
+
+        cursor.close();
+
+        adapter = new PedidoAdapter(Arrays.asList(pedidos),getActivity(), getFragmentManager());
+        recyclerViewPedidos.setAdapter(adapter);
     }
 
     public void actualizarPedidosSurtidos() {
@@ -261,7 +351,21 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         Call call;
 
-        call = userService.getPedidos(strchofer, "Surtido", strtoken);
+        boolean admin = false;
+
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
+        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+        String sql3 = "SELECT * FROM usuario";
+
+        Cursor cursor3 = db.rawQuery(sql3, null);
+
+        if (cursor3.moveToFirst()) {
+            strchofer = cursor3.getString(cursor3.getColumnIndex("oid"));
+            strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
+        }
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+        call = service.getPedidos(strchofer, "Surtido", strtoken);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {

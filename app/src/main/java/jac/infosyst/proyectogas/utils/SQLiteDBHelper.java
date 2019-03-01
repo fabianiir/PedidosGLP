@@ -114,10 +114,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     //endregion
 
     //region Synchro
-    private static final String Synchro_Table = "synchro";
+    public static final String Synchro_Table = "synchro";
     private static final String Synchro_Colum1 = "id";
     private static final String Synchro_Colum2 = "fecha";
-    private static final String Synchro_Colum3 = "chofer";
     //endregion
 
     public SQLiteDBHelper(Context context) {
@@ -183,7 +182,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
         db.execSQL(createProductos_Table);
 
         String createProductos_Mod_Table = "CREATE TABLE " + Productos_Mod_Table + " (" +
-                Productos_Mod_Colum1 + " TEXT PRIMARY KEY, " +
+                Productos_Mod_Colum1 + " TEXT, " +
                 Productos_Mod_Colum2 + " INTEGER, " +
                 Productos_Mod_Colum3 + " BOOL, " +
                 Productos_Mod_Colum4 + " DOUBLE, " +
@@ -229,9 +228,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
         db.execSQL(createPedidos_Mod_Table);
 
         String synchro_Table = "CREATE TABLE " + Synchro_Table + " (" +
-                Synchro_Colum1 + " TEXT PRIMARY KEY, " +
-                Synchro_Colum2 + " DATE, " +
-                Synchro_Colum3 + " TEXT " +
+                Synchro_Colum1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                Synchro_Colum2 + " DATE" +
                 ")";
         db.execSQL(synchro_Table);
     }

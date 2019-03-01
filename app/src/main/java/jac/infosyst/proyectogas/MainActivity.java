@@ -37,11 +37,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.sql.Date;
+import java.sql.Time;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import jac.infosyst.proyectogas.ImpresoraBluetooth.UnicodeFormatter;
@@ -49,13 +55,16 @@ import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
 import jac.infosyst.proyectogas.modelo.Camion;
+import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
 import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
+import jac.infosyst.proyectogas.modelo.ObjetoRes2;
 import jac.infosyst.proyectogas.modelo.ObjetoRes3;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.Spinner;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -78,6 +87,7 @@ public class MainActivity extends AppCompatActivity
    // Bundle bundle;
     PedidosFragment pedidoObj;
 
+    boolean errorDescarga = false;
     String strRolUsuario;
     private String BASEURL = "";
     Sessions objSessions;
@@ -172,266 +182,559 @@ public class MainActivity extends AppCompatActivity
     }
 
     //endregion
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
-        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-        String sql = "SELECT * FROM configuracion";
+        if (getIntent().getBooleanExtra("User", false)) {
+            setContentView(R.layout.activity_main);
 
-        Cursor record = db.rawQuery(sql, null);
-
-        if (record.moveToFirst()) {
-            strIP = record.getString(record.getColumnIndex("ip"));
-            Imei = record.getString(record.getColumnIndex("imei"));
-        }
-
-        boolean admin = false;
-
-        sql = "SELECT * FROM usuario";
-
-        record = db.rawQuery(sql, null);
-
-        if (record.moveToFirst()) {
-            admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
-        }
-
-        String strcamion = Chofer.getCamion();
-
-        BASEURL = strIP + "glpservices/webresources/glpservices/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-        if (!admin) {
-            Call call = service.camion(Integer.parseInt(strcamion));
-            call.enqueue(new Callback() {
+            //region Ejecucion hilo Impresora
+            new Thread(new Runnable() {
                 @Override
-                public void onResponse(Call call, Response response) {
-                    if (response.isSuccessful()) {
-                        ObjetoRes obj_camion = (ObjetoRes) response.body();
-                        if (obj_camion.geterror().equals("false")) {
-                            List<Camion> arrayListCamion = Arrays.asList(obj_camion.getcamion());
+                public void run() {
+                    try {
+                        FindBluetoothDevice();
+                        //openBluetoothPrinter();
 
-                            String oid = "", nombre = "", foto = "", camion = "";
-                            boolean admin = false;
-
-                            String sql = "SELECT * FROM usuario";
-
-                            Cursor record = db.rawQuery(sql, null);
-
-                            if (record.moveToFirst()) {
-                                oid = record.getString(record.getColumnIndex("oid"));
-                                nombre = record.getString(record.getColumnIndex("nombre"));
-                                camion = record.getString(record.getColumnIndex("camion"));
-                                foto = record.getString(record.getColumnIndex("foto"));
-                                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
-                            }
-
-                            ContentValues values = new ContentValues();
-                            values.put("nombre", nombre);
-                            values.put("placas", arrayListCamion.get(0).getplacas());
-                            values.put("camion", arrayListCamion.get(0).getId());
-                            values.put("foto", foto);
-                            values.put("token", "");
-                            values.put("admin", admin);
-
-                            db.update(SQLiteDBHelper.Usuario_Table, values, "oid = ?" , new String[] { oid });
-
-                            sql = "SELECT * FROM usuario";
-
-                            record = db.rawQuery(sql, null);
-
-                            if (record.moveToFirst()) {
-                                oid = record.getString(record.getColumnIndex("oid"));
-                                camion = record.getString(record.getColumnIndex("camion"));
-                            }
-
-                            call = service.bitacora(true, Imei, oid, camion, null);
-                            call.enqueue(new Callback() {
-                                @Override
-                                public void onResponse(Call call, Response response) {
-                                    if (response.isSuccessful()) {
-                                        ObjetoRes obj_bitacora = (ObjetoRes) response.body();
-                                        if (obj_bitacora.geterror().equals("false")) {
-
-                                            String oid = "", nombre = "", placas = "", foto = "", token = "", camion = "";
-                                            boolean admin = false;
-
-                                            String sql = "SELECT * FROM usuario";
-
-                                            Cursor record = db.rawQuery(sql, null);
-
-                                            if (record.moveToFirst()) {
-                                                oid = record.getString(record.getColumnIndex("oid"));
-                                                nombre = record.getString(record.getColumnIndex("nombre"));
-                                                placas = record.getString(record.getColumnIndex("placas"));
-                                                camion = record.getString(record.getColumnIndex("camion"));
-                                                foto = record.getString(record.getColumnIndex("foto"));
-                                                token = record.getString(record.getColumnIndex("token"));
-                                                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
-                                            }
-
-                                            ContentValues values = new ContentValues();
-                                            values.put("oid", oid);
-                                            values.put("nombre", nombre);
-                                            values.put("placas", placas);
-                                            values.put("camion", camion);
-                                            values.put("foto", foto);
-                                            values.put("token", obj_bitacora.gettoken());
-                                            values.put("admin", admin);
-
-                                            db.update(SQLiteDBHelper.Usuario_Table, values, "oid = ?" , new String[] { oid });
-
-                                            record = db.rawQuery(sql, null);
-
-                                            if (record.moveToFirst()) {
-                                                oid = record.getString(record.getColumnIndex("oid"));
-                                                nombre = record.getString(record.getColumnIndex("nombre"));
-                                                placas = record.getString(record.getColumnIndex("placas"));
-                                                camion = record.getString(record.getColumnIndex("camion"));
-                                                foto = record.getString(record.getColumnIndex("foto"));
-                                                token = record.getString(record.getColumnIndex("token"));
-                                                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
-                                            }
-
-                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrImei(Imei);
-                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
-                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
-                                            ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }).start();
+            //endregion
 
 
-                                            call = service.getPedidos(oid, "Pendiente", token);
-                                            call.enqueue(new Callback() {
-                                                @Override
-                                                public void onResponse(Call call, Response response) {
-                                                    if (response.isSuccessful()) {
-                                                        ObjetoRes resObj = (ObjetoRes) response.body();
+            //endregion
 
-                                                        if (resObj.geterror().equals("false")) {
-                                                            if (resObj.getpedido() != null) {
-                                                                List<Pedido> list =  Arrays.asList(resObj.getpedido());
+            objSessions = new Sessions();
 
-                                                                for (Pedido pedido: list) {
+            strRolUsuario = ((Sessions) getApplicationContext()).getsesUsuarioRol();
 
-                                                                    ContentValues values = new ContentValues();
-                                                                    values.put("oid", pedido.getOid());
-                                                                    String datetime = pedido.getfechaprogramada();
-                                                                    datetime.replace('T',' ');
-                                                                    values.put("fecha_hora_programada", datetime);
-                                                                    values.put("cliente", pedido.getcliente());
-                                                                    values.put("direccion", pedido.getdireccion());
-                                                                    values.put("cp", pedido.getcp());
-                                                                    values.put("telefono", pedido.gettelefono());
-                                                                    values.put("lat", pedido.getubicacion_lat());
-                                                                    values.put("lon", pedido.getubicacion_long());
-                                                                    values.put("comentario_cliente", pedido.getcomentarios_cliente());
-                                                                    if(pedido.getsuma_iva() == null)
-                                                                    {
-                                                                        values.put("suma_iva", 0);
-                                                                    }else{
-                                                                        values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
-                                                                    }
-                                                                    if(pedido.gettotal() == null)
-                                                                    {
-                                                                        values.put("total", 0);
-                                                                    }else{
-                                                                        values.put("total", Double.parseDouble(pedido.gettotal()));
-                                                                    }
-                                                                    values.put("empresa", pedido.getEmpresa());
-                                                                    values.put("tipo_pedido", pedido.gettipo_pedido());
-                                                                    values.put("forma_pago", pedido.getForma_pago());
-                                                                    values.put("estatus", pedido.getestatus());
-                                                                    db.insert(SQLiteDBHelper.Pedidos_Table,null, values);
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
 
-                                                                    if(pedido.getHobbies() != null) {
+            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-                                                                        List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+            String sql = "SELECT * FROM configuracion";
 
-                                                                        for (Producto producto : listproductos) {
-                                                                            ContentValues valuesProd = new ContentValues();
-                                                                            valuesProd.put("oid", producto.getOidProducto());
-                                                                            valuesProd.put("cantidad", producto.getCantidad());
-                                                                            valuesProd.put("surtido", producto.getsurtido());
-                                                                            valuesProd.put("precio", producto.getPrecio());
-                                                                            valuesProd.put("descripcion", producto.getdescripcion());
-                                                                            valuesProd.put("pedido", producto.getIdProducto());
-                                                                            db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
-                                                                        }
-                                                                    }
-                                                                }
+            Cursor record = db.rawQuery(sql, null);
 
-                                                            } else {
-                                                                Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        } else {
-                                                            Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    } else {
-                                                        Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
-                                                    }
+            if (record.moveToFirst()) {
+                strIP = record.getString(record.getColumnIndex("ip"));
+                Imei = record.getString(record.getColumnIndex("imei"));
+                objSessions.setSesstrIpServidor(strIP);
+            }
 
-                                                    setContentView(R.layout.activity_main);
+            mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
-//region Ejecucion hilo Impresora
-                                                    new Thread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try{
-                                                                FindBluetoothDevice();
-                                                                //openBluetoothPrinter();
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-                                                            }catch (Exception ex){
-                                                                ex.printStackTrace();
-                                                            }
+            drawerFragment = (FragmentDrawer)
+                    getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
 
-                                                        }
-                                                    }).start();
-                                                //endregion
+            drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+            drawerFragment.setDrawerListener(MainActivity.this);
 
-                                                    objSessions = new Sessions();
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    obtener_pedidos();
+                    guardar_pedidos_productos();
+                    handler.postDelayed(this, 600000);
+                }
+            }, 600000);  //the time is in miliseconds
 
-                                                    strRolUsuario = ((Sessions)getApplicationContext()).getsesUsuarioRol();
+            String oid = "", token = "", camion = "";
 
-                                                    sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+            sql = "SELECT * FROM usuario";
 
-                                                    String sql = "SELECT * FROM configuracion";
+            record = db.rawQuery(sql, null);
+
+            if (record.moveToFirst()) {
+                oid = record.getString(record.getColumnIndex("oid"));
+                camion = record.getString(record.getColumnIndex("camion"));
+                token = record.getString(record.getColumnIndex("token"));
+            }
+
+            ((Sessions) getApplicationContext().getApplicationContext()).setStrImei(Imei);
+            ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
+            ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
+            ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+
+            displayView(0);
+        }else {
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            String sql = "SELECT * FROM configuracion";
+
+            Cursor record = db.rawQuery(sql, null);
+
+            if (record.moveToFirst()) {
+                strIP = record.getString(record.getColumnIndex("ip"));
+                Imei = record.getString(record.getColumnIndex("imei"));
+            }
+
+            boolean admin = false;
+
+            sql = "SELECT * FROM usuario";
+
+            record = db.rawQuery(sql, null);
+
+            if (record.moveToFirst()) {
+                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
+            }
+
+            String strcamion = Chofer.getCamion();
+
+            BASEURL = strIP + "glpservices/webresources/glpservices/";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(BASEURL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+            sql = "SELECT * FROM pedidos";
+
+            record = db.rawQuery(sql, null);
+            if(record.getCount() <= 0) {
+                if (!admin) {
+                    Call call = service.camion(Integer.parseInt(strcamion));
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            if (response.isSuccessful()) {
+                                ObjetoRes obj_camion = (ObjetoRes) response.body();
+                                if (obj_camion.geterror().equals("false")) {
+                                    List<Camion> arrayListCamion = Arrays.asList(obj_camion.getcamion());
+
+                                    String oid = "", nombre = "", foto = "", camion = "";
+                                    boolean admin = false;
+
+                                    String sql = "SELECT * FROM usuario";
+
+                                    Cursor record = db.rawQuery(sql, null);
+
+                                    if (record.moveToFirst()) {
+                                        oid = record.getString(record.getColumnIndex("oid"));
+                                        nombre = record.getString(record.getColumnIndex("nombre"));
+                                        camion = record.getString(record.getColumnIndex("camion"));
+                                        foto = record.getString(record.getColumnIndex("foto"));
+                                        admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
+                                    }
+
+                                    ContentValues values = new ContentValues();
+                                    values.put("nombre", nombre);
+                                    values.put("placas", arrayListCamion.get(0).getplacas());
+                                    values.put("camion", arrayListCamion.get(0).getId());
+                                    values.put("foto", foto);
+                                    values.put("token", "");
+                                    values.put("admin", admin);
+
+                                    db.update(SQLiteDBHelper.Usuario_Table, values, "oid = ?", new String[]{oid});
+
+                                    sql = "SELECT * FROM usuario";
+
+                                    record = db.rawQuery(sql, null);
+
+                                    if (record.moveToFirst()) {
+                                        oid = record.getString(record.getColumnIndex("oid"));
+                                        camion = record.getString(record.getColumnIndex("camion"));
+                                    }
+
+                                    call = service.bitacora(true, Imei, oid, camion, null);
+                                    call.enqueue(new Callback() {
+                                        @Override
+                                        public void onResponse(Call call, Response response) {
+                                            if (response.isSuccessful()) {
+                                                ObjetoRes obj_bitacora = (ObjetoRes) response.body();
+                                                if (obj_bitacora.geterror().equals("false")) {
+
+                                                    String oid = "", nombre = "", placas = "", foto = "", token = "", camion = "";
+                                                    boolean admin = false;
+
+                                                    String sql = "SELECT * FROM usuario";
 
                                                     Cursor record = db.rawQuery(sql, null);
 
                                                     if (record.moveToFirst()) {
-                                                        strIP = record.getString(record.getColumnIndex("ip"));
-                                                        objSessions.setSesstrIpServidor(strIP);
+                                                        oid = record.getString(record.getColumnIndex("oid"));
+                                                        nombre = record.getString(record.getColumnIndex("nombre"));
+                                                        placas = record.getString(record.getColumnIndex("placas"));
+                                                        camion = record.getString(record.getColumnIndex("camion"));
+                                                        foto = record.getString(record.getColumnIndex("foto"));
+                                                        token = record.getString(record.getColumnIndex("token"));
+                                                        admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
                                                     }
 
-                                                    mToolbar = (Toolbar) findViewById(R.id.toolbar);
+                                                    ContentValues values = new ContentValues();
+                                                    values.put("oid", oid);
+                                                    values.put("nombre", nombre);
+                                                    values.put("placas", placas);
+                                                    values.put("camion", camion);
+                                                    values.put("foto", foto);
+                                                    values.put("token", obj_bitacora.gettoken());
+                                                    values.put("admin", admin);
 
-                                                    setSupportActionBar(mToolbar);
-                                                    getSupportActionBar().setDisplayShowHomeEnabled(true);
+                                                    db.update(SQLiteDBHelper.Usuario_Table, values, "oid = ?", new String[]{oid});
 
-                                                    drawerFragment = (FragmentDrawer)
-                                                            getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+                                                    record = db.rawQuery(sql, null);
 
-                                                    drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
-                                                    drawerFragment.setDrawerListener(MainActivity.this);
+                                                    if (record.moveToFirst()) {
+                                                        oid = record.getString(record.getColumnIndex("oid"));
+                                                        camion = record.getString(record.getColumnIndex("camion"));
+                                                        token = record.getString(record.getColumnIndex("token"));
+                                                    }
+
+                                                    ((Sessions) getApplicationContext().getApplicationContext()).setStrImei(Imei);
+                                                    ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
+                                                    ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
+                                                    ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+
+                                                    sql = "SELECT * FROM cat_estatus";
+                                                    record = db.rawQuery(sql, null);
+
+                                                    if (record.getCount() <= 0) {
+                                                        call = service.getCatalogoEstatus(token);
+                                                        call.enqueue(new Callback() {
+                                                            @Override
+                                                            public void onResponse(Call call, Response response) {
+                                                                if (response.isSuccessful()) {
+                                                                    ObjetoRes3 obj_estatus = (ObjetoRes3) response.body();
+                                                                    if (obj_estatus.geterror().equals("false")) {
+                                                                        List<CatalogoEstatus> arrayListEstatus = Arrays.asList(obj_estatus.getCatalogoEstatus());
+                                                                        Estatus estatus = new Estatus();
+
+                                                                        for (CatalogoEstatus catalogoEstatus : arrayListEstatus) {
+                                                                            ContentValues values = new ContentValues();
+                                                                            values.put("oid", catalogoEstatus.getIdProducto());
+                                                                            values.put("nombre", catalogoEstatus.getdescripcion());
+                                                                            db.insert(SQLiteDBHelper.CatEstatus_Table, null, values);
+                                                                        }
+
+                                                                        for (int i = 0; i < arrayListEstatus.size(); i++) {
+                                                                            if (arrayListEstatus.get(i).getdescripcion().equals("Pendiente")) {
+                                                                                estatus.setPendienteId(arrayListEstatus.get(i).getIdProducto());
+                                                                            } else if (arrayListEstatus.get(i).getdescripcion().equals("Surtido")) {
+                                                                                estatus.setSurtidoId(arrayListEstatus.get(i).getIdProducto());
+                                                                            } else if (arrayListEstatus.get(i).getdescripcion().equals("Cancelado")) {
+                                                                                estatus.setCanceladoId(arrayListEstatus.get(i).getIdProducto());
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onFailure(Call call, Throwable t) {
+                                                                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                                        .setCancelable(false)
+                                                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                            public void onClick(DialogInterface dialog, int id) {
+                                                                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                                                intent.putExtra("EXIT", true);
+                                                                                startActivity(intent);
+                                                                            }
+                                                                        });
+                                                                AlertDialog alert = builder.create();
+                                                                alert.show();
+                                                            }
+                                                        });
+                                                    }
+
+                                                    sql = "SELECT * FROM cat_motivo_cancelacion";
+                                                    record = db.rawQuery(sql, null);
+
+                                                    if (record.getCount() <= 0) {
+                                                        call = service.obtenerMotivosCancelacion(token);
+                                                        call.enqueue(new Callback() {
+                                                            @Override
+                                                            public void onResponse(Call call, Response response) {
+                                                                if (response.isSuccessful()) {
+                                                                    ObjetoRes obj_estatus = (ObjetoRes) response.body();
+                                                                    if (obj_estatus.geterror().equals("false")) {
+                                                                        List<Spinner> arrayListMotCancelacion = Arrays.asList(obj_estatus.getmotivoscancelacion());
+                                                                        Estatus estatus = new Estatus();
+
+                                                                        for (Spinner spinner : arrayListMotCancelacion) {
+                                                                            ContentValues values = new ContentValues();
+                                                                            values.put("oid", spinner.getoid());
+                                                                            values.put("nombre", spinner.getnombre());
+                                                                            db.insert(SQLiteDBHelper.CatMotCanc_Table, null, values);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onFailure(Call call, Throwable t) {
+                                                                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                                        .setCancelable(false)
+                                                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                            public void onClick(DialogInterface dialog, int id) {
+                                                                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                                                intent.putExtra("EXIT", true);
+                                                                                startActivity(intent);
+                                                                            }
+                                                                        });
+                                                                AlertDialog alert = builder.create();
+                                                                alert.show();
+                                                            }
+                                                        });
+                                                    }
+
+                                                    sql = "SELECT * FROM cat_productos";
+                                                    record = db.rawQuery(sql, null);
+
+                                                    if (record.getCount() <= 0) {
+                                                        call = service.getCatalagoProductos(token);
+                                                        call.enqueue(new Callback() {
+                                                            @Override
+                                                            public void onResponse(Call call, Response response) {
+                                                                if (response.isSuccessful()) {
+                                                                    ObjetoRes2 obj_estatus = (ObjetoRes2) response.body();
+                                                                    if (obj_estatus.geterror().equals("false")) {
+                                                                        List<CatalagoProducto> arrayListProductos = Arrays.asList(obj_estatus.getcatalogoProductos());
+                                                                        Estatus estatus = new Estatus();
+
+                                                                        for (CatalagoProducto producto : arrayListProductos) {
+                                                                            ContentValues values = new ContentValues();
+                                                                            values.put("oid", producto.getIdProducto());
+                                                                            values.put("descripcion", producto.getdescripcion());
+                                                                            values.put("unidad", producto.getunidad());
+                                                                            values.put("precio_unitario", producto.getprecio_unitario());
+                                                                            db.insert(SQLiteDBHelper.CatProductos_Table, null, values);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onFailure(Call call, Throwable t) {
+                                                                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                                        .setCancelable(false)
+                                                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                            public void onClick(DialogInterface dialog, int id) {
+                                                                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                                                intent.putExtra("EXIT", true);
+                                                                                startActivity(intent);
+                                                                            }
+                                                                        });
+                                                                AlertDialog alert = builder.create();
+                                                                alert.show();
+                                                            }
+                                                        });
+                                                    }
+
+                                                    call = service.getPedidos(oid, "Pendiente", token);
+                                                    call.enqueue(new Callback() {
+                                                        @Override
+                                                        public void onResponse(Call call, Response response) {
+                                                            if (response.isSuccessful()) {
+                                                                ObjetoRes resObj = (ObjetoRes) response.body();
+
+                                                                if (resObj.geterror().equals("false")) {
+                                                                    if (resObj.getpedido() != null) {
+                                                                        List<Pedido> list = Arrays.asList(resObj.getpedido());
+
+                                                                        for (Pedido pedido : list) {
+
+                                                                            ContentValues values = new ContentValues();
+                                                                            values.put("oid", pedido.getOid());
+                                                                            String datetime = pedido.getfechaprogramada();
+                                                                            datetime.replace('T', ' ');
+                                                                            values.put("fecha_hora_programada", datetime);
+                                                                            values.put("cliente", pedido.getcliente());
+                                                                            values.put("direccion", pedido.getdireccion());
+                                                                            values.put("cp", pedido.getcp());
+                                                                            values.put("telefono", pedido.gettelefono());
+                                                                            values.put("lat", pedido.getubicacion_lat());
+                                                                            values.put("lon", pedido.getubicacion_long());
+                                                                            values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                                                            if (pedido.getsuma_iva() == null) {
+                                                                                values.put("suma_iva", 0);
+                                                                            } else {
+                                                                                values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
+                                                                            }
+                                                                            if (pedido.gettotal() == null) {
+                                                                                values.put("total", 0);
+                                                                            } else {
+                                                                                values.put("total", Double.parseDouble(pedido.gettotal()));
+                                                                            }
+                                                                            values.put("empresa", pedido.getEmpresa());
+                                                                            values.put("tipo_pedido", pedido.gettipo_pedido());
+                                                                            values.put("forma_pago", pedido.getForma_pago());
+                                                                            values.put("estatus", pedido.getestatus());
+                                                                            db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
+
+                                                                            if (pedido.getHobbies() != null) {
+
+                                                                                List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+
+                                                                                for (Producto producto : listproductos) {
+                                                                                    ContentValues valuesProd = new ContentValues();
+                                                                                    valuesProd.put("oid", producto.getOidProducto());
+                                                                                    valuesProd.put("cantidad", producto.getCantidad());
+                                                                                    valuesProd.put("surtido", producto.getsurtido());
+                                                                                    valuesProd.put("precio", producto.getPrecio());
+                                                                                    valuesProd.put("descripcion", producto.getdescripcion());
+                                                                                    valuesProd.put("pedido", pedido.getOid());
+                                                                                    db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                    } else {
+                                                                        Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                } else {
+                                                                    Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            } else {
+                                                                Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                                            java.util.Date date = new Date();
+                                                            String fecha = dateFormat.format(date);
+
+                                                            ContentValues values = new ContentValues();
+                                                            values.put("fecha", fecha);
+                                                            db.insert(SQLiteDBHelper.Synchro_Table, null, values);
+
+                                                            setContentView(R.layout.activity_main);
+
+                                                            //region Ejecucion hilo Impresora
+                                                            new Thread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        FindBluetoothDevice();
+                                                                        //openBluetoothPrinter();
+
+                                                                    } catch (Exception ex) {
+                                                                        ex.printStackTrace();
+                                                                    }
+
+                                                                }
+                                                            }).start();
+                                                            //endregion
+
+                                                            objSessions = new Sessions();
+
+                                                            strRolUsuario = ((Sessions) getApplicationContext()).getsesUsuarioRol();
+
+                                                            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+
+                                                            String sql = "SELECT * FROM configuracion";
+
+                                                            Cursor record = db.rawQuery(sql, null);
+
+                                                            if (record.moveToFirst()) {
+                                                                strIP = record.getString(record.getColumnIndex("ip"));
+                                                                Imei = record.getString(record.getColumnIndex("imei"));
+                                                                objSessions.setSesstrIpServidor(strIP);
+                                                            }
+
+                                                            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+                                                            setSupportActionBar(mToolbar);
+                                                            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+                                                            drawerFragment = (FragmentDrawer)
+                                                                    getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+
+                                                            drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+                                                            drawerFragment.setDrawerListener(MainActivity.this);
+
+                                                            String oid = "", token = "", camion = "";
+                                                            boolean admin = false;
+
+                                                            sql = "SELECT * FROM usuario";
+
+                                                            record = db.rawQuery(sql, null);
+
+                                                            if (record.moveToFirst()) {
+                                                                oid = record.getString(record.getColumnIndex("oid"));
+                                                                camion = record.getString(record.getColumnIndex("camion"));
+                                                                token = record.getString(record.getColumnIndex("token"));
+                                                            }
+
+                                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrImei(Imei);
+                                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
+                                                            ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
+                                                            ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+
+                                                            final Handler handler = new Handler();
+                                                            handler.postDelayed(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    obtener_pedidos();
+                                                                    guardar_pedidos_productos();
+                                                                    handler.postDelayed(this, 600000);
+                                                                }
+                                                            }, 600000);  //the time is in miliseconds
+
+                                                            displayView(0);
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Call call, Throwable t) {
+                                                            Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                                    .setCancelable(false)
+                                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                        public void onClick(DialogInterface dialog, int id) {
+                                                                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                                            intent.putExtra("EXIT", true);
+                                                                            startActivity(intent);
+                                                                        }
+                                                                    });
+                                                            AlertDialog alert = builder.create();
+                                                            alert.show();
+                                                        }
+                                                    });
+                                                } else {
+                                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                    builder.setMessage("IMEI no registrado, se cerrará la aplicación")
+                                                            .setCancelable(false)
+                                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                public void onClick(DialogInterface dialog, int id) {
+                                                                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                                    intent.putExtra("EXIT", true);
+                                                                    startActivity(intent);
+                                                                }
+                                                            });
+                                                    AlertDialog alert = builder.create();
+                                                    alert.show();
                                                 }
+                                            } else {
+                                                Toast.makeText(getApplicationContext(), "response.success.bitacora!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
 
-                                                @Override
-                                                public void onFailure(Call call, Throwable t) {
-                                                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        } else {
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                                            builder.setMessage("IMEI no registrado, se cerrará la aplicación")
+                                        @Override
+                                        public void onFailure(Call call, Throwable t) {
+                                            Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
                                                     .setCancelable(false)
                                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int id) {
-                                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                                                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                                             intent.putExtra("EXIT", true);
                                                             startActivity(intent);
@@ -440,30 +743,318 @@ public class MainActivity extends AppCompatActivity
                                             AlertDialog alert = builder.create();
                                             alert.show();
                                         }
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "response.success.bitacora!", Toast.LENGTH_SHORT).show();
+                                    });
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "camion.error.true!", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setMessage("Error en la descarga inicial")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            intent.putExtra("EXIT", true);
+                                            startActivity(intent);
+                                        }
+                                    });
+                            AlertDialog alert1 = builder.create();
+                            alert1.show();
+                        }
+                    });
+                } else {
+
+                }
+            }else {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                java.util.Date date = new Date();
+                String fecha = dateFormat.format(date);
+
+                ContentValues values = new ContentValues();
+                values.put("fecha", fecha);
+                db.insert(SQLiteDBHelper.Synchro_Table, null, values);
+
+                setContentView(R.layout.activity_main);
+
+                //region Ejecucion hilo Impresora
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            FindBluetoothDevice();
+                            //openBluetoothPrinter();
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }).start();
+                //endregion
+
+                objSessions = new Sessions();
+
+                strRolUsuario = ((Sessions) getApplicationContext()).getsesUsuarioRol();
+
+                sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+
+                sql = "SELECT * FROM configuracion";
+
+                record = db.rawQuery(sql, null);
+
+                if (record.moveToFirst()) {
+                    strIP = record.getString(record.getColumnIndex("ip"));
+                    Imei = record.getString(record.getColumnIndex("imei"));
+                    objSessions.setSesstrIpServidor(strIP);
+                }
+
+                mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+                setSupportActionBar(mToolbar);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+                drawerFragment = (FragmentDrawer)
+                        getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+
+                drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+                drawerFragment.setDrawerListener(MainActivity.this);
+
+                String oid = "", token = "", camion = "";
+                admin = false;
+
+                sql = "SELECT * FROM usuario";
+
+                record = db.rawQuery(sql, null);
+
+                if (record.moveToFirst()) {
+                    oid = record.getString(record.getColumnIndex("oid"));
+                    camion = record.getString(record.getColumnIndex("camion"));
+                    token = record.getString(record.getColumnIndex("token"));
+                }
+
+                ((Sessions) getApplicationContext().getApplicationContext()).setStrImei(Imei);
+                ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
+                ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
+                ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        obtener_pedidos();
+                        handler.postDelayed(this, 600000);
+                    }
+                }, 600000);  //the time is in miliseconds
+
+                displayView(0);
+            }
+        }
+    }
+
+    public void obtener_pedidos(){
+
+        Toast.makeText(getApplicationContext(), "llamada", Toast.LENGTH_SHORT).show();
+
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM configuracion";
+        Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+            Imei = record.getString(record.getColumnIndex("imei"));
+        }
+
+        String oid = "", token = "";
+        sql = "SELECT * FROM usuario";
+        record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            oid = record.getString(record.getColumnIndex("oid"));
+            token = record.getString(record.getColumnIndex("token"));
+        }
+
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.getPedidos(oid, "Pendiente", token);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if (resObj.geterror().equals("false")) {
+                        if (resObj.getpedido() != null) {
+                            List<Pedido> list = Arrays.asList(resObj.getpedido());
+                            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+                            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+                            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+                            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+                            for (Pedido pedido : list) {
+                                ContentValues values = new ContentValues();
+                                values.put("oid", pedido.getOid());
+                                String datetime = pedido.getfechaprogramada();
+                                datetime.replace('T', ' ');
+                                values.put("fecha_hora_programada", datetime);
+                                values.put("cliente", pedido.getcliente());
+                                values.put("direccion", pedido.getdireccion());
+                                values.put("cp", pedido.getcp());
+                                values.put("telefono", pedido.gettelefono());
+                                values.put("lat", pedido.getubicacion_lat());
+                                values.put("lon", pedido.getubicacion_long());
+                                values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                if (pedido.getsuma_iva() == null) {
+                                    values.put("suma_iva", 0);
+                                } else {
+                                    values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
+                                }
+                                if (pedido.gettotal() == null) {
+                                    values.put("total", 0);
+                                } else {
+                                    values.put("total", Double.parseDouble(pedido.gettotal()));
+                                }
+                                values.put("empresa", pedido.getEmpresa());
+                                values.put("tipo_pedido", pedido.gettipo_pedido());
+                                values.put("forma_pago", pedido.getForma_pago());
+                                values.put("estatus", pedido.getestatus());
+                                db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
+
+                                if (pedido.getHobbies() != null) {
+
+                                    List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+
+                                    for (Producto producto : listproductos) {
+                                        ContentValues valuesProd = new ContentValues();
+                                        valuesProd.put("oid", producto.getOidProducto());
+                                        valuesProd.put("cantidad", producto.getCantidad());
+                                        valuesProd.put("surtido", producto.getsurtido());
+                                        valuesProd.put("precio", producto.getPrecio());
+                                        valuesProd.put("descripcion", producto.getdescripcion());
+                                        valuesProd.put("pedido", pedido.getOid());
+                                        db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
                                     }
                                 }
-
-                                @Override
-                                public void onFailure(Call call, Throwable t) {
-                                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            }
                         } else {
-                            Toast.makeText(getApplicationContext(), "camion.error.true!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
+                        Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "No hay conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    String oid1[] = new  String[100];
+    String oid2[] = new  String[100];
+    public void guardar_pedidos_productos(){
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM productos_modificados";
+        Cursor record = db.rawQuery(sql, null);
+        int j = 0;
+        if(record.getCount()>0){
+            for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+
+                sql = "SELECT * FROM configuracion";
+
+                Cursor recordConf = db.rawQuery(sql, null);
+
+                if (recordConf.moveToFirst()) {
+                    strIP = recordConf.getString(recordConf.getColumnIndex("ip"));
                 }
 
-                @Override
-                public void onFailure(Call call, Throwable t) {
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                BASEURL = strIP + "glpservices/webresources/glpservices/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASEURL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                String token = "";
+                sql = "SELECT * FROM usuario";
+                Cursor recordUss = db.rawQuery(sql, null);
+
+                if (recordUss.moveToFirst()) {
+                    token = recordUss.getString(recordUss.getColumnIndex("token"));
                 }
-            });
+
+                ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+                if(Boolean.getBoolean(record.getString(record.getColumnIndex("surtido")))){
+                    oid2[j] = record.getString(record.getColumnIndex("oid"));
+                    Call call = service.sumarProducto(Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
+                            Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                            record.getString(record.getColumnIndex("pedido_id")),
+                            record.getString(record.getColumnIndex("producto_id")),
+                            token);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            for(int i = 0;i < oid2.length; i++) {
+                                try{
+                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{oid2[i]});
+                                }catch(Exception e)
+                                {
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+
+                        }
+                    });
+                }else {
+                   oid1[j] = record.getString(record.getColumnIndex("oid"));
+                    Call call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
+                            Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), false,
+                            Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                            token);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            for(int i = 0;i < oid1.length; i++) {
+                                try{
+                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{oid1[i]});
+                                }catch(Exception e)
+                                {
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+
+                        }
+                    });
+                }
+                j++;
+            }
         }
-        else {
+
+        sql = "SELECT * FROM pedidos_modificados";
+        record = db.rawQuery(sql, null);
+        if(record.getCount()>0){
+            for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+
+            }
         }
     }
 
@@ -473,8 +1064,6 @@ public class MainActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
       if(DispositivoEncontrado==false) {
       }  menu.getItem(0).setIcon(ContextCompat.getDrawable(this,R.drawable.ic_printer_disable));
-
-
         return true;
     }
 
@@ -547,6 +1136,15 @@ public class MainActivity extends AppCompatActivity
                     Log.v(TAG,"token: " + position);
                     String strImei, strChofer, strCamion, strToken;
 
+                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                    db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
+                    db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
+                    db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+                    db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+                    db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+                    db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+
                     strImei = ((Sessions)getApplicationContext()).getStrImei();
                     strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
                     strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
@@ -560,6 +1158,15 @@ public class MainActivity extends AppCompatActivity
                 Log.v(TAG,"token: " + position);
 
                 String strImei, strChofer, strCamion, strToken;
+
+                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
+                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
+                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
 
                 strImei = ((Sessions)getApplicationContext()).getStrImei();
                 strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
@@ -585,9 +1192,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     public void insertBitacora(boolean evento, String emai, String chofer_id, String camion_id , String token){
-
                         BASEURL = strIP + "glpservices/webresources/glpservices/";
 
                         Retrofit retrofit = new Retrofit.Builder()
@@ -634,7 +1239,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
 
     void FindBluetoothDevice(){
 

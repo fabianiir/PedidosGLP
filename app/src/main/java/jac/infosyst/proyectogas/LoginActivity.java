@@ -146,6 +146,7 @@ public class LoginActivity extends AppCompatActivity{
                         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
                         /*primera vez */
 
+
                         ContentValues values = new ContentValues();
                         values.put("oid", arrayListUsuario.get(0).getId());
                         values.put("nombre", arrayListUsuario.get(0).getnombre());

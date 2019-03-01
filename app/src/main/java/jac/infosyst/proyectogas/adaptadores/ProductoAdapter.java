@@ -1,6 +1,7 @@
 package jac.infosyst.proyectogas.adaptadores;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -143,17 +144,16 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
         LinearLayout parentLayout;
     }
 
-    public void restarProducto(String idProducto, int cantidad, boolean surtido, int precio, String token){
+    public void restarProducto(final String idProducto, final int cantidad, boolean surtido, final int precio, String token){
         sqLiteDBHelper = new SQLiteDBHelper(mCtx);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM configuracion";
 
         final Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
-
         }
 
         BASEURL = strIP + "glpservices/webresources/glpservices/";
@@ -184,6 +184,17 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
+                sqLiteDBHelper = new SQLiteDBHelper(mCtx);
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put("oid", idProducto);
+                values.put("cantidad", cantidad);
+                values.put("surtido", false);
+                values.put("precio", precio);
+                db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{idProducto});
             }
         });
     }

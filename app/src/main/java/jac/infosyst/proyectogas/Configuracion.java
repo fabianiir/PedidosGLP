@@ -45,8 +45,12 @@ import com.google.gson.GsonBuilder;
 
 import com.squareup.okhttp.OkHttpClient;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Configuracion extends AppCompatActivity {
@@ -211,11 +215,76 @@ public class Configuracion extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     }
-
                     else{
-                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
+                        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        String sql = "SELECT * FROM " + SQLiteDBHelper.Synchro_Table + " ORDER BY id DESC LIMIT 1";
+                        Cursor cursor = db.rawQuery(sql, null);
+                        if(cursor.getCount() <= 0){
+                            Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                            java.util.Date date = new Date();
+                            String only_date = dateFormat.format(date);
+                            try {
+                                date = dateFormat.parse(only_date);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            Date Cdate = new Date();
+                            String SyncDate = "";
+                            if (cursor.moveToFirst()) {
+                                SyncDate = cursor.getString(cursor.getColumnIndex("fecha"));
+                            }
+                            try {
+                                Cdate = dateFormat.parse(SyncDate);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            if(Cdate.before(date)){
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatEstatus_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatEstatus_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatMotCanc_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatMotCanc_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatProductos_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatProductos_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatTpago_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatTpago_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+                                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }else{
+                                sql = "SELECT * FROM " + SQLiteDBHelper.Usuario_Table;
+                                cursor = db.rawQuery(sql, null);
+                                if(cursor.getCount() > 0){
+                                    boolean admin = false;
+                                    if (cursor.moveToFirst()) {
+                                         admin = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("admin")));
+                                    }
+                                    if(admin){
+                                        ((Sessions) getApplication()).setsesUsuarioRol("Admin");
+                                    }else{
+                                        ((Sessions) getApplication()).setsesUsuarioRol("Operador");
+                                    }
+                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                    intent.putExtra("User", true);
+                                    startActivity(intent);
+                                    finish();
+                                }else{
+                                    Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        }
                     }
                 }
             }, 4000);

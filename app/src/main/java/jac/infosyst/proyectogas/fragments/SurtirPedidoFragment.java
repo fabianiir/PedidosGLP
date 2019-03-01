@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import jac.infosyst.proyectogas.MainActivity;
@@ -78,6 +79,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import android.support.design.widget.FloatingActionButton;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class SurtirPedidoFragment  extends Fragment implements LocationListener {
     private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle, textViewFirma, textViewTotal;
@@ -86,7 +88,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     private PopupWindow POPUP_WINDOW_CATALAGOPRODUCTOS = null;
-    private PopupWindow cantidad=null;
+    private PopupWindow cantidad = null;
     Button btnRestar;
 
     View layout, layoutCatalagoProductos;
@@ -189,27 +191,26 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
 
-        userService = RetrofitClient.getClient(BASEURL).create(ServicioUsuario.class);
         dialog = new ProgressDialog(getActivity());
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
 
         final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
 
-        String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
+        String sql3 = "SELECT * FROM usuario";
 
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
 
         Cursor cursor3 = dbConn3.rawQuery(sql3, null);
 
         if (cursor3.moveToFirst()) {
-            strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
+            strchofer = cursor3.getString(cursor3.getColumnIndex("oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
 
         //  strtoken
         ((Sessions)getActivity().getApplicationContext()).setsessToken(strtoken);
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM configuracion";
 
         final int recordCount = dbConn3.rawQuery(sql, null).getCount();
 
@@ -541,39 +542,26 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-        Call call;
+                String sql = "SELECT * FROM cat_productos";
+                Cursor cursorPr = db.rawQuery(sql, null);
 
-        if (strtoken == null){
-            call = service.getCatalagoProductos(((Sessions)getActivity().getApplicationContext()).getsessToken());
-        }else{
-            call = service.getCatalagoProductos(strtoken);
-        }
-
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()){
-                    ObjetoRes2 resObj2 = (ObjetoRes2) response.body();
-
-                    if(resObj2.geterror().equals("false")) {
-
-                        adapterCatalago = new CatalagoProductosAdapter(Arrays.asList(resObj2.getcatalogoProductos()), getActivity(),  getFragmentManager());
-                        recyclerViewCatalagoProductos.setAdapter(adapterCatalago);
-
-                    } else {
-                        Toast.makeText(getActivity(), "no catalago productos!" , Toast.LENGTH_SHORT).show();
+                CatalagoProducto[] catalagoProductos = new CatalagoProducto[cursorPr.getCount()];
+                int j = 0;
+                for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                    CatalagoProducto catalagoProducto = new CatalagoProducto(cursorPr.getString(cursorPr.getColumnIndex("oid")),
+                            cursorPr.getString(cursorPr.getColumnIndex("descripcion")),
+                            Double.parseDouble(cursorPr.getString(cursorPr.getColumnIndex("precio_unitario"))),
+                            cursorPr.getString(cursorPr.getColumnIndex("unidad")));
+                    if (catalagoProducto != null) {
+                        catalagoProductos[j] = catalagoProducto;
                     }
-                } else {
-                    Toast.makeText(getActivity(), "error catalago productos! " , Toast.LENGTH_SHORT).show();
+                    j++;
                 }
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), "catalago productos" + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+
+                adapterCatalago = new CatalagoProductosAdapter(Arrays.asList(catalagoProductos), getActivity(), getFragmentManager());
+                recyclerViewCatalagoProductos.setAdapter(adapterCatalago);
 
         Button btnAgregarProductoNo = (Button) layoutCatalagoProductos.findViewById(R.id.btnAgregarProductoNo);
         btnAgregarProductoNo.setOnClickListener(new View.OnClickListener() {
@@ -603,7 +591,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM configuracion";
 
         final Cursor record = db.rawQuery(sql, null);
 
@@ -626,7 +614,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         Call call = service.up_pedido(pedidoID, strHora, strFecha,
                 "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
-                19, 21, "", "null",
+                0, 0, "", "null",
                 Estatus.getSurtidoId(), "Up_1", strtoken);
 
         call.enqueue(new Callback() {
@@ -652,6 +640,46 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onFailure(Call call, Throwable t) {
                 if (dialog.isShowing()) {
                     dialog.dismiss();
+                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                    SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                    String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+
+                    Cursor record = db.rawQuery(sql, null);
+                    if (record.getCount() > 0) {
+                        ContentValues values = new ContentValues();
+                        values.put("oid", pedidoID);
+                        values.put("hora", strHora);
+                        values.put("fecha", strFecha);
+                        values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
+                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                        values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
+                        values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
+                        values.put("estatus_id", Estatus.getSurtidoId());
+                        values.put("firma", record.getString(record.getColumnIndex("firma")));
+                        values.put("foto_fuga", record.getString(record.getColumnIndex("foto_fuga")));
+                        values.put("clave", "Up_1");
+                        db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
+
+                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                    }else {
+
+                        ContentValues values = new ContentValues();
+                        values.put("oid", pedidoID);
+                        values.put("hora", strHora);
+                        values.put("fecha", strFecha);
+                        values.put("comentario_chofer", "");
+                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                        values.put("pago_id", "");
+                        values.put("motivo_cancelacion_id", "");
+                        values.put("estatus_id", Estatus.getSurtidoId());
+                        values.put("firma", "");
+                        values.put("foto_fuga", "");
+                        values.put("clave", "Up_1");
+                        db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+
+                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                    }
                 }
             }
         });
@@ -809,7 +837,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
             byte[] imageBytes = baos.toByteArray();
-            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+            final String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
             BASEURL = strIP + "glpservices/webresources/glpservices/";
             Retrofit retrofit = new Retrofit.Builder()
@@ -834,6 +862,58 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
                 @Override
                 public void onFailure(Call call, Throwable t) {
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                    String hora = timeFormat.format(calendar.getTime());
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    java.util.Date date = new Date();
+                    String fecha = dateFormat.format(date);
+
+                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
+
+                    String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+
+                    Cursor record = db.rawQuery(sql, null);
+
+                    if (record.getCount() > 0) {
+                        ContentValues values = new ContentValues();
+                        values.put("oid", pedidoID);
+                        values.put("hora", hora);
+                        values.put("fecha", fecha);
+                        values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
+                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                        values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
+                        values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
+                        values.put("estatus_id", record.getString(record.getColumnIndex("estatus_id")));
+                        values.put("firma", imageString);
+                        values.put("foto_fuga", record.getString(record.getColumnIndex("foto_fuga")));
+                        values.put("clave", record.getString(record.getColumnIndex("clave")));
+                        db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
+
+                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                    }else{
+
+                        ContentValues values = new ContentValues();
+                        values.put("oid", pedidoID);
+                        values.put("hora", hora);
+                        values.put("fecha", fecha);
+                        values.put("comentario_chofer", "");
+                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                        values.put("pago_id", "");
+                        values.put("motivo_cancelacion_id", "");
+                        values.put("estatus_id", "");
+                        values.put("firma", imageString);
+                        values.put("foto_fuga", "");
+                        values.put("clave", "");
+                        db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+
+                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+
+                    }
                 }
             });
         }else{
@@ -852,8 +932,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         pedidoID = ((Sessions) getActivity().getApplicationContext()).getSesIdPedido();
 
-        Call call = service.getProductos(pedidoID,
-                strtoken);
+        Call call = service.getProductos(pedidoID, strtoken);
 
         call.enqueue(new Callback() {
             @Override
@@ -868,7 +947,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         } else {
                             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
                             fabAgregarProducto.setEnabled(false);
-
                             signaturePad.setEnabled(false);
                             btnGuardar.setEnabled(false);
                             btnLimpiar.setEnabled(false);
@@ -901,6 +979,35 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
+                fabAgregarProducto.setEnabled(false);
+
+                signaturePad.setEnabled(false);
+                btnGuardar.setEnabled(false);
+                btnLimpiar.setEnabled(false);
+                getImageFirma();
+
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                String sql = "SELECT * FROM cat_productos";
+                Cursor cursorPr = db.rawQuery(sql, null);
+
+                CatalagoProducto[] catalagoProductos = new CatalagoProducto[cursorPr.getCount()];
+                int j = 0;
+                for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                    CatalagoProducto catalagoProducto = new CatalagoProducto(cursorPr.getString(cursorPr.getColumnIndex("oid")),
+                            cursorPr.getString(cursorPr.getColumnIndex("descripcion")),
+                            Double.parseDouble(cursorPr.getString(cursorPr.getColumnIndex("precio_unitario"))),
+                            cursorPr.getString(cursorPr.getColumnIndex("unidad")));
+                    if (catalagoProducto != null) {
+                        catalagoProductos[j] = catalagoProducto;
+                    }
+                    j++;
+                }
+
+                adapterCatalago = new CatalagoProductosAdapter(Arrays.asList(catalagoProductos), getActivity(), getFragmentManager());
+                recyclerViewCatalagoProductos.setAdapter(adapterCatalago);
             }
         });
     }

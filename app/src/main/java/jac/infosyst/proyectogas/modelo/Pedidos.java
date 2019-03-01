@@ -31,6 +31,7 @@ public class Pedidos {
     public String getnombre() {
         return nombre;
     }
+
     public String getplacas() {
         return placas;
     }
@@ -68,7 +69,6 @@ public class Pedidos {
     }
 
     public  Productos getProductos() { return  productos; }
-
 
     private Pedido[] pedido;
 

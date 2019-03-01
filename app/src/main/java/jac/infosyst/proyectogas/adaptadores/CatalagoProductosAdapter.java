@@ -39,6 +39,7 @@ import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
+import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Pedidos;
@@ -56,6 +57,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static jac.infosyst.proyectogas.R.id.tv_cantidad;
@@ -199,12 +201,12 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
         db.insert("productos", null, productosVal);
     }
 
-    public void sumarProducto(int cantidad, int precio, String pedidoId, String productoId, String token){
+    public void sumarProducto(final int cantidad, final int precio, final String pedidoId, final String productoId, String token){
 
         sqLiteDBHelper = new SQLiteDBHelper(mCtx);
 
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM configuracion";
 
         final Cursor record = dbConn3.rawQuery(sql, null);
 
@@ -222,8 +224,6 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
 
         Call call = service.sumarProducto(cantidad, precio, pedidoId, productoId, ((Sessions)mCtx.getApplicationContext()).getsessToken());
 
-        Toast.makeText(mCtx, "/" + cantidad + "/" + precio +  "/" + pedidoId +  "/" + productoId +  "/" + token  , Toast.LENGTH_SHORT).show();
-
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -232,6 +232,17 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
 
                     if(resObj.geterror().equals("false")) {
                         Toast.makeText(mCtx, resObj.getMessage() , Toast.LENGTH_SHORT).show();
+                        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
+                        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                        ContentValues values = new ContentValues();
+                        values.put("cantidad", random());
+                        values.put("cantidad", cantidad);
+                        values.put("surtido", true);
+                        values.put("precio", precio);
+                        values.put("pedido_id", pedidoId);
+                        values.put("producto_id", productoId);
+                        db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
 
                     } else {
                         Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
@@ -240,13 +251,35 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                 } else {
                     Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();
                 }
-
-
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
+                sqLiteDBHelper = new SQLiteDBHelper(mCtx);
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                ContentValues values = new ContentValues();
+                values.put("cantidad", random());
+                values.put("cantidad", cantidad);
+                values.put("surtido", true);
+                values.put("precio", precio);
+                values.put("pedido_id", pedidoId);
+                values.put("producto_id", productoId);
+                db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+
+                Toast.makeText(mCtx, "Producto agregado." , Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static String random() {
+        Random generator = new Random();
+        StringBuilder randomStringBuilder = new StringBuilder();
+        int randomLength = generator.nextInt(16);
+        char tempChar;
+        for (int i = 0; i < randomLength; i++){
+            tempChar = (char) (generator.nextInt(96) + 32);
+            randomStringBuilder.append(tempChar);
+        }
+        return randomStringBuilder.toString();
     }
 }

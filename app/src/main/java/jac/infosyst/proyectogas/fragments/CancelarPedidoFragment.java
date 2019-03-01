@@ -65,7 +65,10 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import jac.infosyst.proyectogas.modelo.Spinners;
 
@@ -78,25 +81,20 @@ public class CancelarPedidoFragment  extends Fragment {
     EditText textViewObservaciones;
     Button btnAceptarCancelarPedido;
     String idPedido;
+    String oidC = "";
     private Context mCtx;
 
     ModeloSpinner spinnerMod;
     Spinner spinner;
-    ServicioUsuario userService;
 
     File directory,directoryIncidencia;
-    ImageView imgFirma;
-    ImageView firmaImage, imageViewIncidencia;
 
-    private ProgressDialog dialog;
-
-    private String BASEURL = "";
-    String strIP = "";
     private SQLiteDBHelper sqLiteDBHelper = null;
-    private String DB_NAME = "proyectogas17.db";
-    private int DB_VERSION = 1;
+
+    String strObservaciones = "";
     String strchofer = "";
     String strtoken = "";
+    String strIp = "";
 
     ArrayList<String> list = new ArrayList<String>();
     ArrayList<String> idlist = new ArrayList<String>();
@@ -108,9 +106,6 @@ public class CancelarPedidoFragment  extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        synchronized (userService = userService) {
-
-        }
     }
 
     @Override
@@ -124,23 +119,27 @@ public class CancelarPedidoFragment  extends Fragment {
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
 
-        userService = userService;
-        dialog = new ProgressDialog(getActivity());
-
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
 
-        final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-        String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM usuario";
 
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
 
-        Cursor cursor3 = dbConn3.rawQuery(sql3, null);
+        Cursor cursor3 = dbConn3.rawQuery(sql, null);
 
         if (cursor3.moveToFirst()) {
-            strchofer = cursor3.getString(cursor3.getColumnIndex("Oid"));
+            strchofer = cursor3.getString(cursor3.getColumnIndex("oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
+        }
 
+        sql = "SELECT * FROM configuracion";
+
+        Cursor cursor = db.rawQuery(sql, null);
+
+        if (cursor.moveToFirst()) {
+            strIp = cursor.getString(cursor.getColumnIndex("ip"));
         }
 
         tvCanNombreOperador = (TextView) rootView.findViewById(R.id.tvCanNombreOperador);
@@ -154,6 +153,7 @@ public class CancelarPedidoFragment  extends Fragment {
         idPedido = ((Sessions)getActivity().getApplicationContext()).getSesIdPedido();
 
         textViewObservaciones = (EditText) rootView.findViewById(R.id.textViewObservaciones);
+        strObservaciones = textViewObservaciones.getText().toString();
 
         spinner = (Spinner) rootView.findViewById(R.id.spinnerMotivoCancelacion);
         llenarMotivosCancelacion();
@@ -179,15 +179,24 @@ public class CancelarPedidoFragment  extends Fragment {
         return rootView;
     }
 
-    public void cancelarPedido(String idPedido){
+    public void cancelarPedido(final String idPedido){
         long Mot_Canc = spinner.getSelectedItemId();
         Toast.makeText(getActivity(), "Cancelando Pedido: " + idPedido , Toast.LENGTH_SHORT).show();
         String oid = "";
         for (int i = 0; i < list.size(); i++){
             if(Mot_Canc == i){
                 oid = idlist.get(i);
+                oidC = idlist.get(i);
             }
         }
+
+        String BASEURL = strIp + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        final ServicioUsuario userService = retrofit.create(ServicioUsuario.class);
         
         Call call = userService.up_pedido(idPedido, "Fecha", "Hora", "comentario_cliente", "comentario_chofer",
                 "Comentario Null", "Comentario Null", 0, 0, "Pago Null", oid,
@@ -196,6 +205,11 @@ public class CancelarPedidoFragment  extends Fragment {
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
+                sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[] {idPedido});
+
                 Toast.makeText(getActivity(), "Pedido Cancelado", Toast.LENGTH_SHORT).show();
                 PedidosFragment spf = new PedidosFragment();
 
@@ -208,7 +222,41 @@ public class CancelarPedidoFragment  extends Fragment {
 
             @Override
             public void onFailure(Call call, Throwable t) {
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                String hora = timeFormat.format(calendar.getTime());
 
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                java.util.Date date = new Date();
+                String fecha = dateFormat.format(date);
+
+                sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                ContentValues values = new ContentValues();
+                values.put("oid", idPedido);
+                values.put("hora", hora);
+                values.put("fecha", fecha);
+                values.put("comentario_chofer", strObservaciones);
+                values.put("suma_iva", ((Sessions)getActivity().getApplicationContext()).getsessumaiva());
+                values.put("pago_id",  "");
+                values.put("motivo_cancelacion_id", oidC);
+                values.put("estatus_id", Estatus.getCanceladoId());
+                values.put("firma", "");
+                values.put("foto_fuga", "");
+                values.put("clave", "Up_2");
+                db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+
+                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[] {idPedido});
+
+                Toast.makeText(getActivity(), "Pedido Cancelado", Toast.LENGTH_SHORT).show();
+                PedidosFragment spf = new PedidosFragment();
+
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container_body, spf);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
     }
@@ -216,17 +264,27 @@ public class CancelarPedidoFragment  extends Fragment {
     public void llenarMotivosCancelacion(){
 
         final String[] letra = {"Cliente Ausente","Datos erroneos","Servicio realziado por otro proveedor"};
-       // spinner.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, letra));
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sqlPedido = "SELECT * FROM cat_motivo_cancelacion";
 
-        Call call = userService.obtenerMotivosCancelacion(strtoken);
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()){
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                    if(resObj.geterror().equals("false")){
+        Cursor cursor = db.rawQuery(sqlPedido, null);
+
+        jac.infosyst.proyectogas.modelo.Spinner[] spinners = new jac.infosyst.proyectogas.modelo.Spinner[cursor.getCount()];
+        int j = 0;
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            jac.infosyst.proyectogas.modelo.Spinner spinner =
+                    new jac.infosyst.proyectogas.modelo.Spinner(cursor.getString(cursor.getColumnIndex("oid")),
+                            cursor.getString(cursor.getColumnIndex("nombre")));
+            if (spinner != null) {
+                spinners[j] = spinner;
+            }
+            j++;
+        }
+
+        cursor.close();
+
                         ArrayList<jac.infosyst.proyectogas.modelo.Spinner> latLngData = new ArrayList<jac.infosyst.proyectogas.modelo.Spinner>();
-                        latLngData.addAll(Arrays.asList(resObj.getmotivoscancelacion()));
+                        latLngData.addAll(Arrays.asList(spinners));
 
                         for (int i = 0; i < latLngData.size(); i++) {
                             String lat = latLngData.get(i).getnombre();
@@ -242,19 +300,7 @@ public class CancelarPedidoFragment  extends Fragment {
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, list);
                         spinner.setAdapter(adapter);
-                    } else {
-                        Toast.makeText(getActivity(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else {
-                    Toast.makeText(getActivity(), "Error! Intenta Nuevamente", Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+
     }
 
     @Override
