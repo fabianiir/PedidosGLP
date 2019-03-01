@@ -35,6 +35,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.content.ContentValues;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessagingService;
+
 import java.util.List;
 
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
@@ -85,8 +88,17 @@ public class LoginActivity extends AppCompatActivity{
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = edtUsername.getText().toString();
-                String password = edtPassword.getText().toString();
+              String username = edtUsername.getText().toString();
+              String password = edtPassword.getText().toString();
+
+
+
+
+              //Obtiene Token del dispositivo
+                Log.w("tokenFire",FirebaseInstanceId.getInstance().getToken());
+
+
+
                 //validate form
                 if(validateLogin(username, password)){
                     login(username, password);
