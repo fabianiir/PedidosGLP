@@ -161,6 +161,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
             @Override
             public void onRefresh() {
                 actualizarPedidosPendientes();
+
                 swipeRefreshLayout.setRefreshing(false);
 
             }
@@ -388,12 +389,14 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 if (resObj.getpedido() != null) {
                                     adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
                                     recyclerViewPedidos.setAdapter(adapter);
+                                    MainActivity.setConexionEstablecida(true);
 
                                 } else {
                                     Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 Toast.makeText(getActivity(), " no hay datos!" + strchofer + "/" + strtoken, Toast.LENGTH_SHORT).show();
+                                MainActivity.setConexionEstablecida(false);
                             }
                         }
                     } else {
@@ -403,6 +406,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 @Override
                 public void onFailure(Call call, Throwable t) {
                     Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                    MainActivity.setConexionEstablecida(false);
                 }
             });
         }
