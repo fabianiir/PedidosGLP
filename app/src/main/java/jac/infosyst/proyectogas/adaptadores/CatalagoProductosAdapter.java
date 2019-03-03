@@ -236,14 +236,30 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                         SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
                         ContentValues values = new ContentValues();
-                        values.put("cantidad", random());
+                        values.put("oid", random());
                         values.put("cantidad", cantidad);
                         values.put("surtido", true);
                         values.put("precio", precio);
                         values.put("pedido_id", pedidoId);
                         values.put("producto_id", productoId);
-                        db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+                        db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
 
+                        String sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId  + "'";
+                        Cursor cursorPr = db.rawQuery(sql, null);
+
+                        for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                            values = new ContentValues();
+                            values.put("oid", random());
+                            values.put("cantidad", cantidad);
+                            values.put("surtido", true);
+                            values.put("precio", precio * cantidad);
+                            values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
+                            values.put("pedido", pedidoId);
+                        }
+
+                        db.insert(SQLiteDBHelper.Productos_Table, null, values);
+
+                        Toast.makeText(mCtx, "Producto agregado." , Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
 
@@ -258,13 +274,28 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                 SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
                 ContentValues values = new ContentValues();
-                values.put("cantidad", random());
+                values.put("oid", random());
                 values.put("cantidad", cantidad);
                 values.put("surtido", true);
                 values.put("precio", precio);
                 values.put("pedido_id", pedidoId);
                 values.put("producto_id", productoId);
-                db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+                db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
+                String sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId  + "'";
+                Cursor cursorPr = db.rawQuery(sql, null);
+
+                for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                    values = new ContentValues();
+                    values.put("oid", random());
+                    values.put("cantidad", cantidad);
+                    values.put("surtido", true);
+                    values.put("precio", precio);
+                    values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
+                    values.put("pedido", pedidoId);
+                }
+
+                db.insert(SQLiteDBHelper.Productos_Table, null, values);
 
                 Toast.makeText(mCtx, "Producto agregado." , Toast.LENGTH_SHORT).show();
             }

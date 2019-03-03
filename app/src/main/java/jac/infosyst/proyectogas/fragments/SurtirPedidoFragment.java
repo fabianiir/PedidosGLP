@@ -20,9 +20,12 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -66,6 +69,7 @@ import jac.infosyst.proyectogas.modelo.ObjetoRes2;
 import jac.infosyst.proyectogas.modelo.Pedido;
 
 import jac.infosyst.proyectogas.modelo.Producto;
+import jac.infosyst.proyectogas.modelo.Productos;
 import jac.infosyst.proyectogas.utils.RetrofitClient;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -177,6 +181,17 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    }
+
+    public void threat(){
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getProductos(true);
+                handler.postDelayed(this, 5000);
+            }
+        }, 1000);  //the time is in miliseconds
     }
 
     @Override
@@ -315,6 +330,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dialog.dismiss();
+                            PedidosFragment spf = new PedidosFragment();
+
+                            FragmentManager fragmentManager = getFragmentManager();
+                            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                            fragmentTransaction.replace(R.id.container_body, spf);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
                             btnReimpresionTicket.setVisibility(View.GONE);
                         }
                     });
@@ -488,6 +510,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     builder.setTitle("¿Se imprimio el ticket?");
                     builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            PedidosFragment spf = new PedidosFragment();
+
+                            FragmentManager fragmentManager = getFragmentManager();
+                            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                            fragmentTransaction.replace(R.id.container_body, spf);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
                         dialog.dismiss();
                         }
                     });
@@ -646,7 +675,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
 
                     Cursor record = db.rawQuery(sql, null);
-                    if (record.getCount() > 0) {
+                    int count = record.getCount();
+                    if (count > 0) {
+                        record.moveToFirst();
                         ContentValues values = new ContentValues();
                         values.put("oid", pedidoID);
                         values.put("hora", strHora);
@@ -922,6 +953,20 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void getProductos(final boolean pendiente) {
+        SQLiteDBHelper sqLiteDBHelper = null;
+
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
+
+        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+        String sql = "SELECT * FROM configuracion";
+
+        final Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+
+            strIP = record.getString(record.getColumnIndex("ip"));
+        }
         BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -932,7 +977,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         pedidoID = ((Sessions) getActivity().getApplicationContext()).getSesIdPedido();
 
-        Call call = service.getProductos(pedidoID, strtoken);
+        /*Call call = service.getProductos(pedidoID, strtoken);
 
         call.enqueue(new Callback() {
             @Override
@@ -979,37 +1024,52 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-
-                ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
-                fabAgregarProducto.setEnabled(false);
-
-                signaturePad.setEnabled(false);
-                btnGuardar.setEnabled(false);
-                btnLimpiar.setEnabled(false);
-                getImageFirma();
-
-                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-                String sql = "SELECT * FROM cat_productos";
-                Cursor cursorPr = db.rawQuery(sql, null);
-
-                CatalagoProducto[] catalagoProductos = new CatalagoProducto[cursorPr.getCount()];
-                int j = 0;
-                for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
-                    CatalagoProducto catalagoProducto = new CatalagoProducto(cursorPr.getString(cursorPr.getColumnIndex("oid")),
-                            cursorPr.getString(cursorPr.getColumnIndex("descripcion")),
-                            Double.parseDouble(cursorPr.getString(cursorPr.getColumnIndex("precio_unitario"))),
-                            cursorPr.getString(cursorPr.getColumnIndex("unidad")));
-                    if (catalagoProducto != null) {
-                        catalagoProductos[j] = catalagoProducto;
-                    }
-                    j++;
-                }
-
-                adapterCatalago = new CatalagoProductosAdapter(Arrays.asList(catalagoProductos), getActivity(), getFragmentManager());
-                recyclerViewCatalagoProductos.setAdapter(adapterCatalago);
             }
-        });
+        });*/
+
+        if (pendiente) {
+            btnReimpresionTicket.setVisibility(View.GONE);
+            ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("visible");
+        } else {
+            ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
+            fabAgregarProducto.setEnabled(false);
+
+            signaturePad.setEnabled(false);
+            btnGuardar.setEnabled(false);
+            btnLimpiar.setEnabled(false);
+            getImageFirma();
+        }
+
+        db = sqLiteDBHelper.getWritableDatabase();
+
+        double total = 0;
+
+        sql = "SELECT * FROM productos WHERE pedido = '" + pedidoID + "'";
+        Cursor cursorPr = db.rawQuery(sql, null);
+        if (cursorPr.getCount() > 0) {
+            Producto[] productos = new Producto[cursorPr.getCount()];
+            int j = 0;
+
+            for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                Producto producto = new Producto(cursorPr.getString(cursorPr.getColumnIndex("oid")),
+                        Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))),
+                        Boolean.parseBoolean(cursorPr.getString(cursorPr.getColumnIndex("surtido"))),
+                        Double.parseDouble(cursorPr.getString(cursorPr.getColumnIndex("precio"))),
+                        cursorPr.getString(cursorPr.getColumnIndex("descripcion")),
+                        cursorPr.getString(cursorPr.getColumnIndex("pedido")));
+                total = total + Double.parseDouble(cursorPr.getString(cursorPr.getColumnIndex("precio")));
+                if (producto != null) {
+                    productos[j] = producto;
+                }
+                j++;
+
+                strTotal = String.valueOf(total);
+                textViewTotal.setText("Total $:" + total);
+
+                adapter = new ProductoAdapter(Arrays.asList(productos), getActivity(), getFragmentManager(), pendiente);
+                recyclerViewProductos.setAdapter(adapter);
+            }
+        }
     }
 
     public void getUbicacion(){

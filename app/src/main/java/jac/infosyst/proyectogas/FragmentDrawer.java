@@ -81,6 +81,7 @@ public class FragmentDrawer extends Fragment {
             if(strUsuarioRol.equals("Operador")) {
                 data.remove(3);
             }
+            data.remove(2);
             return data;
     }
 

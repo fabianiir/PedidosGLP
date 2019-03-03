@@ -20,6 +20,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +49,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.TextView;
@@ -90,6 +93,9 @@ public class CancelarPedidoFragment  extends Fragment {
     File directory,directoryIncidencia;
 
     private SQLiteDBHelper sqLiteDBHelper = null;
+    private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
+    View layout;
+
 
     String strObservaciones = "";
     String strchofer = "";
@@ -172,7 +178,43 @@ public class CancelarPedidoFragment  extends Fragment {
         btnAceptarCancelarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancelarPedido(idPedido);
+                LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                layout = layoutInflater.inflate(R.layout.layout_popup, null);
+
+                DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+                int width = displayMetrics.widthPixels;
+                int height = displayMetrics.heightPixels;
+
+                layout.setVisibility(View.VISIBLE);
+                POPUP_WINDOW_CONFIRMACION = new PopupWindow(getActivity());
+                POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                POPUP_WINDOW_CONFIRMACION.setFocusable(true);
+
+                POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
+
+                POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+
+                TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                txtMessage.setText("¿Desea cancelar éste pedido?");
+
+                Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                    }
+                });
+
+                Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                        cancelarPedido(idPedido);
+                    }
+                });
             }
         });
 
@@ -181,7 +223,6 @@ public class CancelarPedidoFragment  extends Fragment {
 
     public void cancelarPedido(final String idPedido){
         long Mot_Canc = spinner.getSelectedItemId();
-        Toast.makeText(getActivity(), "Cancelando Pedido: " + idPedido , Toast.LENGTH_SHORT).show();
         String oid = "";
         for (int i = 0; i < list.size(); i++){
             if(Mot_Canc == i){

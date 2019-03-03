@@ -206,7 +206,23 @@ public class MainActivity extends AppCompatActivity
 
 
             //endregion
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+            final SQLiteDatabase db1 = sqLiteDBHelper.getWritableDatabase();
 
+            String sql1 = "SELECT * FROM cat_estatus";
+            Cursor record1 = db1.rawQuery(sql1, null);
+            if(record1.moveToFirst()) {
+                Estatus estatus1 = new Estatus();
+                for (record1.moveToFirst(); !record1.isAfterLast(); record1.moveToNext()) {
+                    if (record1.getString(record1.getColumnIndex("nombre")).equals("Pendiente")) {
+                        estatus1.setPendienteId(record1.getString(record1.getColumnIndex("oid")));
+                    } else if (record1.getString(record1.getColumnIndex("nombre")).equals("Surtido")) {
+                        estatus1.setSurtidoId(record1.getString(record1.getColumnIndex("oid")));
+                    } else if (record1.getString(record1.getColumnIndex("nombre")).equals("Cancelado")) {
+                        estatus1.setCanceladoId(record1.getString(record1.getColumnIndex("oid")));
+                    }
+                }
+            }
             objSessions = new Sessions();
 
             strRolUsuario = ((Sessions) getApplicationContext()).getsesUsuarioRol();
@@ -240,11 +256,11 @@ public class MainActivity extends AppCompatActivity
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    obtener_pedidos();
                     guardar_pedidos_productos();
+                    obtener_pedidos();
                     handler.postDelayed(this, 600000);
                 }
-            }, 600000);  //the time is in miliseconds
+            }, 10000);  //the time is in miliseconds
 
             String oid = "", token = "", camion = "";
 
@@ -859,7 +875,7 @@ public class MainActivity extends AppCompatActivity
 
     public void obtener_pedidos(){
 
-        Toast.makeText(getApplicationContext(), "llamada", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Actualizando...", Toast.LENGTH_SHORT).show();
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM configuracion";
@@ -944,12 +960,24 @@ public class MainActivity extends AppCompatActivity
                                         db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
                                     }
                                 }
+                                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                                String sql = "SELECT * FROM pedidos_modificados";
+                                Cursor record = db.rawQuery(sql, null);
+                                if(record.getCount()>0) {
+                                    for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+                                        try {
+                                            db.delete(SQLiteDBHelper.Pedidos_Table,"oid = ?", new String[] {record.getString(record.getColumnIndex("oid"))});
+                                        }catch(Exception ex){
+
+                                        }
+                                    }
+                                }
                             }
                         } else {
                             Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
@@ -957,17 +985,70 @@ public class MainActivity extends AppCompatActivity
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "No hay conexión", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    String oid1[] = new  String[100];
     String oid2[] = new  String[100];
     public void guardar_pedidos_productos(){
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-        String sql = "SELECT * FROM productos_modificados";
+        String sql = "SELECT * FROM pedidos_modificados";
         Cursor record = db.rawQuery(sql, null);
+        if(record.getCount()>0) {
+            for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+
+                String token = "";
+                sql = "SELECT * FROM usuario";
+                Cursor recordUss = db.rawQuery(sql, null);
+
+                if (recordUss.moveToFirst()) {
+                    token = recordUss.getString(recordUss.getColumnIndex("token"));
+                }
+
+                ServicioUsuario userService = retrofit.create(ServicioUsuario.class);
+
+                Call call = userService.up_pedido(record.getString(record.getColumnIndex("oid")),
+                        record.getString(record.getColumnIndex("hora")),
+                        record.getString(record.getColumnIndex("fecha")),
+                        "",
+                        record.getString(record.getColumnIndex("comentario_chofer")),
+                        "",
+                        "",
+                        0,
+                        0,
+                        record.getString(record.getColumnIndex("pago_id")),
+                        record.getString(record.getColumnIndex("motivo_cancelacion_id")),
+                        record.getString(record.getColumnIndex("estatus_id")),
+                        "Up_8",
+                        token);
+
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        if (response.isSuccessful()) {
+                            ObjetoRes resObj = (ObjetoRes) response.body();
+                            if (resObj.geterror().equals("false")) {
+                                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+                    }
+                });
+            }
+        }
+
+        sql = "SELECT * FROM productos_modificados";
+        record = db.rawQuery(sql, null);
         int j = 0;
         if(record.getCount()>0){
             for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
@@ -979,12 +1060,6 @@ public class MainActivity extends AppCompatActivity
                 if (recordConf.moveToFirst()) {
                     strIP = recordConf.getString(recordConf.getColumnIndex("ip"));
                 }
-
-                BASEURL = strIP + "glpservices/webresources/glpservices/";
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(BASEURL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
 
                 String token = "";
                 sql = "SELECT * FROM usuario";
@@ -1014,14 +1089,12 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         }
-
                         @Override
                         public void onFailure(Call call, Throwable t) {
 
                         }
                     });
                 }else {
-                   oid1[j] = record.getString(record.getColumnIndex("oid"));
                     Call call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
                             Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), false,
                             Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
@@ -1029,12 +1102,10 @@ public class MainActivity extends AppCompatActivity
                     call.enqueue(new Callback() {
                         @Override
                         public void onResponse(Call call, Response response) {
-                            for(int i = 0;i < oid1.length; i++) {
-                                try{
-                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{oid1[i]});
-                                }catch(Exception e)
-                                {
-
+                            if (response.isSuccessful()) {
+                                ObjetoRes resObj = (ObjetoRes) response.body();
+                                if (resObj.geterror().equals("false")) {
+                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
                                 }
                             }
                         }
@@ -1109,11 +1180,10 @@ public class MainActivity extends AppCompatActivity
                 fragment = new OperadorFragment();
                 title = getString(R.string.title_operador);
                 break;
-            case 2:
-                fragment = new MapsActivity();
-                title = getString(R.string.title_mapa);
-
-                break;
+            //case 2:
+            //    fragment = new MapsActivity();
+            //    title = getString(R.string.title_mapa);
+            //    break;
             case 3:
                 if (strRolUsuario.equals("Admin")) {
                     Intent i = new Intent(MainActivity.this, Configuracion.class);

@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 
 import jac.infosyst.proyectogas.R;
 
+import jac.infosyst.proyectogas.fragments.PedidosFragment;
+import jac.infosyst.proyectogas.fragments.SurtirPedidoFragment;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Producto;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
@@ -174,11 +177,15 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                     if(resObj.geterror().equals("false")) {
                         Toast.makeText(mCtx, resObj.getMessage() , Toast.LENGTH_SHORT).show();
+                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                        db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                     } else {
                         Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();
+                    db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                    db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                 }
             }
             @Override
@@ -191,10 +198,10 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                 values.put("cantidad", cantidad);
                 values.put("surtido", false);
                 values.put("precio", precio);
-                db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+                db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
                 Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
 
-                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{idProducto});
+                db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
             }
         });
     }

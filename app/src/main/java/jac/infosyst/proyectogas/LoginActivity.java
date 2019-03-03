@@ -64,6 +64,14 @@ public class LoginActivity extends AppCompatActivity{
         setContentView(R.layout.activity_login);
 
         if (getIntent().getBooleanExtra("EXIT", false)) {
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
+            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
+            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
             finish();
         }
 

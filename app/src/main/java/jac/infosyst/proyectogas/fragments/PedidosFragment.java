@@ -98,7 +98,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
     String strIP = "";
     String strchofer = "";
     String strtoken = "";
-    String strcamionid;
+    String Imei = "";
 
     LocationManager locationManager;
     String strLatitude = "";
@@ -164,6 +164,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
             @Override
             public void onRefresh() {
                 try {
+                    guardar_pedidos_productos();
+                    obtener_pedidos();
                     actualizarPedidosPendientes();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -240,6 +242,123 @@ public class PedidosFragment extends Fragment implements LocationListener {
             actualizarPedidosSurtidos();
         }
         return rootView;
+    }
+
+    public void obtener_pedidos(){
+
+        Toast.makeText(getContext(), "Actualizando...", Toast.LENGTH_SHORT).show();
+
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM configuracion";
+        Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+            Imei = record.getString(record.getColumnIndex("imei"));
+        }
+
+        String oid = "", token = "";
+        sql = "SELECT * FROM usuario";
+        record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            oid = record.getString(record.getColumnIndex("oid"));
+            token = record.getString(record.getColumnIndex("token"));
+        }
+
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.getPedidos(oid, "Pendiente", token);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if (resObj.geterror().equals("false")) {
+                        if (resObj.getpedido() != null) {
+                            List<Pedido> list = Arrays.asList(resObj.getpedido());
+                            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+                            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+                            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+                            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+                            for (Pedido pedido : list) {
+                                ContentValues values = new ContentValues();
+                                values.put("oid", pedido.getOid());
+                                String datetime = pedido.getfechaprogramada();
+                                datetime.replace('T', ' ');
+                                values.put("fecha_hora_programada", datetime);
+                                values.put("cliente", pedido.getcliente());
+                                values.put("direccion", pedido.getdireccion());
+                                values.put("cp", pedido.getcp());
+                                values.put("telefono", pedido.gettelefono());
+                                values.put("lat", pedido.getubicacion_lat());
+                                values.put("lon", pedido.getubicacion_long());
+                                values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                if (pedido.getsuma_iva() == null) {
+                                    values.put("suma_iva", 0);
+                                } else {
+                                    values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
+                                }
+                                if (pedido.gettotal() == null) {
+                                    values.put("total", 0);
+                                } else {
+                                    values.put("total", Double.parseDouble(pedido.gettotal()));
+                                }
+                                values.put("empresa", pedido.getEmpresa());
+                                values.put("tipo_pedido", pedido.gettipo_pedido());
+                                values.put("forma_pago", pedido.getForma_pago());
+                                values.put("estatus", pedido.getestatus());
+                                db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
+
+                                if (pedido.getHobbies() != null) {
+
+                                    List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+
+                                    for (Producto producto : listproductos) {
+                                        ContentValues valuesProd = new ContentValues();
+                                        valuesProd.put("oid", producto.getOidProducto());
+                                        valuesProd.put("cantidad", producto.getCantidad());
+                                        valuesProd.put("surtido", producto.getsurtido());
+                                        valuesProd.put("precio", producto.getPrecio());
+                                        valuesProd.put("descripcion", producto.getdescripcion());
+                                        valuesProd.put("pedido", pedido.getOid());
+                                        db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
+                                    }
+                                }
+                                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                                String sql = "SELECT * FROM pedidos_modificados";
+                                Cursor record = db.rawQuery(sql, null);
+                                if(record.getCount()>0) {
+                                    for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+                                        try {
+                                            db.delete(SQLiteDBHelper.Pedidos_Table,"oid = ?", new String[] {record.getString(record.getColumnIndex("oid"))});
+                                        }catch(Exception ex){
+
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "error! ", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getContext(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void actualizarPedidosPendientes() throws JSONException {
@@ -341,6 +460,154 @@ public class PedidosFragment extends Fragment implements LocationListener {
         adapter = new PedidoAdapter(Arrays.asList(pedidos),getActivity(), getFragmentManager());
         recyclerViewPedidos.setAdapter(adapter);
     }
+
+    String oid2[] = new  String[100];
+    public void guardar_pedidos_productos(){
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM pedidos_modificados";
+        Cursor record = db.rawQuery(sql, null);
+        if(record.getCount()>0) {
+            for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+
+                BASEURL = strIP + "glpservices/webresources/glpservices/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASEURL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                String token = "";
+                sql = "SELECT * FROM usuario";
+                Cursor recordUss = db.rawQuery(sql, null);
+
+                if (recordUss.moveToFirst()) {
+                    token = recordUss.getString(recordUss.getColumnIndex("token"));
+                }
+
+                ServicioUsuario userService = retrofit.create(ServicioUsuario.class);
+
+                Call call = userService.up_pedido(record.getString(record.getColumnIndex("oid")),
+                        record.getString(record.getColumnIndex("hora")),
+                        record.getString(record.getColumnIndex("fecha")),
+                        "",
+                        record.getString(record.getColumnIndex("comentario_chofer")),
+                        "",
+                        "",
+                        0,
+                        0,
+                        record.getString(record.getColumnIndex("pago_id")),
+                        record.getString(record.getColumnIndex("motivo_cancelacion_id")),
+                        record.getString(record.getColumnIndex("estatus_id")),
+                        "Up_8",
+                        token);
+                Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        if (response.isSuccessful()) {
+                            ObjetoRes resObj = (ObjetoRes) response.body();
+                            if (resObj.geterror().equals("false")) {
+                                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+
+                    }
+                });
+            }
+        }
+
+        sql = "SELECT * FROM productos_modificados";
+        record = db.rawQuery(sql, null);
+        int j = 0;
+        if(record.getCount()>0){
+            for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+
+                sql = "SELECT * FROM configuracion";
+
+                Cursor recordConf = db.rawQuery(sql, null);
+
+                if (recordConf.moveToFirst()) {
+                    strIP = recordConf.getString(recordConf.getColumnIndex("ip"));
+                }
+
+                BASEURL = strIP + "glpservices/webresources/glpservices/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASEURL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                String token = "";
+                sql = "SELECT * FROM usuario";
+                Cursor recordUss = db.rawQuery(sql, null);
+
+                if (recordUss.moveToFirst()) {
+                    token = recordUss.getString(recordUss.getColumnIndex("token"));
+                }
+
+                ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+                if(Boolean.getBoolean(record.getString(record.getColumnIndex("surtido")))){
+                    oid2[j] = record.getString(record.getColumnIndex("oid"));
+                    Call call = service.sumarProducto(Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
+                            Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                            record.getString(record.getColumnIndex("pedido_id")),
+                            record.getString(record.getColumnIndex("producto_id")),
+                            token);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            for(int i = 0;i < oid2.length; i++) {
+                                try{
+                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{oid2[i]});
+                                }catch(Exception e)
+                                {
+
+                                }
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+
+                        }
+                    });
+                }else {
+                    Call call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
+                            Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), false,
+                            Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                            token);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            if (response.isSuccessful()) {
+                                ObjetoRes resObj = (ObjetoRes) response.body();
+                                if (resObj.geterror().equals("false")) {
+                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+
+                        }
+                    });
+                }
+                j++;
+            }
+        }
+
+        sql = "SELECT * FROM pedidos_modificados";
+        record = db.rawQuery(sql, null);
+        if(record.getCount()>0){
+            for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+
+            }
+        }
+    }
+
+
 
     public void actualizarPedidosSurtidos() {
         BASEURL = strIP + "glpservices/webresources/glpservices/";
