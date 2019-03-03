@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "45356696714",
+    "firebase_url": "https://glp-pedidos.firebaseio.com",
+    "project_id": "glp-pedidos",
+    "storage_bucket": "glp-pedidos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45356696714:android:7b23332e5a48ad43",
+        "android_client_info": {
+          "package_name": "jac.infosyst.proyectogas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "45356696714-56gb0prfape6b7kvl7sdi0a1h0mkla8l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jac.infosyst.proyectogas",
+            "certificate_hash": "6f525fcc20257b9f1c06065dc5e1e6ac7fafcb8b"
+          }
+        },
+        {
+          "client_id": "45356696714-cl0f38glquci2o2qirl44s8ve85sqquu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcPPmbZmPB2_-tLjqaREGPms5li7Bn2o0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "45356696714-cl0f38glquci2o2qirl44s8ve85sqquu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
