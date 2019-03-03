@@ -99,7 +99,17 @@ public class MainActivity extends AppCompatActivity
     BluetoothAdapter bluetoothAdapter;
     BluetoothSocket bluetoothSocket;
     BluetoothDevice bluetoothDevice;
-    Boolean DispositivoEncontrado=false;
+
+
+
+    // Boolean DispositivoEncontrado=false;
+    public static Boolean ConexionEstablecida=false;
+
+
+
+    public static void setConexionEstablecida(Boolean conexionEstablecida) {
+        ConexionEstablecida = conexionEstablecida;
+    }
 
     static OutputStream outputStream;
     InputStream inputStream;
@@ -1132,11 +1142,24 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.main, menu);
-      if(DispositivoEncontrado==false) {
-      }  menu.getItem(0).setIcon(ContextCompat.getDrawable(this,R.drawable.ic_printer_disable));
+        if (ConexionEstablecida==true) {
+            menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_enable));
+        }
+        else{
+            menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_disable));}
+
+      /*if(DispositivoEncontrado==false) {
+    } */
+
+
         return true;
     }
+
+
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -1147,10 +1170,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            if(DispositivoEncontrado==true)
-            {
-                item.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_printer));
-            }
+            /*if(DispositivoEncontrado==true)
+            {-*/
+               // item.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_conection_enable));
+
             Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_SHORT).show();
 
             return true;
@@ -1316,7 +1339,7 @@ public class MainActivity extends AppCompatActivity
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
-                DispositivoEncontrado=false;
+               // DispositivoEncontrado=false;
             }
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -1331,7 +1354,7 @@ public class MainActivity extends AppCompatActivity
                     // My Bluetooth printer name is MTP-3
                     if(pairedDev.getName().equals("MTP-3")){
                         bluetoothDevice=pairedDev;
-                        DispositivoEncontrado=true;
+                       // DispositivoEncontrado=true;
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
                     }
