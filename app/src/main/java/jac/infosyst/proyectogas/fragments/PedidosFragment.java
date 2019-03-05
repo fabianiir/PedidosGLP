@@ -405,7 +405,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }
                 @Override
                 public void onFailure(Call call, Throwable t) {
-                    Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+
                     MainActivity.setConexionEstablecida(false);
                 }
             });

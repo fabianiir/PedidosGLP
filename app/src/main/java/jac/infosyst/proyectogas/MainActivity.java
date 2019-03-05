@@ -50,6 +50,7 @@ import jac.infosyst.proyectogas.fragments.OperadorFragment;
 import jac.infosyst.proyectogas.modelo.Camion;
 import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
 import jac.infosyst.proyectogas.modelo.Estatus;
+import jac.infosyst.proyectogas.modelo.MyFirebaseMessagingService;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.ObjetoRes3;
 import jac.infosyst.proyectogas.modelo.Producto;
@@ -187,6 +188,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
 
 //region Ejecucion hilo Impresora
