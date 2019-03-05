@@ -11,19 +11,15 @@ public class Producto {
     private int cantidad;
     private boolean surtido;
     private double precio;
-
     private String descripcion;
+    private String pedido;
 
-    public Producto(String Oid, int cantidad  , boolean surtido,  double precio,  String descripcion) {
+    public Producto(String Oid, int cantidad  , boolean surtido,  double precio,  String descripcion, String pedido) {
         this.Oid = Oid;
         this.cantidad = cantidad;
         this.surtido = surtido;
         this.precio = precio;
         this.descripcion = descripcion;
-    }
-
-    public String getIdProducto() {
-        return Oid;
     }
 
     public String getOidProducto() {
@@ -46,6 +42,10 @@ public class Producto {
 
     public double getPrecio() {
         return precio;
+    }
+
+    public String getPedido() {
+        return pedido;
     }
 }
 

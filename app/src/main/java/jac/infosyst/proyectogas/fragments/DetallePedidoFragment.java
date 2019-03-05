@@ -128,7 +128,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         View rootView = inflater.inflate(R.layout.fragment_detalle_pedido, container, false);
         getLocation();
 
-        MainActivity.setFragmentController(1);
+
 
 // path to /data/data/yourapp/app_data/imageDir
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());

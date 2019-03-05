@@ -74,28 +74,9 @@ public interface ServicioUsuario {
 
   @FormUrlEncoded
   @POST("config")
-  Call<Result> registroConfiguracion(
+  Call<ObjetoRes> registroConfiguracion(
           @Field("public_ip") String ip,
           @Field("phone") String celular);
-
-  @FormUrlEncoded
-  @POST("actualizarPedido.php/{idPedido}")
-  Call<Result> actualizarPedido(
-          @Path("idPedido") int idPedido);
-
-  @FormUrlEncoded
-  @POST("obtenerProductos.php/{idPedido}")
-  Call<Productos> getProductos(@Field("idPedido") String idPedido);
-
-
-  @FormUrlEncoded
-  @POST("actualizarProducto.php/{idProducto}")
-  Call<Result> actualizarProducto(
-          @Field("idProducto") int idProducto);
-
-  @FormUrlEncoded
-  @POST("obtenerProductos.php/{idPedido}")
-  Call<Spinners> getProductos2(@Field("idPedido") int idPedido);
 
   @FormUrlEncoded
   @POST("cat_motcanc")
@@ -105,19 +86,21 @@ public interface ServicioUsuario {
   @POST("bitacora/")
   Call<ObjetoRes> bitacora(
           @Field("evento") boolean evento,
-          @Field("emai") String emai,
-                  @Field("chofer_id") String chofer_id,
-                  @Field("camion_id") String camion_id,
-                  @Field("token") String token
+          @Field("imei") String emai,
+          @Field("chofer_id") String chofer_id,
+          @Field("camion_id") String camion_id,
+          @Field("token") String token,
+          @Field("Fire_token") String fireToken
   );
 
   @FormUrlEncoded
   @POST("bitacora")
   Call<ObjetoRes> bitacoraOperador(
           @Field("evento") boolean evento,
-          @Field("emai") String emai,
+          @Field("imei") String emai,
           @Field("chofer_id") String chofer_id,
-          @Field("token") String token
+          @Field("token") String token,
+          @Field("Fire_token") String fireToken
   );
 
 

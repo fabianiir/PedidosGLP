@@ -21,11 +21,4 @@ public class Usuario {
     public String getrol() {
         return rol;
     }
-
-
-    private UsuarioInfo[] user;
-
-    public UsuarioInfo[] getUsuarioInfo() {
-        return user;
-    }
 }

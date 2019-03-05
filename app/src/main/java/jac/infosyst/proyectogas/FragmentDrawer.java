@@ -13,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,18 +20,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import jac.infosyst.proyectogas.R;
 import  jac.infosyst.proyectogas.adaptadores.NavigationDrawerAdapter;
 import jac.infosyst.proyectogas.modelo.Imagen;
 import jac.infosyst.proyectogas.modelo.NavDrawerItem;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.UsuarioInfo;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -59,15 +55,12 @@ public class FragmentDrawer extends Fragment {
     static String strUsuarioRol;
 
     private String BASEURL = "";
-    Sessions objSessions;
     Bitmap decodedByte;
     String strIP = "";
     String strtoken = "";
     String archivo = "";
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas11.db";
-    private static int DB_VERSION = 1;
 
     public FragmentDrawer() {
     }
@@ -88,6 +81,7 @@ public class FragmentDrawer extends Fragment {
             if(strUsuarioRol.equals("Operador")) {
                 data.remove(3);
             }
+            data.remove(2);
             return data;
     }
 
@@ -104,39 +98,31 @@ public class FragmentDrawer extends Fragment {
         public View onCreateView (LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState){
 
+        String foto = "", oid = "", nombre = "";
+
             final View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
 
-            if(UsuarioInfo.getFoto() == null) {
-                Sessions strSess = new Sessions();
-                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
-                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            sqLiteDBHelper = new SQLiteDBHelper(getContext());
+            SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            String sql = "SELECT * FROM configuracion";
+            Cursor record = db.rawQuery(sql, null);
+            if (record.moveToFirst()) {
+                strIP = record.getString(record.getColumnIndex("ip"));
+            }
+            record.close();
 
-                String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+            sql = "SELECT * FROM usuario";
+            record = db.rawQuery(sql, null);
 
-                final int recordCount = db.rawQuery(sql, null).getCount();
+            if (record.moveToFirst()) {
+                oid = record.getString(record.getColumnIndex("oid"));
+                nombre = record.getString(record.getColumnIndex("nombre"));
+                foto = record.getString(record.getColumnIndex("foto"));
+                strtoken = record.getString(record.getColumnIndex("token"));
+            }
+            record.close();
 
-                final Cursor record = db.rawQuery(sql, null);
-
-                if (record.moveToFirst()) {
-                    strIP = record.getString(record.getColumnIndex("ip"));
-                }
-
-                sqLiteDBHelper = new SQLiteDBHelper(getActivity(), DB_NAME, null, DB_VERSION);
-
-                final SQLiteDatabase db3 = sqLiteDBHelper.getWritableDatabase();
-
-                String sql3 = "SELECT * FROM usuario ORDER BY id DESC limit 1";
-
-                final int recordCount3 = db.rawQuery(sql3, null).getCount();
-                //  Toast.makeText(getActivity(), "CONTADOR PEDIDOS: " + recordCount3, Toast.LENGTH_LONG).show();
-
-                SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
-
-                Cursor cursor3 = dbConn3.rawQuery(sql3, null);
-
-                if (cursor3.moveToFirst()) {
-                    strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
-                }
+            if(foto.isEmpty()) {
 
             BASEURL = strIP + "glpservices/webresources/glpservices/";
             Retrofit retrofit = new Retrofit.Builder()
@@ -145,7 +131,7 @@ public class FragmentDrawer extends Fragment {
                     .build();
             final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-            Call call = service.Foto(UsuarioInfo.getOid(), "2", strtoken);
+            Call call = service.Foto(oid, "2", strtoken);
             call.enqueue(new Callback() {
                 @Override
                 public void onResponse(Call call, Response response) {
@@ -156,11 +142,8 @@ public class FragmentDrawer extends Fragment {
                          List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
                             archivo = arrayListImagen.get(0).getArchivo();
                             decodedByte = decodeBase64(archivo);
-                            UsuarioInfo uss = new UsuarioInfo();
-                            uss.setFoto(decodedByte);
                             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
-                            imageViewPerfil.setImageBitmap(UsuarioInfo.getFoto());
-
+                            imageViewPerfil.setImageBitmap(decodedByte);
 
                         }
 
@@ -172,10 +155,10 @@ public class FragmentDrawer extends Fragment {
             });
         } else{
             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
-            imageViewPerfil.setImageBitmap(UsuarioInfo.getFoto());
+            imageViewPerfil.setImageBitmap(decodedByte);
         }
             TextView textViewInterno = (TextView) layout.findViewById(R.id.Nom_Operador);
-            textViewInterno.setText(UsuarioInfo.getNombre());
+            textViewInterno.setText(nombre);
 
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
         adapter = new NavigationDrawerAdapter(getActivity(), getData());

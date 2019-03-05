@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -46,8 +45,12 @@ import com.google.gson.GsonBuilder;
 
 import com.squareup.okhttp.OkHttpClient;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Configuracion extends AppCompatActivity {
@@ -56,17 +59,10 @@ public class Configuracion extends AppCompatActivity {
     EditText edtTelefono;
     Button btnConfig;
 
-    String BASEURL;
-    static int checkConfiguracionSqLite = 0;
+    String Base_Url;
     private static SQLiteDBHelper sqLiteDBHelper = null;
-    private static String DB_NAME = "proyectogas17.db";
-    private static int DB_VERSION = 1;
 
     boolean fromSplash = false;
-
-    private static int  statusConf;
-
-    String strIP = "";
 
     @Override
     public void onBackPressed() {
@@ -109,93 +105,70 @@ public class Configuracion extends AppCompatActivity {
                 String telefono = edtTelefono.getText().toString();
                 //validate form
                 if(validateConfig(ipDominio, telefono)){
-                    insertarConfiguracion();
+                    insertarConfiguracion(ipDominio, telefono);
                 }
             }
         });
-
-
     }
 
-    private void insertarConfiguracion(){
-        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
 
+    private void insertarConfiguracion(final String dominio, final String telefono){
+
+        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Registrando Configuracion...");
         progressDialog.show();
 
-        strIP = edtIP.getText().toString().trim();
-        String strCelular = edtTelefono.getText().toString().trim();
-
-        OkHttpClient client = new OkHttpClient();
-
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
-
-        BASEURL = strIP + "glpservices/webresources/glpservices/";
-
         try{
+            Base_Url = dominio + "glpservices/webresources/glpservices/";
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASEURL)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .baseUrl(Base_Url)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
 
             //Defining retrofit api service
             ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-            ConfiguracionModelo conf = new ConfiguracionModelo(strIP, strCelular);
+            Call call = service.registroConfiguracion(dominio, telefono);
 
-            Call<Result> call = service.registroConfiguracion(
-                    conf.getIP(),
-                    conf.getCelular()
-            );
-
-            call.enqueue(new Callback<Result>() {
+            call.enqueue(new Callback() {
                 @Override
-                public void onResponse(Call<Result> call, Response<Result> response) {
-                    progressDialog.dismiss();
-                    Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
+                public void onResponse(Call call, Response response) {
+                    if(response.isSuccessful()) {
+                        progressDialog.dismiss();
+                        ObjetoRes resObj = (ObjetoRes) response.body();
+                        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        /*primera vez */
+                        ContentValues values = new ContentValues();
+                        values.put("oid", resObj.getConfiguracion_id());
+                        values.put("ip", dominio);
+                        values.put("telefono", telefono);
+                        values.put("imei", ObtenerIMEI());
 
-                    sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
+                        db.insert(SQLiteDBHelper.Config_Table, null, values);
+                        //poner if de la primera vez
+                        ((Sessions)getApplication()).setStrDominio(dominio);
 
-                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-                    /*primera vez */
-                    ContentValues values2 = new ContentValues();
-
-                    values2.put("ip", strIP);
-
-                    db.insert("config", null, values2);
-
-                    ContentValues cv = new ContentValues();
-                    cv.put("ip",strIP);
-
-
-                    db.update("config", cv, "id="+1, null);
-                    // Toast.makeText(Configuracion.this, "config java:" + strIP, Toast.LENGTH_SHORT).show();
-                    /*poner if de la primera vezz*/
-                    ((Sessions)getApplication()).setSesstrIpServidor(strIP);
-
-                    Intent intent = new Intent(Configuracion.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                        Intent intent = new Intent(Configuracion.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
 
                 @Override
-                public void onFailure(Call<Result> call, Throwable t) {
+                public void onFailure(Call call, Throwable t) {
                     progressDialog.dismiss();
-                    Toast.makeText(getApplicationContext(), "nnn:" +  t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "error al insertar configuracion", Toast.LENGTH_LONG).show();
                 }
             });
         }catch (Exception ex){
-            progressDialog.dismiss();
-            Toast toast = Toast.makeText(getApplicationContext(), "La URL: " + BASEURL + "no es valida.", Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-
+            Toast.makeText(getApplicationContext(), "URL no valido", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -218,8 +191,8 @@ public class Configuracion extends AppCompatActivity {
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_splash);
-            //Permisos
 
+            //Permisos
             int PermisoAlmacenamiento = ContextCompat.checkSelfPermission(
                     this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             if (PermisoAlmacenamiento != PackageManager.PERMISSION_GRANTED) {
@@ -229,28 +202,10 @@ public class Configuracion extends AppCompatActivity {
                 Log.i("Mensaje", "Se tiene permiso!");
             }
 
-            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
-
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-            String sql = "SELECT * FROM config ORDER BY id DESC limit 1";
-
+            String sql = "SELECT * FROM " + SQLiteDBHelper.Config_Table;
             final int recordCount = db.rawQuery(sql, null).getCount();
-            // Toast.makeText(getApplicationContext(), "CONTADOR: " + recordCount, Toast.LENGTH_LONG).show();
-
-            SQLiteDatabase dbConn = sqLiteDBHelper.getWritableDatabase();
-
-            Cursor cursor = dbConn.rawQuery(sql, null);
-            String email="";
-            String checkEmpty = "";
-            if (cursor.moveToFirst()) {
-                int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
-                String firstname = cursor.getString(cursor.getColumnIndex("status"));
-                email = cursor.getString(cursor.getColumnIndex("ip"));
-              //  Toast.makeText(getApplicationContext(), "datos: " + id, Toast.LENGTH_LONG).show();
-            }
-
-            cursor.close();
 
             new Handler().postDelayed(new Runnable()
             {
@@ -258,83 +213,104 @@ public class Configuracion extends AppCompatActivity {
                 public void run() {
                     //email.equals("null");
                     if(recordCount == 0) {
-
+                        /*cuando se le agrega un campo nuevo (sqlite sin valor)a una tabla ya existente, por default se le asigna un -1 */
                         Intent intent = new Intent(SplashActivity.this, Configuracion.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("SPLASH", true);
                         startActivity(intent);
                         finish();
                     }
-
                     else{
-                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
+                        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        String sql = "SELECT * FROM " + SQLiteDBHelper.Synchro_Table + " ORDER BY id DESC LIMIT 1";
+                        Cursor cursor = db.rawQuery(sql, null);
+                        if(cursor.getCount() <= 0){
+                            Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                            java.util.Date date = new Date();
+                            String only_date = dateFormat.format(date);
+                            try {
+                                date = dateFormat.parse(only_date);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            Date Cdate = new Date();
+                            String SyncDate = "";
+                            if (cursor.moveToFirst()) {
+                                SyncDate = cursor.getString(cursor.getColumnIndex("fecha"));
+                            }
+                            try {
+                                Cdate = dateFormat.parse(SyncDate);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            if(Cdate.before(date)){
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatEstatus_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatEstatus_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatMotCanc_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatMotCanc_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatProductos_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatProductos_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.CatTpago_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.CatTpago_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+                                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+                                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+                                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }else{
+                                sql = "SELECT * FROM " + SQLiteDBHelper.Usuario_Table;
+                                cursor = db.rawQuery(sql, null);
+                                if(cursor.getCount() > 0){
+                                    boolean admin = false;
+                                    if (cursor.moveToFirst()) {
+                                         admin = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("admin")));
+                                    }
+                                    if(admin){
+                                        ((Sessions) getApplication()).setsesUsuarioRol("Admin");
+                                    }else{
+                                        ((Sessions) getApplication()).setsesUsuarioRol("Operador");
+                                    }
+                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                    intent.putExtra("User", true);
+                                    startActivity(intent);
+                                    finish();
+                                }else{
+                                    Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        }
                     }
                 }
-
-
             }, 4000);
         }
     }
 
-    public void insertSqLite(String message, String ip) {
-        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext(), DB_NAME, null, DB_VERSION);
-
-        if (!hasDBVersionError()) {
-            sqLiteDBHelper.getWritableDatabase();
-            Toast.makeText(getApplicationContext(), "SQLite bd " + DB_NAME + " creado satisfactoriamente.", Toast.LENGTH_LONG).show();
-            insertUsuario(message, ip);
-           // selectConf(statusConf);
-        }
-    }
-
-    private static boolean hasDBVersionError()
+    public String ObtenerIMEI()
     {
-        boolean ret = false;
-        try
-        {
-            SQLiteDatabase sqliteDatabase = sqLiteDBHelper.getReadableDatabase();
-        }catch(SQLiteException ex)
-        {
-            ret = true;
-
-            String errorMessage = ex.getMessage();
-
-            Log.d(SQLiteDBHelper.LOG_TAG_SQLITE_DB, errorMessage, ex);
-
-            if(errorMessage.startsWith("No se pudo acutalizar la base de datos sqlite"))
-            {
-             //   Toast.makeText(SplashActivity.this, errorMessage + " , porfavor, elimine la base de datos sqlite desintalando la app primero.", Toast.LENGTH_LONG).show();
-            }else
-            {
-               // Toast.makeText(getApplicationContext(), "Error al crear la bd, mensaje: " + errorMessage, Toast.LENGTH_LONG).show();
-            }
-        }finally {
-            return ret;
+        int permissionCheck = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_PHONE_STATE );
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
         }
-    }
 
-    public void insertUsuario(String mensaje, String ip){
+        String myIMEI = "";
 
-        if(sqLiteDBHelper!=null) {
-            SQLiteDatabase sqLiteDatabase = sqLiteDBHelper.getWritableDatabase();
-            ContentValues contentValues = new ContentValues();
-
-            contentValues.clear();
-            contentValues.put("status", 1);
-            contentValues.put("ipServidor", ip);
-            sqLiteDatabase.insert(SQLiteDBHelper.CONFSQLITE_TABLE_NAME, null, contentValues);
-
-            Toast.makeText(getApplicationContext(), "CONFSQLITE_TABLE_NAME table successfully." + contentValues.getAsString("status"), Toast.LENGTH_LONG).show();
-        }else
-        {
-            Toast.makeText(getApplicationContext(), "Please create database first.", Toast.LENGTH_LONG).show();
+        TelephonyManager mTelephony = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        if (mTelephony.getDeviceId() != null){
+            myIMEI = mTelephony.getDeviceId();
         }
+        return myIMEI;
     }
-
-    public int selectConf(int idStatus){
-        return idStatus;
-    }
-
 }

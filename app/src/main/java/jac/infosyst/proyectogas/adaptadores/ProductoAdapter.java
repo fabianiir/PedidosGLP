@@ -1,40 +1,28 @@
 package jac.infosyst.proyectogas.adaptadores;
 
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
-import jac.infosyst.proyectogas.FragmentDrawer;
-import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.SurtirPedidoFragment;
-import jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
-import jac.infosyst.proyectogas.modelo.Pedido;
-import jac.infosyst.proyectogas.modelo.Pedidos;
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.utils.ApiUtils;
-import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
 import jac.infosyst.proyectogas.utils.Sessions;
@@ -48,10 +36,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.zip.Inflater;
 
-import jac.infosyst.proyectogas.fragments.SurtirPedidoFragment;
-
 public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewHolder> {
 
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private List<Producto> productos;
     private Context mCtx;
     FragmentManager f_manager;
@@ -125,9 +113,6 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                     Toast.makeText(mCtx, "No se puede restar el Producto!", Toast.LENGTH_SHORT).show();
                 }else {
-
-                    Toast.makeText(mCtx, "Restar producto: " + String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
-
                     restarProducto(String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(), String.valueOf(((Sessions) mCtx.getApplicationContext()).getsessToken()));
                 }
 
@@ -137,7 +122,11 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
     @Override
     public int getItemCount() {
-        return productos.size();
+        if(productos == null){
+            return 0;
+        }else{
+            return productos.size();
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -159,17 +148,16 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
         LinearLayout parentLayout;
     }
 
-    public void restarProducto(String idProducto, int cantidad, boolean surtido, int precio, String token){
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+    public void restarProducto(final String idProducto, final int cantidad, boolean surtido, final int precio, String token){
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM configuracion";
 
         final Cursor record = db.rawQuery(sql, null);
 
         if (record.moveToFirst()) {
             strIP = record.getString(record.getColumnIndex("ip"));
-
         }
 
         BASEURL = strIP + "glpservices/webresources/glpservices/";
@@ -190,16 +178,30 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                     if(resObj.geterror().equals("false")) {
                         Toast.makeText(mCtx, resObj.getMessage() , Toast.LENGTH_SHORT).show();
+                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                        db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                     } else {
                         Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();
+                    db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                    db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                 }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
                 Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
+                sqLiteDBHelper = new SQLiteDBHelper(mCtx);
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put("oid", idProducto);
+                values.put("cantidad", cantidad);
+                values.put("surtido", false);
+                values.put("precio", precio);
+                db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
             }
         });
     }

@@ -39,11 +39,11 @@ import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
 import jac.infosyst.proyectogas.modelo.ConfiguracionModelo;
+import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Pedidos;
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.utils.ApiUtils;
 import jac.infosyst.proyectogas.utils.Result;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import jac.infosyst.proyectogas.utils.ServicioUsuario;
@@ -57,6 +57,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static jac.infosyst.proyectogas.R.id.tv_cantidad;
@@ -100,7 +101,6 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mCtx, ""+ catalagoProductos.get(position).getdescripcion(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -125,7 +125,6 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
 
 
                                     int cantidadProducto = Integer.parseInt(cantidad.getText().toString());
-                                    Toast.makeText(mCtx, "Sumar producto: " + catalagoProductos.get(position).getIdProducto(), Toast.LENGTH_SHORT).show();
                                     sumarProducto( cantidadProducto, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
                                             catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
 
@@ -145,17 +144,8 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                     }
                 });
 
-
                 AlertDialog dialog = builder.create();
                 dialog.show();
-
-
-
-
-
-
-
-
             }
         });
     }
@@ -183,10 +173,10 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
         LinearLayout parentLayout;
     }
 
-    public void storeSqLiteProductos(double price){
-        Toast.makeText(mCtx, " storeSqLiteProductos:" + price, Toast.LENGTH_SHORT).show();
 
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+    public void storeSqLiteProductos(double price){
+
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         ContentValues productosVal = new ContentValues();
@@ -195,15 +185,16 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
         productosVal.put("Oid", String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesIdPedido()));
         productosVal.put("activo", "uno");
 
+
         db.insert("productos", null, productosVal);
     }
 
-    public void sumarProducto(int cantidad, int precio, String pedidoId, String productoId, String token){
+    public void sumarProducto(final int cantidad, final int precio, final String pedidoId, final String productoId, String token){
 
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
 
         SQLiteDatabase dbConn3 = sqLiteDBHelper.getWritableDatabase();
-        String sql = "SELECT * FROM config WHERE id = 1 ORDER BY id DESC limit 1";
+        String sql = "SELECT * FROM configuracion";
 
         final Cursor record = dbConn3.rawQuery(sql, null);
 
@@ -221,8 +212,6 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
 
         Call call = service.sumarProducto(cantidad, precio, pedidoId, productoId, ((Sessions)mCtx.getApplicationContext()).getsessToken());
 
-        Toast.makeText(mCtx, "/" + cantidad + "/" + precio +  "/" + pedidoId +  "/" + productoId +  "/" + token  , Toast.LENGTH_SHORT).show();
-
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -230,48 +219,159 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                     ObjetoRes resObj = (ObjetoRes) response.body();
 
                     if(resObj.geterror().equals("false")) {
-                        Toast.makeText(mCtx, resObj.getMessage() , Toast.LENGTH_SHORT).show();
+                        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
+                        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        String sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                        Cursor cursorFr = db.rawQuery(sql, null);
+                        String descripcion = "";
+                        Cursor cursorPr = db.rawQuery(sql, null);
+                        if (cursorFr.getCount() > 0) {
+                            for (cursorFr.moveToFirst(); !cursorFr.isAfterLast(); cursorFr.moveToNext()) {
+                                descripcion = cursorFr.getString(cursorPr.getColumnIndex("descripcion"));
+                                sql = "SELECT * FROM productos WHERE pedido = '" + pedidoId + "' AND descripcion = '" + cursorFr.getString(cursorPr.getColumnIndex("descripcion")) + "'";
+                                cursorPr = db.rawQuery(sql, null);
+                            }
+                        }
+                        if (cursorPr.getCount() > 0){
+                            int CantidadSuma = 0;
+                            for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                                CantidadSuma = Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))) + cantidad;
+                            }
+                            ContentValues values = new ContentValues();
+                            values.put("oid", random());
+                            values.put("cantidad", CantidadSuma);
+                            values.put("surtido", true);
+                            values.put("precio", precio);
+                            values.put("pedido_id", pedidoId);
+                            values.put("producto_id", productoId);
+                            db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
 
+                            sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                            cursorPr = db.rawQuery(sql, null);
+
+                            for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                                values = new ContentValues();
+                                values.put("oid", random());
+                                values.put("cantidad", CantidadSuma);
+                                values.put("surtido", true);
+                                values.put("precio", precio);
+                                values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
+                                values.put("pedido", pedidoId);
+                                db.update(SQLiteDBHelper.Productos_Table, values, "pedido = ? AND descripcion = ?", new String[] { pedidoId, descripcion });
+                            }
+                        }else {
+                            ContentValues values = new ContentValues();
+                            values.put("oid", random());
+                            values.put("cantidad", cantidad);
+                            values.put("surtido", true);
+                            values.put("precio", precio);
+                            values.put("pedido_id", pedidoId);
+                            values.put("producto_id", productoId);
+                            db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
+                            sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                            cursorPr = db.rawQuery(sql, null);
+
+                            for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                                values = new ContentValues();
+                                values.put("oid", random());
+                                values.put("cantidad", cantidad);
+                                values.put("surtido", true);
+                                values.put("precio", precio);
+                                values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
+                                values.put("pedido", pedidoId);
+                            }
+
+                            db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                        }
+                        Toast.makeText(mCtx, "Producto agregado." , Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
 
                     }
                 } else {
-                    Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mCtx, "error al agregar producto! " , Toast.LENGTH_SHORT).show();
                 }
-
-
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_SHORT).show();
+                sqLiteDBHelper = new SQLiteDBHelper(mCtx);
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                String sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                Cursor cursorFr = db.rawQuery(sql, null);
+
+                Cursor cursorPr = db.rawQuery(sql, null);
+
+                for (cursorFr.moveToFirst(); !cursorFr.isAfterLast(); cursorFr.moveToNext()) {
+                    sql = "SELECT * FROM productos WHERE pedido = '" + pedidoId + "' AND detalle = '" + cursorPr.getString(cursorPr.getColumnIndex("descripcion")) + "'";
+                    cursorPr = db.rawQuery(sql, null);
+                }
+                if (cursorPr.getCount() > 0){
+                    int CantidadSuma = 0;
+                    for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                        CantidadSuma = Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))) + cantidad;
+                    }
+                    ContentValues values = new ContentValues();
+                    values.put("oid", random());
+                    values.put("cantidad", CantidadSuma);
+                    values.put("surtido", true);
+                    values.put("precio", precio);
+                    values.put("pedido_id", pedidoId);
+                    values.put("producto_id", productoId);
+                    db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
+                    sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                    cursorPr = db.rawQuery(sql, null);
+
+                    for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                        values = new ContentValues();
+                        values.put("oid", random());
+                        values.put("cantidad", CantidadSuma);
+                        values.put("surtido", true);
+                        values.put("precio", precio);
+                        values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
+                        values.put("pedido", pedidoId);
+                        db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                    }
+                }else {
+                    ContentValues values = new ContentValues();
+                    values.put("oid", random());
+                    values.put("cantidad", cantidad);
+                    values.put("surtido", true);
+                    values.put("precio", precio);
+                    values.put("pedido_id", pedidoId);
+                    values.put("producto_id", productoId);
+                    db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
+                    sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                    cursorPr = db.rawQuery(sql, null);
+
+                    for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                        values = new ContentValues();
+                        values.put("oid", random());
+                        values.put("cantidad", cantidad);
+                        values.put("surtido", true);
+                        values.put("precio", precio);
+                        values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
+                        values.put("pedido", pedidoId);
+                    }
+
+                    db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                }
+                Toast.makeText(mCtx, "Producto agregado." , Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void restarProducto(int idProducto){
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiUtils.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call<Result> call = service.actualizarProducto(idProducto);
-
-        call.enqueue(new Callback<Result>() {
-            @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
-                Toast.makeText(mCtx, response.body().getMessage(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(Call<Result> call, Throwable t) {
-                Toast.makeText(mCtx, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+    public static String random() {
+        Random generator = new Random();
+        StringBuilder randomStringBuilder = new StringBuilder();
+        int randomLength = generator.nextInt(16);
+        char tempChar;
+        for (int i = 0; i < randomLength; i++){
+            tempChar = (char) (generator.nextInt(96) + 32);
+            randomStringBuilder.append(tempChar);
+        }
+        return randomStringBuilder.toString();
     }
 }
-
-

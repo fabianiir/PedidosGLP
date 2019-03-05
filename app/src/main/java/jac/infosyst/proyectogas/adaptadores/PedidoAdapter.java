@@ -37,6 +37,8 @@ import java.util.ArrayList;
 
 public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolder> {
 
+    private static final int DATABASE_VERSION = 1;
+    protected static final String DATABASE_NAME = "proyectoGas";
     private List<Pedido> pedidos;
     private Context mCtx;
     FragmentManager f_manager;
@@ -188,7 +190,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
     public void storeSqLiteProductos(String oidPedido, String oidProducto, int cantidad, boolean surtido, double precio, String descripcion){
         Toast.makeText(mCtx, " storeSqLiteProductos:" + descripcion, Toast.LENGTH_SHORT).show();
 
-        sqLiteDBHelper = new SQLiteDBHelper(mCtx, DB_NAME, null, DB_VERSION);
+        sqLiteDBHelper = new SQLiteDBHelper(mCtx);
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         ContentValues productosVal = new ContentValues();

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +23,7 @@ import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.LectorNFC.NFC;
 import jac.infosyst.proyectogas.modelo.Chofer;
+import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class Escaner extends AppCompatActivity implements ZXingScannerView.ResultHandler {
@@ -29,6 +31,7 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
     Button btnNFC;
     public static Activity escanerActivity = new Activity();
     boolean inCamera = false;
+    private static SQLiteDBHelper sqLiteDBHelper = null;
 
     @Override
     public void onBackPressed(){
@@ -37,6 +40,10 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
             startActivity(intent);
             inCamera = false;
         }else{
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
+            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
             super.onBackPressed();
         }
     }
