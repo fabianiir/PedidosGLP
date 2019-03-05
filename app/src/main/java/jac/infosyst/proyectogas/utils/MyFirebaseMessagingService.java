@@ -1,4 +1,4 @@
-package jac.infosyst.proyectogas.modelo;
+package jac.infosyst.proyectogas.utils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

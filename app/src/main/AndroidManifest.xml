@@ -62,7 +62,7 @@
 
 
 
-        <service android:name=".modelo.MyFirebaseMessagingService"
+        <service android:name=".utils.MyFirebaseMessagingService"
             android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
