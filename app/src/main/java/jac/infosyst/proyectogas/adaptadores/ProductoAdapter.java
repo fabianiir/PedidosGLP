@@ -113,9 +113,6 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
                     Toast.makeText(mCtx, "No se puede restar el Producto!", Toast.LENGTH_SHORT).show();
                 }else {
-
-                    Toast.makeText(mCtx, "Restar producto: " + String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), Toast.LENGTH_SHORT).show();
-
                     restarProducto(String.valueOf(((Sessions) mCtx.getApplicationContext()).getSesOidProducto()), 1, false, (int) productos.get(position).getPrecio(), String.valueOf(((Sessions) mCtx.getApplicationContext()).getsessToken()));
                 }
 
@@ -125,7 +122,11 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
     @Override
     public int getItemCount() {
-        return productos.size();
+        if(productos == null){
+            return 0;
+        }else{
+            return productos.size();
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -183,7 +184,6 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                         Toast.makeText(mCtx, resObj.getMessage()  , Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(mCtx, "error agregar producto! " , Toast.LENGTH_SHORT).show();
                     db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
                     db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                 }

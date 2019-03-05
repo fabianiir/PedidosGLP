@@ -122,7 +122,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
-
+        obtener_pedidos();
         MainActivity.setFragmentController(0);
 
         Sessions strSess = new Sessions();
@@ -163,15 +163,18 @@ public class PedidosFragment extends Fragment implements LocationListener {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                try {
-                    guardar_pedidos_productos();
-                    obtener_pedidos();
-                    actualizarPedidosPendientes();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (tipoPedidos == 0){
+                    try {
+                        guardar_pedidos_productos();
+                        obtener_pedidos();
+                        actualizarPedidosPendientes();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else if(tipoPedidos == 1){
+                    actualizarPedidosSurtidos();
                 }
                 swipeRefreshLayout.setRefreshing(false);
-
             }
         });
 
@@ -247,6 +250,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
     public void obtener_pedidos(){
 
         Toast.makeText(getContext(), "Actualizando...", Toast.LENGTH_SHORT).show();
+
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
 
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM configuracion";
@@ -372,6 +377,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
         Call call;
 
         boolean admin = false;
+
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -617,8 +623,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 .build();
 
         Call call;
-
-        boolean admin = false;
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();

@@ -306,4 +306,12 @@ public class Sessions  extends Application {
     public void setStrDominio(String strDominio) {
         this.strDominio = strDominio;
     }
+
+    private String strFireTOken;
+    public String getStrFireTOken() {
+        return strFireTOken;
+    }
+    public void setStrFireTOken(String strFireTOken) {
+        this.strFireTOken = strFireTOken;
+    }
 }

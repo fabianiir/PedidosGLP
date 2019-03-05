@@ -1,9 +1,5 @@
 package jac.infosyst.proyectogas;
 
-/**
- * Created by jorgeaguilar on 12/27/18.
- */
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -52,7 +48,6 @@ public class LoginActivity extends AppCompatActivity{
 
     private SQLiteDBHelper sqLiteDBHelper = null;
 
-    private String BASEURL = "";
     private String strIP = "";
 
     private Sessions objSessions;
@@ -88,9 +83,9 @@ public class LoginActivity extends AppCompatActivity{
             Log.i("Mensaje", "Se tiene permiso!");
         }
 
-        edtUsername = (EditText) findViewById(R.id.input_email);
-        edtPassword = (EditText) findViewById(R.id.input_password);
-        btnLogin = (Button) findViewById(R.id.btn_login);
+        edtUsername = findViewById(R.id.input_email);
+        edtPassword = findViewById(R.id.input_password);
+        btnLogin = findViewById(R.id.btn_login);
         objSessions = new Sessions();
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -104,8 +99,7 @@ public class LoginActivity extends AppCompatActivity{
 
               //Obtiene Token del dispositivo
                 Log.w("tokenFire",FirebaseInstanceId.getInstance().getToken());
-
-
+                ((Sessions) getApplication()).setStrFireTOken(FirebaseInstanceId.getInstance().getToken());
 
                 //validate form
                 if(validateLogin(username, password)){
@@ -136,7 +130,7 @@ public class LoginActivity extends AppCompatActivity{
             objSessions.setSesstrIpServidor(strIP);
         }
 
-        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        String BASEURL = strIP + "glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASEURL)
@@ -166,7 +160,6 @@ public class LoginActivity extends AppCompatActivity{
                         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
                         /*primera vez */
 
-
                         ContentValues values = new ContentValues();
                         values.put("oid", arrayListUsuario.get(0).getId());
                         values.put("nombre", arrayListUsuario.get(0).getnombre());
@@ -180,7 +173,7 @@ public class LoginActivity extends AppCompatActivity{
                         objSessions.setsessIDuser(arrayListUsuario.get(0).getId());
                         if (resObj.getAdmin().equals("true")) {
                             ((Sessions) getApplication()).setsesUsuarioRol("Admin");
-                            Intent intent = new Intent(LoginActivity.this, Configuracion.class);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
 
                         }else if (resObj.getAdmin().equals("false")) {

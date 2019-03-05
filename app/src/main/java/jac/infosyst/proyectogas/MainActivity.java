@@ -84,8 +84,6 @@ public class MainActivity extends AppCompatActivity
 
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     View layout;
-   // Bundle bundle;
-    PedidosFragment pedidoObj;
 
     boolean errorDescarga = false;
     String strRolUsuario;
@@ -251,7 +249,7 @@ public class MainActivity extends AppCompatActivity
                 objSessions.setSesstrIpServidor(strIP);
             }
 
-            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+            mToolbar = findViewById(R.id.toolbar);
 
             setSupportActionBar(mToolbar);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -302,14 +300,14 @@ public class MainActivity extends AppCompatActivity
                 Imei = record.getString(record.getColumnIndex("imei"));
             }
 
-            boolean admin = false;
+            String admin = "";
 
             sql = "SELECT * FROM usuario";
 
             record = db.rawQuery(sql, null);
 
             if (record.moveToFirst()) {
-                admin = Boolean.parseBoolean(record.getString(record.getColumnIndex("admin")));
+                admin = record.getString(record.getColumnIndex("token"));
             }
 
             String strcamion = Chofer.getCamion();
@@ -326,7 +324,7 @@ public class MainActivity extends AppCompatActivity
 
             record = db.rawQuery(sql, null);
             if(record.getCount() <= 0) {
-                if (!admin) {
+                if (admin == null) {
                     Call call = service.camion(Integer.parseInt(strcamion));
                     call.enqueue(new Callback() {
                         @Override
@@ -370,7 +368,7 @@ public class MainActivity extends AppCompatActivity
                                         camion = record.getString(record.getColumnIndex("camion"));
                                     }
 
-                                    call = service.bitacora(true, Imei, oid, camion, null);
+                                    call = service.bitacora(true, Imei, oid, camion, null, ((Sessions) getApplicationContext().getApplicationContext()).getStrFireTOken());
                                     call.enqueue(new Callback() {
                                         @Override
                                         public void onResponse(Call call, Response response) {
@@ -796,6 +794,331 @@ public class MainActivity extends AppCompatActivity
                     });
                 } else {
 
+                    String oid = "", nombre = "", placas = "", foto = "", token = "", camion = "";
+
+                    sql = "SELECT * FROM usuario";
+
+                    record = db.rawQuery(sql, null);
+
+                    if (record.moveToFirst()) {
+                        oid = record.getString(record.getColumnIndex("oid"));
+                        token = record.getString(record.getColumnIndex("token"));
+                    }
+
+
+                    sql = "SELECT * FROM cat_estatus";
+                    record = db.rawQuery(sql, null);
+
+                    if (record.getCount() <= 0) {
+                        Call call = service.getCatalogoEstatus(token);
+                        call.enqueue(new Callback() {
+                            @Override
+                            public void onResponse(Call call, Response response) {
+                                if (response.isSuccessful()) {
+                                    ObjetoRes3 obj_estatus = (ObjetoRes3) response.body();
+                                    if (obj_estatus.geterror().equals("false")) {
+                                        List<CatalogoEstatus> arrayListEstatus = Arrays.asList(obj_estatus.getCatalogoEstatus());
+                                        Estatus estatus = new Estatus();
+
+                                        for (CatalogoEstatus catalogoEstatus : arrayListEstatus) {
+                                            ContentValues values = new ContentValues();
+                                            values.put("oid", catalogoEstatus.getIdProducto());
+                                            values.put("nombre", catalogoEstatus.getdescripcion());
+                                            db.insert(SQLiteDBHelper.CatEstatus_Table, null, values);
+                                        }
+
+                                        for (int i = 0; i < arrayListEstatus.size(); i++) {
+                                            if (arrayListEstatus.get(i).getdescripcion().equals("Pendiente")) {
+                                                estatus.setPendienteId(arrayListEstatus.get(i).getIdProducto());
+                                            } else if (arrayListEstatus.get(i).getdescripcion().equals("Surtido")) {
+                                                estatus.setSurtidoId(arrayListEstatus.get(i).getIdProducto());
+                                            } else if (arrayListEstatus.get(i).getdescripcion().equals("Cancelado")) {
+                                                estatus.setCanceladoId(arrayListEstatus.get(i).getIdProducto());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call call, Throwable t) {
+                                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                intent.putExtra("EXIT", true);
+                                                startActivity(intent);
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
+                        });
+                    }
+
+                    sql = "SELECT * FROM cat_motivo_cancelacion";
+                    record = db.rawQuery(sql, null);
+
+                    if (record.getCount() <= 0) {
+                        Call call = service.obtenerMotivosCancelacion(token);
+                        call.enqueue(new Callback() {
+                            @Override
+                            public void onResponse(Call call, Response response) {
+                                if (response.isSuccessful()) {
+                                    ObjetoRes obj_estatus = (ObjetoRes) response.body();
+                                    if (obj_estatus.geterror().equals("false")) {
+                                        List<Spinner> arrayListMotCancelacion = Arrays.asList(obj_estatus.getmotivoscancelacion());
+                                        Estatus estatus = new Estatus();
+
+                                        for (Spinner spinner : arrayListMotCancelacion) {
+                                            ContentValues values = new ContentValues();
+                                            values.put("oid", spinner.getoid());
+                                            values.put("nombre", spinner.getnombre());
+                                            db.insert(SQLiteDBHelper.CatMotCanc_Table, null, values);
+                                        }
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call call, Throwable t) {
+                                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                intent.putExtra("EXIT", true);
+                                                startActivity(intent);
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
+                        });
+                    }
+
+                    sql = "SELECT * FROM cat_productos";
+                    record = db.rawQuery(sql, null);
+
+                    if (record.getCount() <= 0) {
+                        Call call = service.getCatalagoProductos(token);
+                        call.enqueue(new Callback() {
+                            @Override
+                            public void onResponse(Call call, Response response) {
+                                if (response.isSuccessful()) {
+                                    ObjetoRes2 obj_estatus = (ObjetoRes2) response.body();
+                                    if (obj_estatus.geterror().equals("false")) {
+                                        List<CatalagoProducto> arrayListProductos = Arrays.asList(obj_estatus.getcatalogoProductos());
+                                        Estatus estatus = new Estatus();
+
+                                        for (CatalagoProducto producto : arrayListProductos) {
+                                            ContentValues values = new ContentValues();
+                                            values.put("oid", producto.getIdProducto());
+                                            values.put("descripcion", producto.getdescripcion());
+                                            values.put("unidad", producto.getunidad());
+                                            values.put("precio_unitario", producto.getprecio_unitario());
+                                            db.insert(SQLiteDBHelper.CatProductos_Table, null, values);
+                                        }
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call call, Throwable t) {
+                                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                intent.putExtra("EXIT", true);
+                                                startActivity(intent);
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
+                        });
+                    }
+
+                    Call call = service.getPedidos(oid, "Pendiente", token);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            if (response.isSuccessful()) {
+                                ObjetoRes resObj = (ObjetoRes) response.body();
+
+                                if (resObj.geterror().equals("false")) {
+                                    if (resObj.getpedido() != null) {
+                                        List<Pedido> list = Arrays.asList(resObj.getpedido());
+
+                                        for (Pedido pedido : list) {
+
+                                            ContentValues values = new ContentValues();
+                                            values.put("oid", pedido.getOid());
+                                            String datetime = pedido.getfechaprogramada();
+                                            datetime.replace('T', ' ');
+                                            values.put("fecha_hora_programada", datetime);
+                                            values.put("cliente", pedido.getcliente());
+                                            values.put("direccion", pedido.getdireccion());
+                                            values.put("cp", pedido.getcp());
+                                            values.put("telefono", pedido.gettelefono());
+                                            values.put("lat", pedido.getubicacion_lat());
+                                            values.put("lon", pedido.getubicacion_long());
+                                            values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                            if (pedido.getsuma_iva() == null) {
+                                                values.put("suma_iva", 0);
+                                            } else {
+                                                values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
+                                            }
+                                            if (pedido.gettotal() == null) {
+                                                values.put("total", 0);
+                                            } else {
+                                                values.put("total", Double.parseDouble(pedido.gettotal()));
+                                            }
+                                            values.put("empresa", pedido.getEmpresa());
+                                            values.put("tipo_pedido", pedido.gettipo_pedido());
+                                            values.put("forma_pago", pedido.getForma_pago());
+                                            values.put("estatus", pedido.getestatus());
+                                            db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
+
+                                            if (pedido.getHobbies() != null) {
+
+                                                List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+
+                                                for (Producto producto : listproductos) {
+                                                    ContentValues valuesProd = new ContentValues();
+                                                    valuesProd.put("oid", producto.getOidProducto());
+                                                    valuesProd.put("cantidad", producto.getCantidad());
+                                                    valuesProd.put("surtido", producto.getsurtido());
+                                                    valuesProd.put("precio", producto.getPrecio());
+                                                    valuesProd.put("descripcion", producto.getdescripcion());
+                                                    valuesProd.put("pedido", pedido.getOid());
+                                                    db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
+                            }
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                            java.util.Date date = new Date();
+                            String fecha = dateFormat.format(date);
+
+                            ContentValues values = new ContentValues();
+                            values.put("fecha", fecha);
+                            db.insert(SQLiteDBHelper.Synchro_Table, null, values);
+
+                            setContentView(R.layout.activity_main);
+
+                            //region Ejecucion hilo Impresora
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        FindBluetoothDevice();
+                                        //openBluetoothPrinter();
+
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                }
+                            }).start();
+                            //endregion
+
+                            objSessions = new Sessions();
+
+                            strRolUsuario = ((Sessions) getApplicationContext()).getsesUsuarioRol();
+
+                            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+
+                            String sql = "SELECT * FROM configuracion";
+
+                            Cursor record = db.rawQuery(sql, null);
+
+                            if (record.moveToFirst()) {
+                                strIP = record.getString(record.getColumnIndex("ip"));
+                                Imei = record.getString(record.getColumnIndex("imei"));
+                                objSessions.setSesstrIpServidor(strIP);
+                            }
+
+                            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+                            setSupportActionBar(mToolbar);
+                            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+                            drawerFragment = (FragmentDrawer)
+                                    getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+
+                            drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+                            drawerFragment.setDrawerListener(MainActivity.this);
+
+                            String oid = "", token = "", camion = "";
+                            boolean admin = false;
+
+                            sql = "SELECT * FROM usuario";
+
+                            record = db.rawQuery(sql, null);
+
+                            if (record.moveToFirst()) {
+                                oid = record.getString(record.getColumnIndex("oid"));
+                                camion = record.getString(record.getColumnIndex("camion"));
+                                token = record.getString(record.getColumnIndex("token"));
+                            }
+
+                            ((Sessions) getApplicationContext().getApplicationContext()).setStrImei(Imei);
+                            ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
+                            ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
+                            ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    obtener_pedidos();
+                                    guardar_pedidos_productos();
+                                    handler.postDelayed(this, 600000);
+                                }
+                            }, 600000);  //the time is in miliseconds
+
+                            displayView(0);
+                        }
+
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+                            Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            intent.putExtra("EXIT", true);
+                                            startActivity(intent);
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        }
+                    });
                 }
             }else {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -852,7 +1175,6 @@ public class MainActivity extends AppCompatActivity
                 drawerFragment.setDrawerListener(MainActivity.this);
 
                 String oid = "", token = "", camion = "";
-                admin = false;
 
                 sql = "SELECT * FROM usuario";
 
@@ -1157,10 +1479,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -1188,7 +1506,7 @@ public class MainActivity extends AppCompatActivity
         displayView(position);
     }
 
-    private void displayView(int position) {
+    private void displayView(final int position) {
         Fragment fragment = null;
         String title = getString(R.string.app_name);
 
@@ -1207,7 +1525,7 @@ public class MainActivity extends AppCompatActivity
             //    fragment = new MapsActivity();
             //    title = getString(R.string.title_mapa);
             //    break;
-            case 3:
+            case 2:
                 if (strRolUsuario.equals("Admin")) {
                     Intent i = new Intent(MainActivity.this, Configuracion.class);
                     startActivity(i);
@@ -1220,55 +1538,111 @@ public class MainActivity extends AppCompatActivity
 
                 break;
 
-            case 4:
+            case 3:
                 if (strRolUsuario.equals("Admin")) {
                     title = getString(R.string.title_pedidosrealizados);
                     fragment = new PedidosFragment();
                 }
                 if(strRolUsuario.equals("Operador")){
-                    Log.v(TAG,"token: " + position);
-                    String strImei, strChofer, strCamion, strToken;
+                    LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    layout = layoutInflater.inflate(R.layout.layout_popup, null);
 
-                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                    DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+                    int width = displayMetrics.widthPixels;
+                    int height = displayMetrics.heightPixels;
 
-                    db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
-                    db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
-                    db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
-                    db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
-                    db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
-                    db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+                    layout.setVisibility(View.VISIBLE);
+                    POPUP_WINDOW_CONFIRMACION = new PopupWindow(this);
+                    POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                    POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                    POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                    POPUP_WINDOW_CONFIRMACION.setFocusable(true);
 
-                    strImei = ((Sessions)getApplicationContext()).getStrImei();
-                    strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
-                    strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
-                    strToken = ((Sessions)getApplicationContext()).getsessToken();
+                    POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
 
-                    insertBitacora(false, strImei, strChofer, strCamion ,strToken);
+                    POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+
+                    TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                    txtMessage.setText("¿Desea cerrar sesión?");
+
+                    Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                    btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                        }
+                    });
+
+                    Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                    btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                            Log.v(TAG,"token: " + position);
+                            String strImei, strChofer, strCamion, strToken;
+
+                            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                            strImei = ((Sessions)getApplicationContext()).getStrImei();
+                            strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
+                            strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
+                            strToken = ((Sessions)getApplicationContext()).getsessToken();
+
+                            insertBitacora(false, strImei, strChofer, strCamion ,strToken);
+                        }
+                    });
                 }
                 break;
 
-            case 5:
-                Log.v(TAG,"token: " + position);
+            case 4:
+                LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                layout = layoutInflater.inflate(R.layout.layout_popup, null);
 
-                String strImei, strChofer, strCamion, strToken;
+                DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+                int width = displayMetrics.widthPixels;
+                int height = displayMetrics.heightPixels;
 
-                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                layout.setVisibility(View.VISIBLE);
+                POPUP_WINDOW_CONFIRMACION = new PopupWindow(this);
+                POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                POPUP_WINDOW_CONFIRMACION.setFocusable(true);
 
-                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
-                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
-                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
-                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
-                db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
-                db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+                POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
 
-                strImei = ((Sessions)getApplicationContext()).getStrImei();
-                strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
-                strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
-                strToken = ((Sessions)getApplicationContext()).getsessToken();
+                POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
 
-                insertBitacora(false, strImei, strChofer, strCamion ,strToken);
+                TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                txtMessage.setText("¿Desea cerrar sesión?");
+
+                Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                    }
+                });
+
+                Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                        Log.v(TAG,"token: " + position);
+                        String strImei, strChofer, strCamion, strToken;
+
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                        strImei = ((Sessions)getApplicationContext()).getStrImei();
+                        strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
+                        strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
+                        strToken = ((Sessions)getApplicationContext()).getsessToken();
+
+                        insertBitacora(false, strImei, null, null,strToken);
+                    }
+                });
                 break;
-
             default:
                 break;
         }
@@ -1295,7 +1669,7 @@ public class MainActivity extends AppCompatActivity
 
                         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-                        Call call = service.bitacora(evento, emai, chofer_id , camion_id , token);
+                        Call call = service.bitacora(evento, emai, chofer_id , camion_id , token, ((Sessions) getApplicationContext().getApplicationContext()).getStrFireTOken());
                         call.enqueue(new Callback() {
                             @Override
                             public void onResponse(Call call, Response response) {
@@ -1304,10 +1678,20 @@ public class MainActivity extends AppCompatActivity
 
                                     if(resObj.geterror().equals("false")){
 
+                                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                                        db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
+                                        db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
+                                        db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
+                                        db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
+                                        db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
+                                        db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+
                                         Log.d(TAG,"token: " + resObj.gettoken());
 
                                         Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                                         startActivity(i2);
+                                        finish();
                                         ((Activity) MainActivity.this).overridePendingTransition(0,0);
                                     } else {
                         Toast.makeText(getApplicationContext(), resObj.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1324,7 +1708,6 @@ public class MainActivity extends AppCompatActivity
                         .setCancelable(false)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-
                             }
                         });
                 AlertDialog alert = builder.create();

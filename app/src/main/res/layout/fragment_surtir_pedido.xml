@@ -163,15 +163,35 @@
                 android:visibility="gone"
                 app:fontFamily="@font/roboto" />
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fabAgregarProducto"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/main_view_layout2"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@android:drawable/ic_input_add"
-                android:tint="@color/BotonGris" />
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal"
+                >
 
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fabRestarProducto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center"
+                    android:layout_margin="16dp"
+                    android:src="@android:drawable/ic_delete"
+                    android:tint="@color/BotonGris" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fabAgregarProducto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center"
+                    android:layout_margin="@dimen/fab_margin"
+                    android:src="@android:drawable/ic_input_add"
+                    android:tint="@color/BotonGris" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvTotal"

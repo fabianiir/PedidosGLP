@@ -87,13 +87,9 @@ import java.util.Locale;
 
 public class SurtirPedidoFragment  extends Fragment implements LocationListener {
     private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle, textViewFirma, textViewTotal;
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "proyectoGas";
-    Button btnFirmar, btnGuardar, btnReimpresionTicket, btnLimpiar;
+    Button btnGuardar, btnReimpresionTicket, btnLimpiar;
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     private PopupWindow POPUP_WINDOW_CATALAGOPRODUCTOS = null;
-    private PopupWindow cantidad = null;
-    Button btnRestar;
 
     View layout, layoutCatalagoProductos;
     LayoutInflater layoutInflater, layoutInflaterCatalagoProductos;
@@ -415,8 +411,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View view) {
                 mostrarCatalagoProductos("Productos");
-                Toast.makeText(getActivity(), "AgregarProducto!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
+        FloatingActionButton fabRestarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabRestarProducto);
+        fabRestarProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                restarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto());
             }
         });
 
@@ -529,12 +531,86 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     AlertDialog dialog = builder.create();
                     dialog.show();
 
-
-
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    public void restarProducto(final String idProducto){
+        int setcantidad = 0;
+        boolean surtido = false;
+        int setprecio = 0;
+        String token = "";
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+        String sql = "SELECT * FROM productos WHERE oid = '" + idProducto + "'";
+
+        Cursor cursor = db.rawQuery(sql, null);
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            setcantidad = Integer.parseInt(cursor.getString(cursor.getColumnIndex("cantidad")));
+            setprecio = Integer.parseInt(cursor.getString(cursor.getColumnIndex("precio")));
+        }
+        final int cantidad = setcantidad;
+        final int precio = setprecio;
+        token = ((Sessions) getActivity().getApplicationContext()).getsessToken();
+
+        sql = "SELECT * FROM configuracion";
+
+        final Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+        }
+
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.up_detalle(idProducto, cantidad, surtido,  precio, token);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+
+                    if(resObj.geterror().equals("false")) {
+                        Toast.makeText(getActivity(), resObj.getMessage() , Toast.LENGTH_SHORT).show();
+                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                        db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
+                        getProductos(true);
+                    } else {
+                        Toast.makeText(getActivity(), resObj.getMessage()  , Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                    db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
+                    getProductos(true);
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                sqLiteDBHelper = new SQLiteDBHelper(getActivity());
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put("oid", idProducto);
+                values.put("cantidad", cantidad);
+                values.put("surtido", false);
+                values.put("precio", precio);
+                db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
+                getProductos(true);
             }
         });
     }
@@ -656,6 +732,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     if (resObj.geterror().equals("false")) {
                         if (dialog.isShowing()) {
                             dialog.dismiss();
+                            db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[] {pedidoID});
                         }
                     }
                     if (resObj.geterror().equals("true")) {
@@ -778,6 +855,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 }
         }
     }
+
     public String getRealPathFromURI(Uri contentUri) {
         String[] proj = { MediaStore.Images.Media.DATA };
         Cursor cursor = getActivity().managedQuery(contentUri, proj, null, null, null);
@@ -1069,6 +1147,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 adapter = new ProductoAdapter(Arrays.asList(productos), getActivity(), getFragmentManager(), pendiente);
                 recyclerViewProductos.setAdapter(adapter);
             }
+        }else {
+            strTotal = String.valueOf(0);
+            textViewTotal.setText("Total $:" + 0);
+
+            adapter = new ProductoAdapter(null, getActivity(), getFragmentManager(), pendiente);
+            recyclerViewProductos.setAdapter(adapter);
         }
     }
 

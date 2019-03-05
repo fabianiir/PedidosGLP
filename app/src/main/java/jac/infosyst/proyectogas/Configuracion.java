@@ -124,49 +124,52 @@ public class Configuracion extends AppCompatActivity {
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
-
-        Base_Url = dominio + "glpservices/webresources/glpservices/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Base_Url)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+        try{
+            Base_Url = dominio + "glpservices/webresources/glpservices/";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(Base_Url)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
 
             //Defining retrofit api service
             ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-        Call call = service.registroConfiguracion(dominio, telefono);
+            Call call = service.registroConfiguracion(dominio, telefono);
 
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if(response.isSuccessful()) {
-                    progressDialog.dismiss();
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                    sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
-                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-                    /*primera vez */
-                    ContentValues values = new ContentValues();
-                    values.put("oid", resObj.getConfiguracion_id());
-                    values.put("ip", dominio);
-                    values.put("telefono", telefono);
-                    values.put("imei", ObtenerIMEI());
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if(response.isSuccessful()) {
+                        progressDialog.dismiss();
+                        ObjetoRes resObj = (ObjetoRes) response.body();
+                        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        /*primera vez */
+                        ContentValues values = new ContentValues();
+                        values.put("oid", resObj.getConfiguracion_id());
+                        values.put("ip", dominio);
+                        values.put("telefono", telefono);
+                        values.put("imei", ObtenerIMEI());
 
-                    db.insert(SQLiteDBHelper.Config_Table, null, values);
-                //poner if de la primera vez
-                ((Sessions)getApplication()).setStrDominio(dominio);
+                        db.insert(SQLiteDBHelper.Config_Table, null, values);
+                        //poner if de la primera vez
+                        ((Sessions)getApplication()).setStrDominio(dominio);
 
-                Intent intent = new Intent(Configuracion.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                        Intent intent = new Intent(Configuracion.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                progressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), "nnn:" +  t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "error al insertar configuracion", Toast.LENGTH_LONG).show();
+                }
+            });
+        }catch (Exception ex){
+            Toast.makeText(getApplicationContext(), "URL no valido", Toast.LENGTH_LONG).show();
+        }
     }
 
 

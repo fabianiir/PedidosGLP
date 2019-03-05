@@ -86,19 +86,21 @@ public interface ServicioUsuario {
   @POST("bitacora/")
   Call<ObjetoRes> bitacora(
           @Field("evento") boolean evento,
-          @Field("emai") String emai,
-                  @Field("chofer_id") String chofer_id,
-                  @Field("camion_id") String camion_id,
-                  @Field("token") String token
+          @Field("imei") String emai,
+          @Field("chofer_id") String chofer_id,
+          @Field("camion_id") String camion_id,
+          @Field("token") String token,
+          @Field("Fire_token") String fireToken
   );
 
   @FormUrlEncoded
   @POST("bitacora")
   Call<ObjetoRes> bitacoraOperador(
           @Field("evento") boolean evento,
-          @Field("emai") String emai,
+          @Field("imei") String emai,
           @Field("chofer_id") String chofer_id,
-          @Field("token") String token
+          @Field("token") String token,
+          @Field("Fire_token") String fireToken
   );
 
 
