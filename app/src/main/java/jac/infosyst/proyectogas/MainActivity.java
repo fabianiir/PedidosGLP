@@ -37,21 +37,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.sql.Time;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import jac.infosyst.proyectogas.ImpresoraBluetooth.UnicodeFormatter;
-import jac.infosyst.proyectogas.adaptadores.PedidoAdapter;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
 import jac.infosyst.proyectogas.fragments.OperadorFragment;
 import jac.infosyst.proyectogas.modelo.Camion;
@@ -197,6 +191,9 @@ public class MainActivity extends AppCompatActivity
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
 
+
+
+//region Ejecucion hilo Impresora
             //region Ejecucion hilo Impresora
             new Thread(new Runnable() {
                 @Override

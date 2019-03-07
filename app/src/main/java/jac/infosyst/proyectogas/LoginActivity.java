@@ -97,6 +97,10 @@ public class LoginActivity extends AppCompatActivity{
 
 
 
+
+
+
+
               //Obtiene Token del dispositivo
                 Log.w("tokenFire",FirebaseInstanceId.getInstance().getToken());
                 ((Sessions) getApplication()).setStrFireTOken(FirebaseInstanceId.getInstance().getToken());
