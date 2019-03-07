@@ -623,7 +623,7 @@ public class MainActivity extends AppCompatActivity
                                                                         Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 } else {
-                                                                    Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(getApplicationContext(), "No hay pedidos nuevos!", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             } else {
                                                                 Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
@@ -1012,7 +1012,7 @@ public class MainActivity extends AppCompatActivity
                                         Toast.makeText(getApplicationContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Toast.makeText(getApplicationContext(), "no datos!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "No hay pedidos nuevos!", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();

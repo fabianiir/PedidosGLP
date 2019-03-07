@@ -247,6 +247,38 @@ public class PedidosFragment extends Fragment implements LocationListener {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        if (tipoPedidos == 0){
+            try {
+                guardar_pedidos_productos();
+                obtener_pedidos();
+                actualizarPedidosPendientes();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else if(tipoPedidos == 1){
+            actualizarPedidosSurtidos();
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        if (tipoPedidos == 0){
+            try {
+                guardar_pedidos_productos();
+                obtener_pedidos();
+                actualizarPedidosPendientes();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else if(tipoPedidos == 1){
+            actualizarPedidosSurtidos();
+        }
+        super.onStart();
+    }
+
     public void obtener_pedidos(){
 
         Toast.makeText(getContext(), "Actualizando...", Toast.LENGTH_SHORT).show();
@@ -653,7 +685,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                             Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getActivity(), "no datos!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "No hay pedidos surtidos!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();

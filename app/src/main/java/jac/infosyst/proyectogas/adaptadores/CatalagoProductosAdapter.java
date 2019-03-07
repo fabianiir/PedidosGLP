@@ -211,7 +211,6 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
         ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
         Call call = service.sumarProducto(cantidad, precio, pedidoId, productoId, ((Sessions)mCtx.getApplicationContext()).getsessToken());
-
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
@@ -237,52 +236,60 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                             for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
                                 CantidadSuma = Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))) + cantidad;
                             }
-                            ContentValues values = new ContentValues();
-                            values.put("oid", random());
-                            values.put("cantidad", CantidadSuma);
-                            values.put("surtido", true);
-                            values.put("precio", precio);
-                            values.put("pedido_id", pedidoId);
-                            values.put("producto_id", productoId);
-                            db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
 
                             sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
                             cursorPr = db.rawQuery(sql, null);
 
                             for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
-                                values = new ContentValues();
-                                values.put("oid", random());
+                                int precioMult = CantidadSuma * Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("precio_unitario")));
+
+                                ContentValues values = new ContentValues();
+                                values.put("oid", resObj.getMessage());
                                 values.put("cantidad", CantidadSuma);
                                 values.put("surtido", true);
-                                values.put("precio", precio);
+                                values.put("precio", precioMult);
+                                values.put("pedido_id", pedidoId);
+                                values.put("producto_id", productoId);
+                                db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
+                                values = new ContentValues();
+                                values.put("oid", resObj.getMessage());
+                                values.put("cantidad", CantidadSuma);
+                                values.put("surtido", true);
+                                values.put("precio", precioMult);
                                 values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
                                 values.put("pedido", pedidoId);
                                 db.update(SQLiteDBHelper.Productos_Table, values, "pedido = ? AND descripcion = ?", new String[] { pedidoId, descripcion });
                             }
                         }else {
-                            ContentValues values = new ContentValues();
-                            values.put("oid", random());
-                            values.put("cantidad", cantidad);
-                            values.put("surtido", true);
-                            values.put("precio", precio);
-                            values.put("pedido_id", pedidoId);
-                            values.put("producto_id", productoId);
-                            db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+                            int CantidadSuma = 0;
+                            for (cursorFr.moveToFirst(); !cursorFr.isAfterLast(); cursorFr.moveToNext()) {
+                                CantidadSuma = cantidad;
+                                int precioMult = CantidadSuma * Integer.parseInt(cursorFr.getString(cursorFr.getColumnIndex("precio_unitario")));
 
-                            sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
-                            cursorPr = db.rawQuery(sql, null);
-
-                            for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
-                                values = new ContentValues();
-                                values.put("oid", random());
+                                ContentValues values = new ContentValues();
+                                values.put("oid", resObj.getMessage());
                                 values.put("cantidad", cantidad);
                                 values.put("surtido", true);
-                                values.put("precio", precio);
-                                values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
-                                values.put("pedido", pedidoId);
-                            }
+                                values.put("precio", precioMult);
+                                values.put("pedido_id", pedidoId);
+                                values.put("producto_id", productoId);
+                                db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
 
-                            db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                                sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                                cursorPr = db.rawQuery(sql, null);
+
+                                values = new ContentValues();
+                                values.put("oid", resObj.getMessage());
+                                values.put("cantidad", cantidad);
+                                values.put("surtido", true);
+                                values.put("precio", precioMult);
+                                values.put("descripcion", cursorFr.getString(cursorFr.getColumnIndex("descripcion")));
+                                values.put("pedido", pedidoId);
+
+                                db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                            }
                         }
                         Toast.makeText(mCtx, "Producto agregado." , Toast.LENGTH_SHORT).show();
                     } else {
@@ -299,64 +306,73 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                 SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
                 String sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
                 Cursor cursorFr = db.rawQuery(sql, null);
-
+                String descripcion = "";
                 Cursor cursorPr = db.rawQuery(sql, null);
-
-                for (cursorFr.moveToFirst(); !cursorFr.isAfterLast(); cursorFr.moveToNext()) {
-                    sql = "SELECT * FROM productos WHERE pedido = '" + pedidoId + "' AND detalle = '" + cursorPr.getString(cursorPr.getColumnIndex("descripcion")) + "'";
-                    cursorPr = db.rawQuery(sql, null);
+                if (cursorFr.getCount() > 0) {
+                    for (cursorFr.moveToFirst(); !cursorFr.isAfterLast(); cursorFr.moveToNext()) {
+                        descripcion = cursorFr.getString(cursorPr.getColumnIndex("descripcion"));
+                        sql = "SELECT * FROM productos WHERE pedido = '" + pedidoId + "' AND descripcion = '" + cursorFr.getString(cursorPr.getColumnIndex("descripcion")) + "'";
+                        cursorPr = db.rawQuery(sql, null);
+                    }
                 }
                 if (cursorPr.getCount() > 0){
                     int CantidadSuma = 0;
                     for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
                         CantidadSuma = Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))) + cantidad;
                     }
-                    ContentValues values = new ContentValues();
-                    values.put("oid", random());
-                    values.put("cantidad", CantidadSuma);
-                    values.put("surtido", true);
-                    values.put("precio", precio);
-                    values.put("pedido_id", pedidoId);
-                    values.put("producto_id", productoId);
-                    db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
 
                     sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
                     cursorPr = db.rawQuery(sql, null);
 
                     for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                        int precioMult = CantidadSuma * Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("precio_unitario")));
+
+                        ContentValues values = new ContentValues();
+                        values.put("oid", random());
+                        values.put("cantidad", CantidadSuma);
+                        values.put("surtido", true);
+                        values.put("precio", precioMult);
+                        values.put("pedido_id", pedidoId);
+                        values.put("producto_id", productoId);
+                        db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+
                         values = new ContentValues();
                         values.put("oid", random());
                         values.put("cantidad", CantidadSuma);
                         values.put("surtido", true);
-                        values.put("precio", precio);
+                        values.put("precio", precioMult);
                         values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
                         values.put("pedido", pedidoId);
-                        db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                        db.update(SQLiteDBHelper.Productos_Table, values, "pedido = ? AND descripcion = ?", new String[] { pedidoId, descripcion });
                     }
                 }else {
-                    ContentValues values = new ContentValues();
-                    values.put("oid", random());
-                    values.put("cantidad", cantidad);
-                    values.put("surtido", true);
-                    values.put("precio", precio);
-                    values.put("pedido_id", pedidoId);
-                    values.put("producto_id", productoId);
-                    db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
+                    int CantidadSuma = 0;
+                    for (cursorFr.moveToFirst(); !cursorFr.isAfterLast(); cursorFr.moveToNext()) {
+                        int precioMult = CantidadSuma * Integer.parseInt(cursorFr.getString(cursorFr.getColumnIndex("precio_unitario")));
 
-                    sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
-                    cursorPr = db.rawQuery(sql, null);
+                        ContentValues values = new ContentValues();
+                        values.put("oid", random());
+                        values.put("cantidad", cantidad);
+                        values.put("surtido", true);
+                        values.put("precio", precioMult);
+                        values.put("pedido_id", pedidoId);
+                        values.put("producto_id", productoId);
+                        db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
 
-                    for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                        sql = "SELECT * FROM cat_productos WHERE oid = '" + productoId + "'";
+                        cursorPr = db.rawQuery(sql, null);
+
                         values = new ContentValues();
                         values.put("oid", random());
                         values.put("cantidad", cantidad);
                         values.put("surtido", true);
-                        values.put("precio", precio);
-                        values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
+                        values.put("precio", precioMult);
+                        values.put("descripcion", cursorFr.getString(cursorFr.getColumnIndex("descripcion")));
                         values.put("pedido", pedidoId);
-                    }
 
-                    db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                        db.insert(SQLiteDBHelper.Productos_Table, null, values);
+                    }
                 }
                 Toast.makeText(mCtx, "Producto agregado." , Toast.LENGTH_SHORT).show();
             }
