@@ -206,12 +206,18 @@ public class PedidosFragment extends Fragment implements LocationListener {
         btnImprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ReimpresionPedidoFragment rpf = new ReimpresionPedidoFragment(getActivity().getBaseContext());
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container_body, rpf);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                if(((Sessions)getActivity().getApplicationContext()).getSesIdPedido().equals("null")) {
+
+                    Toast.makeText(getActivity(),  "Debe seleccionar un Pedido!" , Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    ReimpresionPedidoFragment rpf = new ReimpresionPedidoFragment(getActivity().getBaseContext());
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.container_body, rpf);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
             }
         });
 

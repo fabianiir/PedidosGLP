@@ -128,8 +128,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         View rootView = inflater.inflate(R.layout.fragment_detalle_pedido, container, false);
         getLocation();
 
-
-
 // path to /data/data/yourapp/app_data/imageDir
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
@@ -152,9 +150,17 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             for (int i=0; i < producto.length; i++)
                 arrayListProductos.add(producto[i].getdescripcion() +
                 "\nCantidad: " + producto[i].getCantidad() + "\nPrecio: " + producto[i].getPrecio());
-        }else
-            arrayListProductos.add("N/A");
 
+            if(((Sessions)getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")){
+                arrayListProductos.add("Fuga");
+            }
+        }else {
+            if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
+                arrayListProductos.add("Fuga");
+            } else {
+                arrayListProductos.add("N/A");
+            }
+        }
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, arrayListProductos);
 
         listView = (ListView) rootView.findViewById(R.id.lvProductos);
@@ -183,9 +189,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         if(strFirma == null){
             strFirma = "N/A";
         }
-        if(strTotal == null){
-            strTotal = "N/A";
-        }
+
 
         textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
         textViewCliente.setText("Nombre: " + strCliente);
@@ -231,10 +235,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             }
         });
 
-
-
-
-
         btnComoLlegar = (Button) rootView.findViewById(R.id.btnComoLlegar);
         btnComoLlegar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,6 +255,16 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 }
             }
         });
+        if(strTotal.equals("0")){
+            btnSurtirPedido.setEnabled(false);
+        }else{
+            btnSurtirPedido.setEnabled(true);
+        }
+        if(strTotal == null){
+            btnSurtirPedido.setEnabled(false);
+        }else{
+            btnSurtirPedido.setEnabled(true);
+        }
         return rootView;
     }
 

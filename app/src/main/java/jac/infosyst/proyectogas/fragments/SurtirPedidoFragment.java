@@ -294,10 +294,28 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!signaturePad.isEmpty()) {
-                    mostrarConfirmacion("¿Desea Confirmar?");
-                } else {
-                    Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+                sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                String sqlValidación = "SELECT * FROM productos WHERE pedido = '" + pedidoID + "'";
+                Cursor cursorPr = db.rawQuery(sqlValidación, null);
+                if (cursorPr.getCount() > 0) {
+                    if (!signaturePad.isEmpty()) {
+                        mostrarConfirmacion("¿Desea Confirmar?");
+                    } else {
+                        Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Este pedido no contiene productos y no puede ser guardado")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
                 }
             }
         });
@@ -419,44 +437,49 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         fabRestarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                layout = layoutInflater.inflate(R.layout.layout_popup, null);
+                String producto = ((Sessions) getActivity().getApplicationContext()).getSesOidProducto();
+                if (producto != null) {
+                    LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    layout = layoutInflater.inflate(R.layout.layout_popup, null);
 
-                DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-                int width = displayMetrics.widthPixels;
-                int height = displayMetrics.heightPixels;
+                    DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+                    int width = displayMetrics.widthPixels;
+                    int height = displayMetrics.heightPixels;
 
-                layout.setVisibility(View.VISIBLE);
-                POPUP_WINDOW_CONFIRMACION = new PopupWindow(getContext());
-                POPUP_WINDOW_CONFIRMACION.setContentView(layout);
-                POPUP_WINDOW_CONFIRMACION.setWidth(width);
-                POPUP_WINDOW_CONFIRMACION.setHeight(height);
-                POPUP_WINDOW_CONFIRMACION.setFocusable(true);
+                    layout.setVisibility(View.VISIBLE);
+                    POPUP_WINDOW_CONFIRMACION = new PopupWindow(getContext());
+                    POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                    POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                    POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                    POPUP_WINDOW_CONFIRMACION.setFocusable(true);
 
-                POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
+                    POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
 
-                POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+                    POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
 
-                TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
-                txtMessage.setText("¿Desea eliminar este producto?");
+                    TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                    txtMessage.setText("¿Desea eliminar este producto?");
 
-                Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
-                btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        POPUP_WINDOW_CONFIRMACION.dismiss();
-                    }
-                });
+                    Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                    btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                        }
+                    });
 
-                Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
-                btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        restarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto());
-                        POPUP_WINDOW_CONFIRMACION.dismiss();
-                    }
-                });
+                    Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                    btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            restarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto());
+                            POPUP_WINDOW_CONFIRMACION.dismiss();
+                        }
+                    });
 
+                }else {
+                    Toast.makeText(getActivity(), "Debe de seleccionar un producto", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -622,6 +645,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     if(resObj.geterror().equals("false")) {
                         db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
                         db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
+                        ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                         getProductos(true);
                     } else {
                         Toast.makeText(getActivity(), resObj.getMessage()  , Toast.LENGTH_SHORT).show();
@@ -629,6 +653,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 } else {
                     db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
                     db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
+                    ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                     getProductos(true);
                 }
             }
@@ -646,6 +671,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
 
                 db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
+                ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                 getProductos(true);
             }
         });
@@ -715,7 +741,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void pedidoActualizarSurtido(){
-
         fabAgregarProducto.setEnabled(false);
         signaturePad.setEnabled(false);
         btnLimpiar.setEnabled(false);

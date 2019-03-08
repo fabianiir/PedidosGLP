@@ -42,8 +42,8 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
         }else{
             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
             final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Usuario_Table + "'");
             db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Usuario_Table + "'");
-            db.execSQL("DELETE FROM '" + SQLiteDBHelper.Pedidos_Table + "'");
             super.onBackPressed();
         }
     }

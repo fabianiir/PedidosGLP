@@ -191,8 +191,6 @@ public class MainActivity extends AppCompatActivity
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
 
-
-
 //region Ejecucion hilo Impresora
             //region Ejecucion hilo Impresora
             new Thread(new Runnable() {
@@ -767,7 +765,7 @@ public class MainActivity extends AppCompatActivity
                                     });
                                 } else {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                    builder.setMessage("El QR no es válido, la aplicación se cerrará")
+                                    builder.setMessage("El Tag del camión que está intentando ingresar no es válido, la aplicación se cerrará...")
                                             .setCancelable(false)
                                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
@@ -782,7 +780,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                builder.setMessage("El QR no es válido, la aplicación se cerrará")
+                                builder.setMessage("El Tag del camión que está intentando ingresar no es válido, la aplicación se cerrará...")
                                         .setCancelable(false)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
