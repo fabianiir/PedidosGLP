@@ -249,15 +249,6 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                                 values.put("cantidad", CantidadSuma);
                                 values.put("surtido", true);
                                 values.put("precio", precioMult);
-                                values.put("pedido_id", pedidoId);
-                                values.put("producto_id", productoId);
-                                db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
-
-                                values = new ContentValues();
-                                values.put("oid", resObj.getMessage());
-                                values.put("cantidad", CantidadSuma);
-                                values.put("surtido", true);
-                                values.put("precio", precioMult);
                                 values.put("descripcion", cursorPr.getString(cursorPr.getColumnIndex("descripcion")));
                                 values.put("pedido", pedidoId);
                                 db.update(SQLiteDBHelper.Productos_Table, values, "pedido = ? AND descripcion = ?", new String[] { pedidoId, descripcion });

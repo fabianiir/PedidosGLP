@@ -164,7 +164,7 @@ public class Configuracion extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, Throwable t) {
                     progressDialog.dismiss();
-                    Toast.makeText(getApplicationContext(), "error al insertar configuracion", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "No hay conexión a internet o la IP no es valida", Toast.LENGTH_LONG).show();
                 }
             });
         }catch (Exception ex){
@@ -267,20 +267,30 @@ public class Configuracion extends AppCompatActivity {
                             }else{
                                 sql = "SELECT * FROM " + SQLiteDBHelper.Usuario_Table;
                                 cursor = db.rawQuery(sql, null);
+                                sql = "SELECT placas FROM " + SQLiteDBHelper.Usuario_Table;
+                                Cursor cursor1 = db.rawQuery(sql, null);
                                 if(cursor.getCount() > 0){
-                                    boolean admin = false;
-                                    if (cursor.moveToFirst()) {
-                                         admin = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("admin")));
-                                    }
-                                    if(admin){
-                                        ((Sessions) getApplication()).setsesUsuarioRol("Admin");
+                                    cursor1.moveToFirst();
+                                    String placa = cursor1.getString(cursor1.getColumnIndex("placas"));
+                                    if(!placa.isEmpty()) {
+                                        boolean admin = false;
+                                        if (cursor.moveToFirst()) {
+                                            admin = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("admin")));
+                                        }
+                                        if (admin) {
+                                            ((Sessions) getApplication()).setsesUsuarioRol("Admin");
+                                        } else {
+                                            ((Sessions) getApplication()).setsesUsuarioRol("Operador");
+                                        }
+                                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                        intent.putExtra("User", true);
+                                        startActivity(intent);
+                                        finish();
                                     }else{
-                                        ((Sessions) getApplication()).setsesUsuarioRol("Operador");
+                                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+                                        finish();
                                     }
-                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                    intent.putExtra("User", true);
-                                    startActivity(intent);
-                                    finish();
                                 }else{
                                     Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                                     startActivity(intent);

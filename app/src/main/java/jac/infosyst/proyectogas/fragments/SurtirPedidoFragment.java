@@ -56,6 +56,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.CatalagoProductosAdapter;
@@ -418,7 +419,44 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         fabRestarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                restarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto());
+                LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                layout = layoutInflater.inflate(R.layout.layout_popup, null);
+
+                DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+                int width = displayMetrics.widthPixels;
+                int height = displayMetrics.heightPixels;
+
+                layout.setVisibility(View.VISIBLE);
+                POPUP_WINDOW_CONFIRMACION = new PopupWindow(getContext());
+                POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                POPUP_WINDOW_CONFIRMACION.setFocusable(true);
+
+                POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
+
+                POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+
+                TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                txtMessage.setText("¿Desea eliminar este producto?");
+
+                Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                    }
+                });
+
+                Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        restarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto());
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                    }
+                });
+
             }
         });
 
@@ -581,9 +619,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onResponse(Call call, Response response) {
                 if(response.isSuccessful()){
                     ObjetoRes resObj = (ObjetoRes) response.body();
-
                     if(resObj.geterror().equals("false")) {
-                        Toast.makeText(getActivity(), resObj.getMessage() , Toast.LENGTH_SHORT).show();
                         db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
                         db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                         getProductos(true);
