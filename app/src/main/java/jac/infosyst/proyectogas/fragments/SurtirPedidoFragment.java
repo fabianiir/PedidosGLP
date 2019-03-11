@@ -294,28 +294,40 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sqLiteDBHelper = new SQLiteDBHelper(getContext());
-                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-                String sqlValidación = "SELECT * FROM productos WHERE pedido = '" + pedidoID + "'";
-                Cursor cursorPr = db.rawQuery(sqlValidación, null);
-                if (cursorPr.getCount() > 0) {
+                if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
                     if (!signaturePad.isEmpty()) {
                         mostrarConfirmacion("¿Desea Confirmar?");
                     } else {
                         Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
                     }
-                }else{
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Este pedido no contiene productos y no puede ser guardado")
-                            .setCancelable(false)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                } else {
+                    if (strTotal != "0") {
+                        sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        String sqlValidación = "SELECT * FROM productos WHERE pedido = '" + pedidoID + "'";
+                        Cursor cursorPr = db.rawQuery(sqlValidación, null);
+                        if (cursorPr.getCount() > 0) {
+                            if (!signaturePad.isEmpty()) {
+                                mostrarConfirmacion("¿Desea Confirmar?");
+                            } else {
+                                Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setMessage("Este pedido no contiene productos y no puede ser guardado")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
 
-                                }
-                            });
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
 
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "No puede surtir el pedido sy el total es \"0\" ", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -643,7 +655,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 if(response.isSuccessful()){
                     ObjetoRes resObj = (ObjetoRes) response.body();
                     if(resObj.geterror().equals("false")) {
-                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                        ContentValues values = new ContentValues();
+                        values.put("surtido", 1);
+                        db.update(SQLiteDBHelper.Productos_Mod_Table, values,"oid = ?", new String[]{idProducto});
                         db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                         ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                         getProductos(true);
@@ -651,7 +665,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         Toast.makeText(getActivity(), resObj.getMessage()  , Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{idProducto});
+                    ContentValues values = new ContentValues();
+                    values.put("surtido", 1);
+                    db.update(SQLiteDBHelper.Productos_Mod_Table, values,"oid = ?", new String[]{idProducto});
                     db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                     ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                     getProductos(true);
@@ -659,16 +675,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
                 sqLiteDBHelper = new SQLiteDBHelper(getActivity());
                 SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 values.put("oid", idProducto);
                 values.put("cantidad", cantidad);
-                values.put("surtido", false);
+                values.put("surtido", 0);
                 values.put("precio", precio);
                 db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
 
                 db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                 ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
@@ -999,10 +1013,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         }
     }
 
-    public void putImageFirma(){
+    public void putImageFirma() {
         //encode image to base64 string
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if(!signaturePad.isEmpty()) {
+        if (!signaturePad.isEmpty()) {
             Bitmap bitmap = signaturePad.getSignatureBitmap();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
@@ -1065,7 +1079,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
 
                         db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
-                    }else{
+                    } else {
 
                         ContentValues values = new ContentValues();
                         values.put("oid", pedidoID);
@@ -1086,8 +1100,93 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     }
                 }
             });
-        }else{
+        } else {
             Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+        }
+        if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
+            Bitmap bitmap = thumbnail;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+            byte[] imageBytes = baos.toByteArray();
+            final String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+            BASEURL = strIP + "glpservices/webresources/glpservices/";
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(BASEURL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+            Call call = service.in_foto(pedidoID, imageString, 4, strtoken);
+
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    if (response.isSuccessful()) {
+                        ObjetoRes resObj = (ObjetoRes) response.body();
+                        if (resObj.geterror().equals("false")) {
+                        } else {
+                            Toast.makeText(getActivity(), "No fue posible guardar la foto de la incidencia", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                    String hora = timeFormat.format(calendar.getTime());
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    java.util.Date date = new Date();
+                    String fecha = dateFormat.format(date);
+
+                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
+
+                    String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+
+                    Cursor record = db.rawQuery(sql, null);
+
+                    if (record.getCount() > 0) {
+                        ContentValues values = new ContentValues();
+                        values.put("oid", pedidoID);
+                        values.put("hora", hora);
+                        values.put("fecha", fecha);
+                        values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
+                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                        values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
+                        values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
+                        values.put("estatus_id", record.getString(record.getColumnIndex("estatus_id")));
+                        values.put("firma",  record.getString(record.getColumnIndex("firma")));
+                        values.put("foto_fuga",imageString);
+                        values.put("clave", record.getString(record.getColumnIndex("clave")));
+                        db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
+
+                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                    } else {
+
+                        ContentValues values = new ContentValues();
+                        values.put("oid", pedidoID);
+                        values.put("hora", hora);
+                        values.put("fecha", fecha);
+                        values.put("comentario_chofer", "");
+                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                        values.put("pago_id", "");
+                        values.put("motivo_cancelacion_id", "");
+                        values.put("estatus_id", "");
+                        values.put("firma", imageString);
+                        values.put("foto_fuga", "");
+                        values.put("clave", "");
+                        db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+
+                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+
+                    }
+                }
+            });
         }
     }
 

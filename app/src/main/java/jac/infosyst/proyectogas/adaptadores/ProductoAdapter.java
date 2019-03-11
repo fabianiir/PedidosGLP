@@ -103,7 +103,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                 sqLiteDBHelper = new SQLiteDBHelper(mCtx);
                 SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-                String sql3 = "SELECT * FROM productos";
+                String sql3 = "SELECT * FROM productos WHERE oid = '" + strIdProducto + "'";
 
                 Cursor cursor3 = db.rawQuery(sql3, null);
                 String descripcion = "";
@@ -112,7 +112,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                     descripcion = cursor3.getString(cursor3.getColumnIndex("descripcion"));
                 }
 
-                Toast.makeText(mCtx, "Producto selecciono: " + descripcion, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mCtx, "Producto seleccionado: " + descripcion, Toast.LENGTH_SHORT).show();
             }
         });
         holder.btnRestarProducto.setOnClickListener(new View.OnClickListener() {

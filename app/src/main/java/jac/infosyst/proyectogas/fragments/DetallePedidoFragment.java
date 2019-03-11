@@ -3,7 +3,9 @@ package jac.infosyst.proyectogas.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -20,16 +22,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.modelo.Producto;
@@ -73,6 +79,8 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
     Bitmap bitmap;
 
+    private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
+    View layout;
 
     // Creating Separate Directory for saving Generated Images
     String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/firmas/";
@@ -128,6 +136,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         View rootView = inflater.inflate(R.layout.fragment_detalle_pedido, container, false);
         getLocation();
 
+        MainActivity.setFragmentController(1);
 // path to /data/data/yourapp/app_data/imageDir
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
@@ -255,15 +264,55 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 }
             }
         });
+
         if(strTotal.equals("0")){
-            btnSurtirPedido.setEnabled(false);
+            if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
+            } else {
+
+                LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                layout = layoutInflater.inflate(R.layout.layout_popup, null);
+
+                DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+                int width = displayMetrics.widthPixels;
+                int height = displayMetrics.heightPixels;
+
+                layout.setVisibility(View.VISIBLE);
+                POPUP_WINDOW_CONFIRMACION = new PopupWindow(getContext());
+                POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                POPUP_WINDOW_CONFIRMACION.setFocusable(true);
+
+                POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
+
+                POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+
+                TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                txtMessage.setText("Este pedido tiene productos. ¿Desea surtirlo?");
+
+                Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PedidosFragment rpf = new PedidosFragment();
+                        FragmentManager fragmentManager = getFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.container_body, rpf);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                    }
+                });
+
+                Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                    }
+                });
+            }
         }else{
-            btnSurtirPedido.setEnabled(true);
-        }
-        if(strTotal == null){
-            btnSurtirPedido.setEnabled(false);
-        }else{
-            btnSurtirPedido.setEnabled(true);
         }
         return rootView;
     }

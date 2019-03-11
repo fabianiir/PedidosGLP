@@ -357,6 +357,89 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 values.put("tipo_pedido", pedido.gettipo_pedido());
                                 values.put("forma_pago", pedido.getForma_pago());
                                 values.put("estatus", pedido.getestatus());
+                                values.put("surtido", 0);
+                                db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
+
+                                if (pedido.getHobbies() != null) {
+
+                                    List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+
+                                    for (Producto producto : listproductos) {
+                                        ContentValues valuesProd = new ContentValues();
+                                        valuesProd.put("oid", producto.getOidProducto());
+                                        valuesProd.put("cantidad", producto.getCantidad());
+                                        valuesProd.put("surtido", producto.getsurtido());
+                                        valuesProd.put("precio", producto.getPrecio());
+                                        valuesProd.put("descripcion", producto.getdescripcion());
+                                        valuesProd.put("pedido", pedido.getOid());
+                                        db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
+                                    }
+                                }
+                                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                                String sql = "SELECT * FROM pedidos_modificados";
+                                Cursor record = db.rawQuery(sql, null);
+                                if(record.getCount()>0) {
+                                    for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+                                        try {
+                                            db.delete(SQLiteDBHelper.Pedidos_Table,"oid = ?", new String[] {record.getString(record.getColumnIndex("oid"))});
+                                        }catch(Exception ex){
+
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "error! ", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(getContext(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+            }
+        });
+        call = service.getPedidos(oid, "Surtido", token);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if (resObj.geterror().equals("false")) {
+                        if (resObj.getpedido() != null) {
+                            List<Pedido> list = Arrays.asList(resObj.getpedido());
+                            for (Pedido pedido : list) {
+                                ContentValues values = new ContentValues();
+                                values.put("oid", pedido.getOid());
+                                String datetime = pedido.getfechaprogramada();
+                                datetime.replace('T', ' ');
+                                values.put("fecha_hora_programada", datetime);
+                                values.put("cliente", pedido.getcliente());
+                                values.put("direccion", pedido.getdireccion());
+                                values.put("cp", pedido.getcp());
+                                values.put("telefono", pedido.gettelefono());
+                                values.put("lat", pedido.getubicacion_lat());
+                                values.put("lon", pedido.getubicacion_long());
+                                values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                if (pedido.getsuma_iva() == null) {
+                                    values.put("suma_iva", 0);
+                                } else {
+                                    values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
+                                }
+                                if (pedido.gettotal() == null) {
+                                    values.put("total", 0);
+                                } else {
+                                    values.put("total", Double.parseDouble(pedido.gettotal()));
+                                }
+                                values.put("empresa", pedido.getEmpresa());
+                                values.put("tipo_pedido", pedido.gettipo_pedido());
+                                values.put("forma_pago", pedido.getForma_pago());
+                                values.put("estatus", pedido.getestatus());
+                                values.put("surtido", 1);
                                 db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
 
                                 if (pedido.getHobbies() != null) {
@@ -429,7 +512,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
 
-        String sqlPedido = "SELECT * FROM pedidos";
+        String sqlPedido = "SELECT * FROM pedidos WHERE surtido = 0";
 
         Cursor cursor = db.rawQuery(sqlPedido, null);
 
@@ -505,7 +588,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
         recyclerViewPedidos.setAdapter(adapter);
     }
 
-    String oid2[] = new  String[100];
     public void guardar_pedidos_productos(){
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM pedidos_modificados";
@@ -529,7 +611,49 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
                 ServicioUsuario userService = retrofit.create(ServicioUsuario.class);
 
-                Call call = userService.up_pedido(record.getString(record.getColumnIndex("oid")),
+                Call  call = userService.in_foto(record.getString(record.getColumnIndex("oid")),
+                        record.getString(record.getColumnIndex("firma")),
+                        3, strtoken);
+
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        if (response.isSuccessful()) {
+                            ObjetoRes resObj = (ObjetoRes) response.body();
+                            if (resObj.geterror().equals("false")) {
+                            } else {
+                            }
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+
+                    }
+                });
+
+                if  (!record.getString(record.getColumnIndex("foto_fuga")).isEmpty()){
+                    call = userService.in_foto(record.getString(record.getColumnIndex("oid")),
+                            record.getString(record.getColumnIndex("foto_fuga")),
+                            4, strtoken);
+
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            if (response.isSuccessful()) {
+                                ObjetoRes resObj = (ObjetoRes) response.body();
+                                if (resObj.geterror().equals("false")) {
+                                } else {
+                                }
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+
+                        }
+                    });
+                }
+
+                call = userService.up_pedido(record.getString(record.getColumnIndex("oid")),
                         record.getString(record.getColumnIndex("hora")),
                         record.getString(record.getColumnIndex("fecha")),
                         "",
@@ -592,9 +716,10 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }
 
                 ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-                if(Boolean.getBoolean(record.getString(record.getColumnIndex("surtido")))){
-                    oid2[j] = record.getString(record.getColumnIndex("oid"));
-                    Call call = service.sumarProducto(Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
+                String prueba = record.getString(record.getColumnIndex("surtido"));
+                if(prueba.equals("1")){
+                    Call call = service.sumarProducto(record.getString(record.getColumnIndex("oid")),
+                            Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
                             Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
                             record.getString(record.getColumnIndex("pedido_id")),
                             record.getString(record.getColumnIndex("producto_id")),
@@ -602,12 +727,62 @@ public class PedidosFragment extends Fragment implements LocationListener {
                     call.enqueue(new Callback() {
                         @Override
                         public void onResponse(Call call, Response response) {
-                            for(int i = 0;i < oid2.length; i++) {
-                                try{
-                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{oid2[i]});
-                                }catch(Exception e)
-                                {
+                            if (response.isSuccessful()) {
+                                ObjetoRes resObj = (ObjetoRes) response.body();
+                                if (resObj.geterror().equals("false")) {
+                                    String token = "";
+                                    String sql = "SELECT * FROM usuario";
+                                    Cursor recordUss = db.rawQuery(sql, null);
 
+                                    if (recordUss.moveToFirst()) {
+                                        token = recordUss.getString(recordUss.getColumnIndex("token"));
+                                    }
+
+                                    BASEURL = strIP + "glpservices/webresources/glpservices/";
+                                    Retrofit retrofit = new Retrofit.Builder()
+                                            .baseUrl(BASEURL)
+                                            .addConverterFactory(GsonConverterFactory.create())
+                                            .build();
+
+                                    sql = "SELECT * FROM " + SQLiteDBHelper.Productos_Mod_Table + " WHERE oid = '" + resObj.geteraseoid() + "'";
+                                    Cursor record = db.rawQuery(sql, null);
+                                    if (record.getCount() > 1) {
+                                        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+                                        for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+                                            String prueba = record.getString(record.getColumnIndex("surtido"));
+                                            if (prueba.equals("1")) {
+                                                call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), true,
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                                                        token);
+                                            } else {
+                                                call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), false,
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                                                        token);
+                                            }
+
+                                            call.enqueue(new Callback() {
+                                                @Override
+                                                public void onResponse(Call call, Response response) {
+                                                    if (response.isSuccessful()) {
+                                                        ObjetoRes resObj = (ObjetoRes) response.body();
+                                                        if (resObj.geterror().equals("false")) {
+                                                            db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.geteraseoid()});
+                                                            db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call call, Throwable t) {
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.geteraseoid()});
+                                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                    }
                                 }
                             }
                         }
@@ -618,21 +793,21 @@ public class PedidosFragment extends Fragment implements LocationListener {
                     });
                 }else {
                     Call call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
-                            Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), false,
-                            Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
-                            token);
+                                             Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), Boolean.parseBoolean(record.getString(record.getColumnIndex("surtido"))),
+                                             Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                                     token);
                     call.enqueue(new Callback() {
-                        @Override
-                        public void onResponse(Call call, Response response) {
-                            if (response.isSuccessful()) {
-                                ObjetoRes resObj = (ObjetoRes) response.body();
-                                if (resObj.geterror().equals("false")) {
-                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
-                                }
-                            }
-                        }
+                                         @Override
+                                         public void onResponse(Call call, Response response) {
+                                             if (response.isSuccessful()) {
+                                                 ObjetoRes resObj = (ObjetoRes) response.body();
+                                                 if (resObj.geterror().equals("false")) {
+                                                     db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                                 }
+                                             }
+                                         }
 
-                        @Override
+                                         @Override
                         public void onFailure(Call call, Throwable t) {
 
                         }
@@ -660,7 +835,11 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+        final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
         Call call;
+
+        boolean admin = false;
+
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -673,35 +852,81 @@ public class PedidosFragment extends Fragment implements LocationListener {
             strchofer = cursor3.getString(cursor3.getColumnIndex("oid"));
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-        call = service.getPedidos(strchofer, "Surtido", strtoken);
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) {
-                    ObjetoRes resObj = (ObjetoRes) response.body();
 
-                    if (resObj.geterror().equals("false")) {
+        String sqlPedido = "SELECT * FROM pedidos WHERE surtido = 1";
 
-                        if (resObj.getpedido() != null) {
-                            adapter = new PedidoAdapter(Arrays.asList(resObj.getpedido()), getActivity(), getFragmentManager());
-                            recyclerViewPedidos.setAdapter(adapter);
+        Cursor cursor = db.rawQuery(sqlPedido, null);
 
-                        } else {
-                            Toast.makeText(getActivity(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "No hay pedidos surtidos!", Toast.LENGTH_SHORT).show();
+        Pedido[] pedidos = new Pedido[cursor.getCount()];
+        int i = 0;
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            String sqlProducto = "SELECT * FROM productos WHERE pedido = '" + cursor.getString(cursor.getColumnIndex("oid")) + "'";
+            Cursor cursorPr = db.rawQuery(sqlProducto, null);
+            if(cursorPr.getCount() > 0) {
+                Producto[] productos = new Producto[cursorPr.getCount()];
+                int j = 0;
+                for (cursorPr.moveToFirst(); !cursorPr.isAfterLast(); cursorPr.moveToNext()) {
+                    Producto producto = new Producto(cursorPr.getString(cursorPr.getColumnIndex("oid")),
+                            Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))),
+                            Boolean.parseBoolean(cursorPr.getString(cursorPr.getColumnIndex("surtido"))),
+                            Double.parseDouble(cursorPr.getString(cursorPr.getColumnIndex("precio"))),
+                            cursorPr.getString(cursorPr.getColumnIndex("descripcion")),
+                            cursorPr.getString(cursorPr.getColumnIndex("pedido")));
+                    if (producto != null) {
+                        productos[j] = producto;
                     }
-                } else {
-                    Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
+                    j++;
                 }
+                Pedido pedido = new Pedido(cursor.getString(cursor.getColumnIndex("oid")),
+                        "",
+                        "",
+                        cursor.getString(cursor.getColumnIndex("fecha_hora_programada")),
+                        cursor.getString(cursor.getColumnIndex("cliente")),
+                        cursor.getString(cursor.getColumnIndex("direccion")),
+                        cursor.getString(cursor.getColumnIndex("cp")),
+                        cursor.getString(cursor.getColumnIndex("telefono")),
+                        cursor.getString(cursor.getColumnIndex("comentario_cliente")),
+                        cursor.getString(cursor.getColumnIndex("suma_iva")),
+                        cursor.getString(cursor.getColumnIndex("total")),
+                        cursor.getString(cursor.getColumnIndex("tipo_pedido")),
+                        cursor.getString(cursor.getColumnIndex("estatus")), productos,
+                        cursor.getString(cursor.getColumnIndex("lat")),
+                        cursor.getString(cursor.getColumnIndex("lon")),
+                        cursor.getString(cursor.getColumnIndex("empresa")),
+                        cursor.getString(cursor.getColumnIndex("forma_pago")));
+                if (pedido != null) {
+                    pedidos[i] = pedido;
+                }
+                i++;
+            }else{
+                Pedido pedido = new Pedido(cursor.getString(cursor.getColumnIndex("oid")),
+                        "",
+                        "",
+                        cursor.getString(cursor.getColumnIndex("fecha_hora_programada")),
+                        cursor.getString(cursor.getColumnIndex("cliente")),
+                        cursor.getString(cursor.getColumnIndex("direccion")),
+                        cursor.getString(cursor.getColumnIndex("cp")),
+                        cursor.getString(cursor.getColumnIndex("telefono")),
+                        cursor.getString(cursor.getColumnIndex("comentario_cliente")),
+                        cursor.getString(cursor.getColumnIndex("suma_iva")),
+                        cursor.getString(cursor.getColumnIndex("total")),
+                        cursor.getString(cursor.getColumnIndex("tipo_pedido")),
+                        cursor.getString(cursor.getColumnIndex("estatus")), null,
+                        cursor.getString(cursor.getColumnIndex("lat")),
+                        cursor.getString(cursor.getColumnIndex("lon")),
+                        cursor.getString(cursor.getColumnIndex("empresa")),
+                        cursor.getString(cursor.getColumnIndex("forma_pago")));
+                if (pedido != null) {
+                    pedidos[i] = pedido;
+                }
+                i++;
             }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        }
+
+        cursor.close();
+
+        adapter = new PedidoAdapter(Arrays.asList(pedidos),getActivity(), getFragmentManager());
+        recyclerViewPedidos.setAdapter(adapter);
     }
 
         @Override
@@ -723,8 +948,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
     @Override
     public void onProviderEnabled(String provider) {
     }
-
-
 
     @Override
     public void onAttach(Activity activity) {

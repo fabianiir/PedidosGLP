@@ -22,6 +22,16 @@ public class ObjetoRes {
         this.message = message;
     }
 
+    private String eraseoid;
+
+    public String geteraseoid() {
+        return eraseoid;
+    }
+
+    public void seteraseoid(String eraseoid) {
+        this.eraseoid = eraseoid;
+    }
+
     private String error;
 
     public String geterror() {
@@ -113,7 +123,6 @@ public class ObjetoRes {
     public Spinner[] getmotivoscancelacion() {
         return catalogo;
     }
-
 
     private int total;
 

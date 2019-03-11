@@ -141,6 +141,7 @@ public interface ServicioUsuario {
   @FormUrlEncoded
   @POST("detalle")
   Call<ObjetoRes> sumarProducto(
+          @Field("oid") String oid,
           @Field("cantidad") int cantidad,
           @Field("precio") int precio,
           @Field("pedido_id") String pedido_id,

@@ -581,6 +581,7 @@ public class MainActivity extends AppCompatActivity
                                                                             values.put("lat", pedido.getubicacion_lat());
                                                                             values.put("lon", pedido.getubicacion_long());
                                                                             values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                                                            values.put("surtido", 0);
                                                                             if (pedido.getsuma_iva() == null) {
                                                                                 values.put("suma_iva", 0);
                                                                             } else {
@@ -1280,6 +1281,7 @@ public class MainActivity extends AppCompatActivity
                                 values.put("lat", pedido.getubicacion_lat());
                                 values.put("lon", pedido.getubicacion_long());
                                 values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                values.put("surtido", 0);
                                 if (pedido.getsuma_iva() == null) {
                                     values.put("suma_iva", 0);
                                 } else {
@@ -1423,7 +1425,7 @@ public class MainActivity extends AppCompatActivity
                 ServicioUsuario service = retrofit.create(ServicioUsuario.class);
                 if(Boolean.getBoolean(record.getString(record.getColumnIndex("surtido")))){
                     oid2[j] = record.getString(record.getColumnIndex("oid"));
-                    Call call = service.sumarProducto(Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
+                    Call call = service.sumarProducto(null, Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
                             Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
                             record.getString(record.getColumnIndex("pedido_id")),
                             record.getString(record.getColumnIndex("producto_id")),

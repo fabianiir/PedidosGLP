@@ -95,6 +95,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
     private static final String Pedidos_Colum13 = "tipo_pedido";
     private static final String Pedidos_Colum14 = "forma_pago";
     private static final String Pedidos_Colum15 = "estatus";
+    private static final String Pedidos_Colum16 = "surtido";
     //endregion
 
     //region Pedidos_Mod
@@ -167,7 +168,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
                 Usuario_Colum4 + " TEXT, " +
                 Usuario_Colum5 + " TEXT, " +
                 Usuario_Colum6 + " TEXT, " +
-                Usuario_Colum7 + " BOOLEAN" +
+                Usuario_Colum7 + " Integer" +
                 ")";
         db.execSQL(createUsuario_Table);
 
@@ -207,7 +208,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
                 Pedidos_Colum12 + " TEXT, " +
                 Pedidos_Colum13 + " TEXT, " +
                 Pedidos_Colum14 + " TEXT, " +
-                Pedidos_Colum15 + " TEXT" +
+                Pedidos_Colum15 + " TEXT, " +
+                Pedidos_Colum16 + " BOOLEAN" +
                 ")";
         db.execSQL(createPedidos_Table);
 
