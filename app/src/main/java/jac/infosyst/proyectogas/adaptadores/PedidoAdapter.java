@@ -2,6 +2,7 @@ package jac.infosyst.proyectogas.adaptadores;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
@@ -77,6 +78,14 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
 
         holder.textViewdetalleproducto.setText(pedido.getnombre());
         holder.textViewfirmaurl.setText(pedido.gettelefono());
+        holder.iconoPedido.setColorFilter(Color.BLUE);
+
+        if(pedido.gettipo_pedido().equals("Fuga"))
+        {
+            holder.iconoPedido.setColorFilter(Color.RED);
+
+        }
+
 
             if (pedido.getHobbies() != null) {
 
@@ -167,6 +176,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
         public TextView textViewdetalleproducto;
         public TextView textViewfirmaurl;
         public TextView textViewtotal;
+        public ImageView iconoPedido;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -177,7 +187,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
             textViewdetalleproducto = (TextView) itemView.findViewById(R.id.textViewdetalleproducto);
             textViewfirmaurl = (TextView) itemView.findViewById(R.id.textViewfirmaurl);
             textViewtotal = (TextView) itemView.findViewById(R.id.textViewtotal);
-
+            iconoPedido=(ImageView)itemView.findViewById(R.id.iconoPedido);
             parentLayout = itemView.findViewById(R.id.parent_layout);
             relativeRow = itemView.findViewById(R.id.relativeRow);
         }

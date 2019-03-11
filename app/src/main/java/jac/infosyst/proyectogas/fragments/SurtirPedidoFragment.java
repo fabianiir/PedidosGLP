@@ -746,6 +746,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         btnLimpiar.setEnabled(false);
         btnGuardar.setEnabled(false);
         favplus.setEnabled(false);
+        imageViewIncidencia.setEnabled(false);
         getProductos(false);
 
 
@@ -1172,7 +1173,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         } else {
             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
             fabAgregarProducto.setEnabled(false);
-
+imageViewIncidencia.setEnabled(false);
             signaturePad.setEnabled(false);
             btnGuardar.setEnabled(false);
             btnLimpiar.setEnabled(false);

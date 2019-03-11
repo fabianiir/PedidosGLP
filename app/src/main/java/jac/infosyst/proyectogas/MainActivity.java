@@ -1511,7 +1511,7 @@ public class MainActivity extends AppCompatActivity
             {-*/
                // item.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_conection_enable));
 
-            Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_SHORT).show();
 
             return true;
         }
