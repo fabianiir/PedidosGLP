@@ -107,9 +107,9 @@
             <ImageView
                 android:id="@+id/imageViewIncidencia"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="42dp"
 
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="8dp"
                 android:cropToPadding="?android:attr/windowOverscan"
                 android:src="@drawable/ic_menu_camera"
                 android:theme="@style/AppTheme"
@@ -125,10 +125,10 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="128dp"
                     android:orientation="horizontal"
-                    tools:layout_editor_absoluteY="298dp"
-                    tools:ignore="MissingConstraints">
+                    tools:ignore="MissingConstraints"
+                    tools:layout_editor_absoluteY="298dp">
 
 
                     <android.support.v7.widget.RecyclerView
@@ -137,7 +137,7 @@
                         android:layout_height="match_parent">
 
                     </android.support.v7.widget.RecyclerView>
-<!--
+                    <!--
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/recyclerViewPedidosHide"
                         android:layout_width="match_parent"
@@ -170,7 +170,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 android:orientation="horizontal"
                 >
 
@@ -179,7 +179,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center"
-                    android:layout_margin="16dp"
+                    android:layout_margin="8dp"
                     android:src="@android:drawable/ic_delete"
                     android:tint="@color/BotonGris" />
 
@@ -188,7 +188,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center"
-                    android:layout_margin="@dimen/fab_margin"
+                    android:layout_margin="8dp"
                     android:src="@android:drawable/ic_input_add"
                     android:tint="@color/BotonGris" />
             </LinearLayout>
@@ -224,8 +224,8 @@
             <ImageView
                 android:id="@+id/imgFirma"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="204dp"
+                android:layout_marginTop="8dp"
                 android:src="@android:color/transparent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -234,8 +234,8 @@
             <com.github.gcacace.signaturepad.views.SignaturePad
                 android:id="@+id/signaturePad"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="202dp"
+                android:layout_marginTop="8dp"
                 android:background="@color/BotonGris"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -245,7 +245,7 @@
                 android:id="@+id/btnReimpresionTicket"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:background="@color/colorPrimary"
                 android:text="Reimpresion Ticket"
                 android:textColor="@color/BotonGris"
@@ -270,7 +270,7 @@
                 android:id="@+id/btnGuardar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:background="@color/BotonGris"
                 android:text="Guardar"
                 android:textColor="@color/colorPrimary"
@@ -282,7 +282,7 @@
                 android:id="@+id/btnLimpiarFirmar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:background="@color/colorPrimary"
                 android:text="Limpiar"
                 android:textColor="@color/BotonGris"

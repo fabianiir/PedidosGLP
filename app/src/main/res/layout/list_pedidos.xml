@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -11,12 +12,11 @@
         android:layout_margin="4dp">
 
         <RelativeLayout
+            android:id="@+id/relativeRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
-            android:id="@+id/relativeRow"
-            >
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/textViewCliente"
@@ -31,53 +31,68 @@
                 android:id="@+id/textViewDescripcion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
                 android:layout_weight="1"
                 android:text="Desc"
-                android:visibility="gone"
-                android:layout_centerHorizontal="true"/>
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/textViewEstatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_weight="0"
                 android:text="Pendiente"
-                android:layout_alignParentRight="true"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
             <TextView
                 android:id="@+id/textViewDireccion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/textViewCliente"
                 android:layout_weight="2"
-                android:text="Direccion"
-                android:layout_below="@id/textViewCliente"/>
+                android:text="Direccion" />
 
             <TextView
                 android:id="@+id/textViewdetalleproducto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:layout_below="@id/textViewEstatus"
                 android:text="Direccion"
-                android:layout_below="@id/textViewEstatus"/>
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/textViewfirmaurl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/textViewCliente"
                 android:layout_weight="2"
                 android:text="Direccion"
-                android:visibility="gone"
-                android:layout_below="@id/textViewCliente"/>
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/textViewtotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/textViewCliente"
                 android:layout_weight="2"
                 android:text="Direccion"
-                android:visibility="gone"
-                android:layout_below="@id/textViewCliente"/>
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iconoPedido"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewEstatus"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
+                app:srcCompat="@android:drawable/presence_invisible" />
 
 
         </RelativeLayout>
-
 
 
     </android.support.v7.widget.CardView>
