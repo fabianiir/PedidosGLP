@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -37,6 +39,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -185,26 +189,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     //endregion
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//region Ejecucion hilo Impresora
-        //region Ejecucion hilo Impresora
-        final Handler handlerImp = new Handler();
-        handlerImp.postDelayed(new Runnable() {
+
+        final Handler handlerim = new Handler();
+        handlerim.postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                while (!DispositivoEncontrado) {
-
-                    FindBluetoothDevice();
-                }
-
-                handlerImp.postDelayed(this, 5000);
+               FindBluetoothDevice();
+                handlerim.postDelayed(this, 60000);
             }
-        }, 5000);
-        //endregion
+        }, 5000);  //the time is in miliseconds
+
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
 
@@ -1702,7 +1703,7 @@ public class MainActivity extends AppCompatActivity
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
-                setDispositivoEncontrado(false);
+
             }
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -1720,6 +1721,9 @@ public class MainActivity extends AppCompatActivity
                         setDispositivoEncontrado(true);
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
+                    }
+                    else {
+                        setDispositivoEncontrado(false);
                     }
                 }
                 openBluetoothPrinter();
@@ -1876,13 +1880,16 @@ if(reImpresion){
                         + "            R E  I M P R E S I O N        \n";
 
             }
+            DecimalFormatSymbols separadoresPersonalizados = new DecimalFormatSymbols();
+            separadoresPersonalizados.setDecimalSeparator('.');
 
+            DecimalFormat formato1 = new DecimalFormat("#.##", separadoresPersonalizados);
             double subtotal = (Double.parseDouble(total)/1.16);
             double IVA = Double.parseDouble(total) - subtotal;
 
-            BILL = BILL + "                          SUBTOTAL:" + "   $" + String.valueOf(subtotal) + "\n";
-            BILL = BILL + "                            I.V.A.:" + "   $" + String.valueOf(IVA) + "\n";
-            BILL = BILL + "                             TOTAL:" + "   $" + String.valueOf(Double.parseDouble(total)) + "\n";
+            BILL = BILL + "                          SUBTOTAL:" + "   $" + String.valueOf(formato1.format(subtotal)) + "\n";
+            BILL = BILL + "                            I.V.A.:" + "   $" + String.valueOf(formato1.format(IVA)) + "\n";
+            BILL = BILL + "                             TOTAL:" + "   $" + String.valueOf(formato1.format(Double.parseDouble(total))) + "\n";
 
             BILL = BILL
                     + "-----------------------------------------------\n\n";
