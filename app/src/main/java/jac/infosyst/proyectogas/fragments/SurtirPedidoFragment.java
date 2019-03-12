@@ -295,10 +295,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
-                    if (!signaturePad.isEmpty()) {
-                        mostrarConfirmacion("¿Desea Confirmar?");
+                    if (thumbnail != null) {
+                        if (!signaturePad.isEmpty()) {
+                            mostrarConfirmacion("¿Desea Confirmar?");
+                        } else {
+                            Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Se debe de tomar la foto de la fuga", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     if (strTotal != "0") {
@@ -576,6 +580,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 putImageFirma();
+                dialog.setMax(10);
+                dialog.setMessage("Actualizando Pedido....");
+                dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                dialog.show();
                 pedidoActualizarSurtido();
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
@@ -763,11 +771,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         imageViewIncidencia.setEnabled(false);
         getProductos(false);
 
-
-        dialog.setMax(10);
-        dialog.setMessage("Actualizando Pedido....");
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.show();
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -1106,88 +1109,92 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         }
         if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
             Bitmap bitmap = thumbnail;
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            if (bitmap != null) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
-            byte[] imageBytes = baos.toByteArray();
-            final String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+                byte[] imageBytes = baos.toByteArray();
+                final String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
-            BASEURL = strIP + "glpservices/webresources/glpservices/";
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASEURL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+                BASEURL = strIP + "glpservices/webresources/glpservices/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASEURL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
-            Call call = service.in_foto(pedidoID, imageString, 4, strtoken);
+                Call call = service.in_foto(pedidoID, imageString, 4, strtoken);
 
-            call.enqueue(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    if (response.isSuccessful()) {
-                        ObjetoRes resObj = (ObjetoRes) response.body();
-                        if (resObj.geterror().equals("false")) {
-                        } else {
-                            Toast.makeText(getActivity(), "No fue posible guardar la foto de la incidencia", Toast.LENGTH_SHORT).show();
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        if (response.isSuccessful()) {
+                            ObjetoRes resObj = (ObjetoRes) response.body();
+                            if (resObj.geterror().equals("false")) {
+                            } else {
+                                Toast.makeText(getActivity(), "No fue posible guardar la foto de la incidencia", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void onFailure(Call call, Throwable t) {
-                    Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-                    String hora = timeFormat.format(calendar.getTime());
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                        String hora = timeFormat.format(calendar.getTime());
 
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    java.util.Date date = new Date();
-                    String fecha = dateFormat.format(date);
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                        java.util.Date date = new Date();
+                        String fecha = dateFormat.format(date);
 
-                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
-                    final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
-                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                        sqLiteDBHelper = new SQLiteDBHelper(getContext());
 
-                    String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+                        String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
 
-                    Cursor record = db.rawQuery(sql, null);
+                        Cursor record = db.rawQuery(sql, null);
 
-                    if (record.getCount() > 0) {
-                        ContentValues values = new ContentValues();
-                        values.put("oid", pedidoID);
-                        values.put("hora", hora);
-                        values.put("fecha", fecha);
-                        values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
-                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
-                        values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
-                        values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
-                        values.put("estatus_id", record.getString(record.getColumnIndex("estatus_id")));
-                        values.put("firma",  record.getString(record.getColumnIndex("firma")));
-                        values.put("foto_fuga",imageString);
-                        values.put("clave", record.getString(record.getColumnIndex("clave")));
-                        db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
+                        if (record.getCount() > 0) {
+                            ContentValues values = new ContentValues();
+                            values.put("oid", pedidoID);
+                            values.put("hora", hora);
+                            values.put("fecha", fecha);
+                            values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
+                            values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                            values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
+                            values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
+                            values.put("estatus_id", record.getString(record.getColumnIndex("estatus_id")));
+                            values.put("firma", record.getString(record.getColumnIndex("firma")));
+                            values.put("foto_fuga", imageString);
+                            values.put("clave", record.getString(record.getColumnIndex("clave")));
+                            db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
 
-                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
-                    } else {
+                            db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                        } else {
 
-                        ContentValues values = new ContentValues();
-                        values.put("oid", pedidoID);
-                        values.put("hora", hora);
-                        values.put("fecha", fecha);
-                        values.put("comentario_chofer", "");
-                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
-                        values.put("pago_id", "");
-                        values.put("motivo_cancelacion_id", "");
-                        values.put("estatus_id", "");
-                        values.put("firma", imageString);
-                        values.put("foto_fuga", "");
-                        values.put("clave", "");
-                        db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+                            ContentValues values = new ContentValues();
+                            values.put("oid", pedidoID);
+                            values.put("hora", hora);
+                            values.put("fecha", fecha);
+                            values.put("comentario_chofer", "");
+                            values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                            values.put("pago_id", "");
+                            values.put("motivo_cancelacion_id", "");
+                            values.put("estatus_id", "");
+                            values.put("firma", imageString);
+                            values.put("foto_fuga", "");
+                            values.put("clave", "");
+                            db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
 
-                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                            db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
 
+                        }
                     }
-                }
-            });
+                });
+            }else{
+                Toast.makeText(getActivity(), "Se debe de tomar la foto de la incidencia", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -1272,7 +1279,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         } else {
             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
             fabAgregarProducto.setEnabled(false);
-imageViewIncidencia.setEnabled(false);
+            imageViewIncidencia.setEnabled(false);
             signaturePad.setEnabled(false);
             btnGuardar.setEnabled(false);
             btnLimpiar.setEnabled(false);

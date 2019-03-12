@@ -276,22 +276,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
         super.onResume();
     }
 
-    @Override
-    public void onStart() {
-        if (tipoPedidos == 0){
-            try {
-                guardar_pedidos_productos();
-                obtener_pedidos();
-                actualizarPedidosPendientes();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else if(tipoPedidos == 1){
-            actualizarPedidosSurtidos();
-        }
-        super.onStart();
-    }
-
     public void obtener_pedidos(){
 
         Toast.makeText(getContext(), "Actualizando...", Toast.LENGTH_SHORT).show();

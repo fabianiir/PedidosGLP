@@ -1174,8 +1174,6 @@ public class MainActivity extends AppCompatActivity
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-
-
                         obtener_pedidos();
                         handler.postDelayed(this, 600000);
                     }
