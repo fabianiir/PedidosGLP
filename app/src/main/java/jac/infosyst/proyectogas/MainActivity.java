@@ -94,13 +94,14 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    // Boolean DispositivoEncontrado=false;
-    public static Boolean ConexionEstablecida=false;
+    public static Boolean DispositivoEncontrado=false;
 
+    public void setDispositivoEncontrado(Boolean dispositivoEncontrado) {
+        DispositivoEncontrado = dispositivoEncontrado;
+    }
 
-
-    public static void setConexionEstablecida(Boolean conexionEstablecida) {
-        ConexionEstablecida = conexionEstablecida;
+    public static Boolean getDispositivoEncontrado() {
+        return DispositivoEncontrado;
     }
 
     static OutputStream outputStream;
@@ -188,24 +189,25 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//region Ejecucion hilo Impresora
+        //region Ejecucion hilo Impresora
+        final Handler handlerImp = new Handler();
+        handlerImp.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                while (!DispositivoEncontrado) {
+
+                    FindBluetoothDevice();
+                }
+
+                handlerImp.postDelayed(this, 5000);
+            }
+        }, 5000);
+        //endregion
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
 
-//region Ejecucion hilo Impresora
-            //region Ejecucion hilo Impresora
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        FindBluetoothDevice();
-                        //openBluetoothPrinter();
-
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }).start();
-            //endregion
 
 
             //endregion
@@ -634,21 +636,7 @@ public class MainActivity extends AppCompatActivity
 
                                                             setContentView(R.layout.activity_main);
 
-                                                            //region Ejecucion hilo Impresora
-                                                            new Thread(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    try {
-                                                                        FindBluetoothDevice();
-                                                                        //openBluetoothPrinter();
 
-                                                                    } catch (Exception ex) {
-                                                                        ex.printStackTrace();
-                                                                    }
-
-                                                                }
-                                                            }).start();
-                                                            //endregion
 
                                                             objSessions = new Sessions();
 
@@ -1048,21 +1036,6 @@ public class MainActivity extends AppCompatActivity
 
                             setContentView(R.layout.activity_main);
 
-                            //region Ejecucion hilo Impresora
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        FindBluetoothDevice();
-                                        //openBluetoothPrinter();
-
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
-
-                                }
-                            }).start();
-                            //endregion
 
                             objSessions = new Sessions();
 
@@ -1151,21 +1124,7 @@ public class MainActivity extends AppCompatActivity
 
                 setContentView(R.layout.activity_main);
 
-                //region Ejecucion hilo Impresora
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FindBluetoothDevice();
-                            //openBluetoothPrinter();
 
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-
-                    }
-                }).start();
-                //endregion
 
                 objSessions = new Sessions();
 
@@ -1215,6 +1174,8 @@ public class MainActivity extends AppCompatActivity
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+
+
                         obtener_pedidos();
                         handler.postDelayed(this, 600000);
                     }
@@ -1486,12 +1447,12 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
-        getMenuInflater().inflate(R.menu.main, menu);
-        if (ConexionEstablecida==true) {
-            menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_enable));
-        }
-        else{
-            menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_disable));}
+       getMenuInflater().inflate(R.menu.main, menu);
+
+        //    menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_enable));
+
+
+           // menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_disable));
 
       /*if(DispositivoEncontrado==false) {
     } */
@@ -1743,7 +1704,7 @@ public class MainActivity extends AppCompatActivity
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
-               // DispositivoEncontrado=false;
+                setDispositivoEncontrado(false);
             }
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -1758,7 +1719,7 @@ public class MainActivity extends AppCompatActivity
                     // My Bluetooth printer name is MTP-3
                     if(pairedDev.getName().equals("MTP-3")){
                         bluetoothDevice=pairedDev;
-                       // DispositivoEncontrado=true;
+                        setDispositivoEncontrado(true);
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
                     }
