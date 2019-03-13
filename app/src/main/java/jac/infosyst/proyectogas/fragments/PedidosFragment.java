@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -122,7 +123,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
-        obtener_pedidos();
         MainActivity.setFragmentController(0);
 
         Sessions strSess = new Sessions();
@@ -273,6 +273,24 @@ public class PedidosFragment extends Fragment implements LocationListener {
         }else if(tipoPedidos == 1){
             actualizarPedidosSurtidos();
         }
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (tipoPedidos == 0){
+                    try {
+                        guardar_pedidos_productos();
+                        obtener_pedidos();
+                        actualizarPedidosPendientes();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else if(tipoPedidos == 1){
+                    actualizarPedidosSurtidos();
+                }
+                handler.postDelayed(this, 60000);
+            }
+        }, 60000);
         super.onResume();
     }
 

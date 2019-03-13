@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    public static Boolean DispositivoEncontrado;
+    public static Boolean DispositivoEncontrado=false;
 
     public void setDispositivoEncontrado(Boolean dispositivoEncontrado) {
         DispositivoEncontrado = dispositivoEncontrado;
@@ -190,93 +190,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     //endregion
-
-
-
-
-    //The BroadcastReceiver that listens for bluetooth broadcasts
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                //Do something if connected
-                Toast.makeText(getApplicationContext(), "Conexión con Impresora exitosa", Toast.LENGTH_SHORT).show();
-            }
-            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                //Do something if disconnected
-                setDispositivoEncontrado(false);
-                Toast.makeText(getApplicationContext(), "Impresora desconectada", Toast.LENGTH_SHORT).show();
-
-                //region Ejecucion hilo Impresora
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            while(!getDispositivoEncontrado()) {
-                                FindBluetoothDevice();
-                                openBluetoothPrinter();
-                                if(bluetoothSocket.isConnected())
-                                {
-                                    setDispositivoEncontrado(true);
-                                }
-                                else {
-                                    setDispositivoEncontrado(false);
-                                }
-                            }
-
-
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }).start();
-                //endregion*/
-            }
-            //else if...
-        }
-    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-setDispositivoEncontrado(false);
-
-        IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
-        IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-        IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        this.registerReceiver(mReceiver, filter1);
-        this.registerReceiver(mReceiver, filter2);
-        this.registerReceiver(mReceiver, filter3);
-
-
-
-
+//region Ejecucion hilo Impresora
             //region Ejecucion hilo Impresora
-       new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    while(!getDispositivoEncontrado()) {
-                        FindBluetoothDevice();
-                        openBluetoothPrinter();
-                        if(bluetoothSocket.isConnected())
-                        {
-                            setDispositivoEncontrado(true);
-                        }
-                        else {
-                            setDispositivoEncontrado(false);
-                        }
-
-                    }
+                    FindBluetoothDevice();
+                    //openBluetoothPrinter();
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
         }).start();
-            //endregion*/
+            //endregion
 
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
@@ -336,7 +268,7 @@ setDispositivoEncontrado(false);
                     obtener_pedidos();
                     handler.postDelayed(this, 600000);
                 }
-            }, 10000);  //the time is in miliseconds
+            }, 600000);  //the time is in miliseconds
 
             String oid = "", token = "", camion = "";
 
@@ -707,7 +639,21 @@ setDispositivoEncontrado(false);
 
                                                             setContentView(R.layout.activity_main);
 
+                                                            //region Ejecucion hilo Impresora
+                                                            new Thread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        FindBluetoothDevice();
+                                                                        //openBluetoothPrinter();
 
+                                                                    } catch (Exception ex) {
+                                                                        ex.printStackTrace();
+                                                                    }
+
+                                                                }
+                                                            }).start();
+                                                            //endregion
 
                                                             objSessions = new Sessions();
 
@@ -1107,7 +1053,21 @@ setDispositivoEncontrado(false);
 
                             setContentView(R.layout.activity_main);
 
+                            //region Ejecucion hilo Impresora
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        FindBluetoothDevice();
+                                        //openBluetoothPrinter();
 
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                }
+                            }).start();
+                            //endregion
 
                             objSessions = new Sessions();
 
@@ -1196,7 +1156,21 @@ setDispositivoEncontrado(false);
 
                 setContentView(R.layout.activity_main);
 
+                //region Ejecucion hilo Impresora
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            FindBluetoothDevice();
+                            //openBluetoothPrinter();
 
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }).start();
+                //endregion
 
                 objSessions = new Sessions();
 
@@ -1863,7 +1837,7 @@ setDispositivoEncontrado(false);
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
-               // setDispositivoEncontrado(false);
+                setDispositivoEncontrado(false);
             }
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -1878,15 +1852,14 @@ setDispositivoEncontrado(false);
                     // My Bluetooth printer name is MTP-3
                     if(pairedDev.getName().equals("MTP-3")){
                         bluetoothDevice=pairedDev;
-                        Toast.makeText(getApplicationContext(), "Impresora encontrada", Toast.LENGTH_SHORT).show();
-
+                        setDispositivoEncontrado(true);
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
                     } else {
-                        Toast.makeText(getApplicationContext(), "Impresora no encontrada", Toast.LENGTH_SHORT).show();
+                        setDispositivoEncontrado(false);
                     }
                 }
-
+                openBluetoothPrinter();
             }
 
             //lblPrinterName.setText("Impresora Bluetooth adjuntada");
@@ -1905,8 +1878,6 @@ setDispositivoEncontrado(false);
             UUID uuidSting = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
             bluetoothSocket=bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
             bluetoothSocket.connect();
-
-
             outputStream=bluetoothSocket.getOutputStream();
             inputStream=bluetoothSocket.getInputStream();
 
