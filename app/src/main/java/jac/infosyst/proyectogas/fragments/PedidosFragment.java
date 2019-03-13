@@ -88,11 +88,12 @@ public class PedidosFragment extends Fragment implements LocationListener {
     Button btnAtenderPedido,  btnImprimirPedido;
     FragmentManager f_manager;
 
-    private SQLiteDBHelper sqLiteDBHelper = null;
+    private SQLiteDBHelper sqLiteDBHelper = new SQLiteDBHelper(getActivity());;
     private String DB_NAME = "proyectogas17.db";
     private int DB_VERSION = 1;
     private String TABLE_NAME = "usuarios";
     ServicioUsuario userService;
+    private Context ctx = getContext();
 
     private String BASEURL = "";
     Sessions objSessions;
@@ -124,6 +125,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
         ((Sessions)getActivity().getApplicationContext()).setSesIdPedido("null");
         MainActivity.setFragmentController(0);
+
+        ctx = getContext();
 
         Sessions strSess = new Sessions();
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
@@ -279,8 +282,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             public void run() {
                 if (tipoPedidos == 0){
                     try {
-                        guardar_pedidos_productos();
-                        obtener_pedidos();
                         actualizarPedidosPendientes();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -295,9 +296,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
     }
 
     public void obtener_pedidos(){
-
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
-
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM configuracion";
         Cursor record = db.rawQuery(sql, null);
@@ -396,18 +394,18 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 }
                             }
                         } else {
-                            Toast.makeText(getContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ctx, "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getContext(), "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getContext(), "error! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "error! ", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getContext(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
             }
         });
         call = service.getPedidos(oid, "Surtido", token);
@@ -478,18 +476,18 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 }
                             }
                         } else {
-                            Toast.makeText(getContext(), "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ctx, "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getContext(), "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getContext(), "error! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "error! ", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getContext(), "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -506,8 +504,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
         boolean admin = false;
 
-
-        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
         String sql3 = "SELECT * FROM usuario";
