@@ -202,12 +202,12 @@ public class MainActivity extends AppCompatActivity
 
             if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
                 //Do something if connected
-                Toast.makeText(getApplicationContext(), "BT Connected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Conexión con Impresora exitosa", Toast.LENGTH_SHORT).show();
             }
             else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 //Do something if disconnected
                 setDispositivoEncontrado(false);
-                Toast.makeText(getApplicationContext(), "BT Disconnected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Impresora desconectada", Toast.LENGTH_SHORT).show();
 
                 //region Ejecucion hilo Impresora
                 new Thread(new Runnable() {
@@ -1878,11 +1878,12 @@ setDispositivoEncontrado(false);
                     // My Bluetooth printer name is MTP-3
                     if(pairedDev.getName().equals("MTP-3")){
                         bluetoothDevice=pairedDev;
+                        Toast.makeText(getApplicationContext(), "Impresora encontrada", Toast.LENGTH_SHORT).show();
 
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
                     } else {
-                       // setDispositivoEncontrado(false);
+                        Toast.makeText(getApplicationContext(), "Impresora no encontrada", Toast.LENGTH_SHORT).show();
                     }
                 }
 
