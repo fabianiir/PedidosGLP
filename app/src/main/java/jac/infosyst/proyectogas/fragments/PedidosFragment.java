@@ -186,11 +186,14 @@ public class PedidosFragment extends Fragment implements LocationListener {
         btnAtenderPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    if(MainActivity.getDispositivoEncontrado())
-                    {
-                        Toast.makeText(getActivity(),"Conectando Impresora", Toast.LENGTH_SHORT).show();
-                    }
-
+                if(MainActivity.getDispositivoEncontrado())
+                {
+                    Toast.makeText(getActivity(),"Impresora conectada", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(getActivity(),"Impresora no conectada", Toast.LENGTH_SHORT).show();
+                }
                 if(((Sessions)getActivity().getApplicationContext()).getSesIdPedido().equals("null")) {
 
                     Toast.makeText(getActivity(),  "Debe seleccionar un Pedido!" , Toast.LENGTH_SHORT).show();
@@ -274,8 +277,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
     }
 
     public void obtener_pedidos(){
-
-        Toast.makeText(getContext(), "Actualizando...", Toast.LENGTH_SHORT).show();
 
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
 

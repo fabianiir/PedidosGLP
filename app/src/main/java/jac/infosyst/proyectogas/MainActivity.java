@@ -5,8 +5,8 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     View layout;
 
+    String strtoken = "";
     boolean errorDescarga = false;
     String strRolUsuario;
     private String BASEURL = "";
@@ -189,27 +190,28 @@ public class MainActivity extends AppCompatActivity
     }
 
     //endregion
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        final Handler handlerim = new Handler();
-        handlerim.postDelayed(new Runnable() {
+//region Ejecucion hilo Impresora
+            //region Ejecucion hilo Impresora
+        new Thread(new Runnable() {
             @Override
             public void run() {
-               FindBluetoothDevice();
-                handlerim.postDelayed(this, 60000);
+                try {
+                    FindBluetoothDevice();
+                    //openBluetoothPrinter();
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
-        }, 5000);  //the time is in miliseconds
+        }).start();
+            //endregion
 
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
-
-
 
             //endregion
             sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
@@ -637,7 +639,21 @@ public class MainActivity extends AppCompatActivity
 
                                                             setContentView(R.layout.activity_main);
 
+                                                            //region Ejecucion hilo Impresora
+                                                            new Thread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        FindBluetoothDevice();
+                                                                        //openBluetoothPrinter();
 
+                                                                    } catch (Exception ex) {
+                                                                        ex.printStackTrace();
+                                                                    }
+
+                                                                }
+                                                            }).start();
+                                                            //endregion
 
                                                             objSessions = new Sessions();
 
@@ -1037,6 +1053,21 @@ public class MainActivity extends AppCompatActivity
 
                             setContentView(R.layout.activity_main);
 
+                            //region Ejecucion hilo Impresora
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        FindBluetoothDevice();
+                                        //openBluetoothPrinter();
+
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                }
+                            }).start();
+                            //endregion
 
                             objSessions = new Sessions();
 
@@ -1125,7 +1156,21 @@ public class MainActivity extends AppCompatActivity
 
                 setContentView(R.layout.activity_main);
 
+                //region Ejecucion hilo Impresora
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            FindBluetoothDevice();
+                            //openBluetoothPrinter();
 
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }).start();
+                //endregion
 
                 objSessions = new Sessions();
 
@@ -1303,31 +1348,72 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    String oid2[] = new  String[100];
     public void guardar_pedidos_productos(){
-        BASEURL = strIP + "glpservices/webresources/glpservices/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM pedidos_modificados";
         Cursor record = db.rawQuery(sql, null);
         if(record.getCount()>0) {
             for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
 
-                String token = "";
+                BASEURL = strIP + "glpservices/webresources/glpservices/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASEURL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+
                 sql = "SELECT * FROM usuario";
                 Cursor recordUss = db.rawQuery(sql, null);
 
                 if (recordUss.moveToFirst()) {
-                    token = recordUss.getString(recordUss.getColumnIndex("token"));
+                    strtoken = recordUss.getString(recordUss.getColumnIndex("token"));
                 }
 
                 ServicioUsuario userService = retrofit.create(ServicioUsuario.class);
 
-                Call call = userService.up_pedido(record.getString(record.getColumnIndex("oid")),
+                Call  call = userService.in_foto(record.getString(record.getColumnIndex("oid")),
+                        record.getString(record.getColumnIndex("firma")),
+                        3, strtoken);
+
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        if (response.isSuccessful()) {
+                            ObjetoRes resObj = (ObjetoRes) response.body();
+                            if (resObj.geterror().equals("false")) {
+                            } else {
+                            }
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+
+                    }
+                });
+
+                if  (!record.getString(record.getColumnIndex("foto_fuga")).isEmpty()){
+                    call = userService.in_foto(record.getString(record.getColumnIndex("oid")),
+                            record.getString(record.getColumnIndex("foto_fuga")),
+                            4, strtoken);
+
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            if (response.isSuccessful()) {
+                                ObjetoRes resObj = (ObjetoRes) response.body();
+                                if (resObj.geterror().equals("false")) {
+                                } else {
+                                }
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+
+                        }
+                    });
+                }
+
+                call = userService.up_pedido(record.getString(record.getColumnIndex("oid")),
                         record.getString(record.getColumnIndex("hora")),
                         record.getString(record.getColumnIndex("fecha")),
                         "",
@@ -1340,8 +1426,8 @@ public class MainActivity extends AppCompatActivity
                         record.getString(record.getColumnIndex("motivo_cancelacion_id")),
                         record.getString(record.getColumnIndex("estatus_id")),
                         "Up_8",
-                        token);
-
+                        strtoken);
+                Toast.makeText(MainActivity.this, "error! ", Toast.LENGTH_SHORT).show();
                 call.enqueue(new Callback() {
                     @Override
                     public void onResponse(Call call, Response response) {
@@ -1355,6 +1441,7 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onFailure(Call call, Throwable t) {
+
                     }
                 });
             }
@@ -1374,6 +1461,12 @@ public class MainActivity extends AppCompatActivity
                     strIP = recordConf.getString(recordConf.getColumnIndex("ip"));
                 }
 
+                BASEURL = strIP + "glpservices/webresources/glpservices/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASEURL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
                 String token = "";
                 sql = "SELECT * FROM usuario";
                 Cursor recordUss = db.rawQuery(sql, null);
@@ -1383,9 +1476,10 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-                if(Boolean.getBoolean(record.getString(record.getColumnIndex("surtido")))){
-                    oid2[j] = record.getString(record.getColumnIndex("oid"));
-                    Call call = service.sumarProducto(null, Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
+                String prueba = record.getString(record.getColumnIndex("surtido"));
+                if(prueba.equals("1")){
+                    Call call = service.sumarProducto(record.getString(record.getColumnIndex("oid")),
+                            Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
                             Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
                             record.getString(record.getColumnIndex("pedido_id")),
                             record.getString(record.getColumnIndex("producto_id")),
@@ -1393,12 +1487,62 @@ public class MainActivity extends AppCompatActivity
                     call.enqueue(new Callback() {
                         @Override
                         public void onResponse(Call call, Response response) {
-                            for(int i = 0;i < oid2.length; i++) {
-                                try{
-                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{oid2[i]});
-                                }catch(Exception e)
-                                {
+                            if (response.isSuccessful()) {
+                                ObjetoRes resObj = (ObjetoRes) response.body();
+                                if (resObj.geterror().equals("false")) {
+                                    String token = "";
+                                    String sql = "SELECT * FROM usuario";
+                                    Cursor recordUss = db.rawQuery(sql, null);
 
+                                    if (recordUss.moveToFirst()) {
+                                        token = recordUss.getString(recordUss.getColumnIndex("token"));
+                                    }
+
+                                    BASEURL = strIP + "glpservices/webresources/glpservices/";
+                                    Retrofit retrofit = new Retrofit.Builder()
+                                            .baseUrl(BASEURL)
+                                            .addConverterFactory(GsonConverterFactory.create())
+                                            .build();
+
+                                    sql = "SELECT * FROM " + SQLiteDBHelper.Productos_Mod_Table + " WHERE oid = '" + resObj.geteraseoid() + "'";
+                                    Cursor record = db.rawQuery(sql, null);
+                                    if (record.getCount() > 1) {
+                                        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+                                        for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+                                            String prueba = record.getString(record.getColumnIndex("surtido"));
+                                            if (prueba.equals("1")) {
+                                                call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), true,
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                                                        token);
+                                            } else {
+                                                call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), false,
+                                                        Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                                                        token);
+                                            }
+
+                                            call.enqueue(new Callback() {
+                                                @Override
+                                                public void onResponse(Call call, Response response) {
+                                                    if (response.isSuccessful()) {
+                                                        ObjetoRes resObj = (ObjetoRes) response.body();
+                                                        if (resObj.geterror().equals("false")) {
+                                                            db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.geteraseoid()});
+                                                            db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call call, Throwable t) {
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.geteraseoid()});
+                                        db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                    }
                                 }
                             }
                         }
@@ -1409,7 +1553,7 @@ public class MainActivity extends AppCompatActivity
                     });
                 }else {
                     Call call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
-                            Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), false,
+                            Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), Boolean.parseBoolean(record.getString(record.getColumnIndex("surtido"))),
                             Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
                             token);
                     call.enqueue(new Callback() {
@@ -1446,17 +1590,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
-       getMenuInflater().inflate(R.menu.main, menu);
-
-        //    menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_enable));
-
-
-           // menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_conection_disable));
-
-      /*if(DispositivoEncontrado==false) {
-    } */
-
-
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -1703,7 +1837,7 @@ public class MainActivity extends AppCompatActivity
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
-
+                setDispositivoEncontrado(false);
             }
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -1721,8 +1855,7 @@ public class MainActivity extends AppCompatActivity
                         setDispositivoEncontrado(true);
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
-                    }
-                    else {
+                    } else {
                         setDispositivoEncontrado(false);
                     }
                 }

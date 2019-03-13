@@ -771,7 +771,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         imageViewIncidencia.setEnabled(false);
         getProductos(false);
 
-
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
 
