@@ -1883,7 +1883,7 @@ setDispositivoEncontrado(false);
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
                     } else {
-                        Toast.makeText(getApplicationContext(), "Impresora no encontrada", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "Impresora no encontrada", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -1905,7 +1905,10 @@ setDispositivoEncontrado(false);
             UUID uuidSting = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
             bluetoothSocket=bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
             bluetoothSocket.connect();
-
+if(!bluetoothSocket.isConnected())
+{
+    setDispositivoEncontrado(false);
+}
 
             outputStream=bluetoothSocket.getOutputStream();
             inputStream=bluetoothSocket.getInputStream();
