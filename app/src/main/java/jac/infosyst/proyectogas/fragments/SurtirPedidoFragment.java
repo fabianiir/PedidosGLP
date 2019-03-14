@@ -156,10 +156,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     static SimpleDateFormat simpleDateFormatFecha = new SimpleDateFormat("dd-MM-yyyy");
     static SimpleDateFormat simpleDateFormatHora = new SimpleDateFormat("HH:mm:ss");
-    LocationManager locationManager;
+
     String strLatitude = "";
     String strLongitude = "";
-    Location location;
+
     FloatingActionButton fabAgregarProducto, fabRestarProducto;
 
     String strGettoken = "";
@@ -1321,34 +1321,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
             adapter = new ProductoAdapter(null, getActivity(), getFragmentManager(), pendiente);
             recyclerViewProductos.setAdapter(adapter);
+
         }
     }
 
-    public void getUbicacion(){
-        getLocation();
-    }
 
-    public void getLocation(){
-
-        try {
-            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
-            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if (location != null){
-                callSeguimiento();
-            }else{
-                Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        catch(SecurityException e) {
-            e.printStackTrace();
-            Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void callSeguimiento(){
-    }
 
     @Override
     public void onLocationChanged(Location location) {

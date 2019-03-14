@@ -13,6 +13,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -98,8 +101,7 @@ public class MainActivity extends AppCompatActivity
     BluetoothDevice bluetoothDevice;
 
 
-
-    public static Boolean DispositivoEncontrado;
+    private static Boolean DispositivoEncontrado;
 
     public void setDispositivoEncontrado(Boolean dispositivoEncontrado) {
         DispositivoEncontrado = dispositivoEncontrado;
@@ -108,7 +110,34 @@ public class MainActivity extends AppCompatActivity
     public static Boolean getDispositivoEncontrado() {
         return DispositivoEncontrado;
     }
+//endregion
 
+    //region variables localizacion
+    LocationManager locationManager;
+    Location location;
+
+    private static String latitud;
+    private static String longitud;
+
+    public void setLatitud(String latitud) {
+        this.latitud = latitud;
+    }
+
+    public void setLongitud(String longitud) {
+        this.longitud = longitud;
+    }
+
+
+    public static String getLatitud() {
+        return latitud;
+    }
+
+    public static String getLongitud() {
+        return longitud;
+    }
+
+
+    //endregion
     static OutputStream outputStream;
     InputStream inputStream;
     Thread thread;
@@ -189,8 +218,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //endregion
-
 
 
 
@@ -240,9 +267,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setLatitud(null);
+        setLongitud(null);
+        getLocation();
+   
 
-setDispositivoEncontrado(false);
-
+        //region Deteccion Impresora Bluetooth
+        setDispositivoEncontrado(false);
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
@@ -276,7 +307,10 @@ setDispositivoEncontrado(false);
                 }
             }
         }).start();
-            //endregion*/
+            //endregion
+//endregion
+
+
 
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
@@ -334,6 +368,7 @@ setDispositivoEncontrado(false);
                 public void run() {
                     guardar_pedidos_productos();
                     obtener_pedidos();
+                    getLocation();
                     handler.postDelayed(this, 600000);
                 }
             }, 600000);  //the time is in miliseconds
@@ -760,6 +795,7 @@ setDispositivoEncontrado(false);
                                                                 public void run() {
                                                                     obtener_pedidos();
                                                                     guardar_pedidos_productos();
+                                                                    getLocation();
                                                                     handler.postDelayed(this, 600000);
                                                                 }
                                                             }, 600000);  //the time is in miliseconds
@@ -1160,6 +1196,7 @@ setDispositivoEncontrado(false);
                                 public void run() {
                                     obtener_pedidos();
                                     guardar_pedidos_productos();
+                                    getLocation();
                                     handler.postDelayed(this, 600000);
                                 }
                             }, 600000);  //the time is in miliseconds
@@ -1247,7 +1284,9 @@ setDispositivoEncontrado(false);
                     @Override
                     public void run() {
                         obtener_pedidos();
+                        getLocation();
                         handler.postDelayed(this, 600000);
+
                     }
                 }, 600000);  //the time is in miliseconds
 
@@ -2105,5 +2144,35 @@ if(reImpresion){
                     + UnicodeFormatter.byteToHex(b[k]));
         }
         return b[3];
+    }
+
+
+
+    public void getLocation(){
+
+        try {
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+           // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) this);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+
+            if (location != null){
+
+                setLongitud( String.valueOf(location.getLongitude()));
+                setLatitud( String.valueOf(location.getLatitude()));
+            }else{
+
+
+              setLatitud(null);
+              setLongitud(null);
+                Toast.makeText(this, "Localización no encontrada", Toast.LENGTH_SHORT).show();
+            }
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error de  GPS!", Toast.LENGTH_SHORT).show();
+        }
+
     }
 }
