@@ -336,7 +336,7 @@ setDispositivoEncontrado(false);
                     obtener_pedidos();
                     handler.postDelayed(this, 600000);
                 }
-            }, 10000);  //the time is in miliseconds
+            }, 600000);  //the time is in miliseconds
 
             String oid = "", token = "", camion = "";
 
@@ -1863,7 +1863,7 @@ setDispositivoEncontrado(false);
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter==null){
 
-               // setDispositivoEncontrado(false);
+                setDispositivoEncontrado(false);
             }
             if(bluetoothAdapter.isEnabled()){
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
