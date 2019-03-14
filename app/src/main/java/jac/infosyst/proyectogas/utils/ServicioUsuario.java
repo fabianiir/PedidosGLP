@@ -158,4 +158,13 @@ public interface ServicioUsuario {
           @Field("precio") int precio,
           @Field("token") String token
   );
+
+  @FormUrlEncoded
+  @POST("seguimiento")
+  Call<ObjetoRes> seguimiento(
+          @Field("lat") String lat,
+          @Field("long") String lon,
+          @Field("imei") String imei,
+          @Field("token") String token
+  );
 }

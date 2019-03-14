@@ -218,9 +218,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-
-
     //The BroadcastReceiver that listens for bluetooth broadcasts
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -362,16 +359,7 @@ public class MainActivity extends AppCompatActivity
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
             drawerFragment.setDrawerListener(MainActivity.this);
 
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    guardar_pedidos_productos();
-                    obtener_pedidos();
-                    getLocation();
-                    handler.postDelayed(this, 600000);
-                }
-            }, 600000);  //the time is in miliseconds
+
 
             String oid = "", token = "", camion = "";
 
@@ -389,6 +377,19 @@ public class MainActivity extends AppCompatActivity
             ((Sessions) getApplicationContext().getApplicationContext()).setStrChoferId(oid);
             ((Sessions) getApplicationContext().getApplicationContext()).setStrCamionId(camion);
             ((Sessions) getApplicationContext().getApplicationContext()).setsessToken(token);
+
+            strtoken = token;
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    guardar_pedidos_productos();
+                    obtener_pedidos();
+                    seguimiento(Imei, strtoken);
+                    handler.postDelayed(this, 600000);
+                }
+            }, 600000);  //the time is in miliseconds
 
             displayView(0);
         }else {
@@ -795,7 +796,7 @@ public class MainActivity extends AppCompatActivity
                                                                 public void run() {
                                                                     obtener_pedidos();
                                                                     guardar_pedidos_productos();
-                                                                    getLocation();
+                                                                    seguimiento(Imei, strtoken);
                                                                     handler.postDelayed(this, 600000);
                                                                 }
                                                             }, 600000);  //the time is in miliseconds
@@ -1196,7 +1197,7 @@ public class MainActivity extends AppCompatActivity
                                 public void run() {
                                     obtener_pedidos();
                                     guardar_pedidos_productos();
-                                    getLocation();
+                                    seguimiento(Imei, strtoken);
                                     handler.postDelayed(this, 600000);
                                 }
                             }, 600000);  //the time is in miliseconds
@@ -1284,7 +1285,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         obtener_pedidos();
-                        getLocation();
+                        seguimiento(Imei, strtoken);
                         handler.postDelayed(this, 600000);
 
                     }
@@ -2174,6 +2175,37 @@ if(reImpresion){
             e.printStackTrace();
             Toast.makeText(this, "Error de  GPS!", Toast.LENGTH_SHORT).show();
         }
+    }
 
+    public void seguimiento(String imei, String token){
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        getLocation();
+
+        Call call = service.seguimiento(getLatitud(), getLongitud(), imei, token);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if(resObj.geterror().equals("false")){
+                    } else {
+                    }
+                }
+                else {
+
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+            }
+        });
     }
 }
