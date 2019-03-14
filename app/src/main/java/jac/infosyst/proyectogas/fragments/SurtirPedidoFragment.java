@@ -62,11 +62,13 @@ import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.adaptadores.CatalagoProductosAdapter;
 import jac.infosyst.proyectogas.adaptadores.ProductoAdapter;
 import jac.infosyst.proyectogas.modelo.CatalagoProducto;
+import jac.infosyst.proyectogas.modelo.CatalogoEstatus;
 import jac.infosyst.proyectogas.modelo.Chofer;
 import jac.infosyst.proyectogas.modelo.Estatus;
 import jac.infosyst.proyectogas.modelo.Imagen;
 import jac.infosyst.proyectogas.modelo.ObjetoRes;
 import jac.infosyst.proyectogas.modelo.ObjetoRes2;
+import jac.infosyst.proyectogas.modelo.ObjetoRes3;
 import jac.infosyst.proyectogas.modelo.Pedido;
 
 import jac.infosyst.proyectogas.modelo.Producto;
@@ -266,6 +268,14 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         }
         if(strTotal == null){
             strTotal = "N/A";
+        }
+
+        TextView tvTitulo = rootView.findViewById(R.id.tvTitulo);
+
+        if(((Sessions)getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")){
+            tvTitulo.setText("Atender Fuga");
+        }else{
+            tvTitulo.setText("Surtir Pedido");
         }
 
         textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
@@ -793,82 +803,215 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-        Call call = service.up_pedido(pedidoID, strHora, strFecha,
-                "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
-                0, 0, "", "null",
-                Estatus.getSurtidoId(), "Up_1", strtoken);
-
-        call.enqueue(new Callback() {
-
-            @Override
-            public void onResponse(Call call, Response response) {
-
-                if (response.isSuccessful()) {
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                    if (resObj.geterror().equals("false")) {
-                        if (dialog.isShowing()) {
-                            dialog.dismiss();
-                            db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[] {pedidoID});
-                        }
-                    }
-                    if (resObj.geterror().equals("true")) {
-                        if (dialog.isShowing()) {
-                            dialog.dismiss();
-                        }
+        final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+        String estatus = Estatus.getSurtidoId();
+        if(estatus.isEmpty()){
+            String sql1 = "SELECT * FROM cat_estatus";
+            Cursor record1 = db.rawQuery(sql1, null);
+            if(record1.moveToFirst()) {
+                Estatus estatus1 = new Estatus();
+                for (record1.moveToFirst(); !record1.isAfterLast(); record1.moveToNext()) {
+                    if (record1.getString(record1.getColumnIndex("nombre")).equals("Pendiente")) {
+                        estatus1.setPendienteId(record1.getString(record1.getColumnIndex("oid")));
+                    } else if (record1.getString(record1.getColumnIndex("nombre")).equals("Surtido")) {
+                        estatus1.setSurtidoId(record1.getString(record1.getColumnIndex("oid")));
+                    } else if (record1.getString(record1.getColumnIndex("nombre")).equals("Cancelado")) {
+                        estatus1.setCanceladoId(record1.getString(record1.getColumnIndex("oid")));
                     }
                 }
             }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                    sqLiteDBHelper = new SQLiteDBHelper(getContext());
-                    SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+            estatus = Estatus.getSurtidoId();
+            if (estatus.isEmpty()){
+                Call call = service.getCatalogoEstatus(strtoken);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        if (response.isSuccessful()) {
+                            ObjetoRes3 obj_estatus = (ObjetoRes3) response.body();
+                            if (obj_estatus.geterror().equals("false")) {
+                                List<CatalogoEstatus> arrayListEstatus = Arrays.asList(obj_estatus.getCatalogoEstatus());
+                                Estatus estatus = new Estatus();
 
-                    String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+                                for (CatalogoEstatus catalogoEstatus : arrayListEstatus) {
+                                    ContentValues values = new ContentValues();
+                                    values.put("oid", catalogoEstatus.getIdProducto());
+                                    values.put("nombre", catalogoEstatus.getdescripcion());
+                                    db.insert(SQLiteDBHelper.CatEstatus_Table, null, values);
+                                }
 
-                    Cursor record = db.rawQuery(sql, null);
-                    int count = record.getCount();
-                    if (count > 0) {
-                        record.moveToFirst();
-                        ContentValues values = new ContentValues();
-                        values.put("oid", pedidoID);
-                        values.put("hora", strHora);
-                        values.put("fecha", strFecha);
-                        values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
-                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
-                        values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
-                        values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
-                        values.put("estatus_id", Estatus.getSurtidoId());
-                        values.put("firma", record.getString(record.getColumnIndex("firma")));
-                        values.put("foto_fuga", record.getString(record.getColumnIndex("foto_fuga")));
-                        values.put("clave", "Up_1");
-                        db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
+                                for (int i = 0; i < arrayListEstatus.size(); i++) {
+                                    if (arrayListEstatus.get(i).getdescripcion().equals("Pendiente")) {
+                                        estatus.setPendienteId(arrayListEstatus.get(i).getIdProducto());
+                                    } else if (arrayListEstatus.get(i).getdescripcion().equals("Surtido")) {
+                                        estatus.setSurtidoId(arrayListEstatus.get(i).getIdProducto());
+                                    } else if (arrayListEstatus.get(i).getdescripcion().equals("Cancelado")) {
+                                        estatus.setCanceladoId(arrayListEstatus.get(i).getIdProducto());
+                                    }
+                                    String estatusEnqueue = Estatus.getSurtidoId();
+                                    call = service.up_pedido(pedidoID, strHora, strFecha,
+                                            "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
+                                            0, 0, "", "null",
+                                            estatusEnqueue, "Up_1", strtoken);
 
-                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
-                    }else {
+                                    call.enqueue(new Callback() {
 
-                        ContentValues values = new ContentValues();
-                        values.put("oid", pedidoID);
-                        values.put("hora", strHora);
-                        values.put("fecha", strFecha);
-                        values.put("comentario_chofer", "");
-                        values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
-                        values.put("pago_id", "");
-                        values.put("motivo_cancelacion_id", "");
-                        values.put("estatus_id", Estatus.getSurtidoId());
-                        values.put("firma", "");
-                        values.put("foto_fuga", "");
-                        values.put("clave", "Up_1");
-                        db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+                                        @Override
+                                        public void onResponse(Call call, Response response) {
 
-                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                                            if (response.isSuccessful()) {
+                                                ObjetoRes resObj = (ObjetoRes) response.body();
+                                                if (resObj.geterror().equals("false")) {
+                                                    if (dialog.isShowing()) {
+                                                        dialog.dismiss();
+                                                        db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                                                    }
+                                                }
+                                                if (resObj.geterror().equals("true")) {
+                                                    if (dialog.isShowing()) {
+                                                        dialog.dismiss();
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call call, Throwable t) {
+                                            if (dialog.isShowing()) {
+                                                dialog.dismiss();
+                                                sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                                                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                                                String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+
+                                                Cursor record = db.rawQuery(sql, null);
+                                                int count = record.getCount();
+                                                if (count > 0) {
+                                                    record.moveToFirst();
+                                                    ContentValues values = new ContentValues();
+                                                    values.put("oid", pedidoID);
+                                                    values.put("hora", strHora);
+                                                    values.put("fecha", strFecha);
+                                                    values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
+                                                    values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                                                    values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
+                                                    values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
+                                                    values.put("estatus_id", Estatus.getSurtidoId());
+                                                    values.put("firma", record.getString(record.getColumnIndex("firma")));
+                                                    values.put("foto_fuga", record.getString(record.getColumnIndex("foto_fuga")));
+                                                    values.put("clave", "Up_1");
+                                                    db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
+
+                                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                                                } else {
+
+                                                    ContentValues values = new ContentValues();
+                                                    values.put("oid", pedidoID);
+                                                    values.put("hora", strHora);
+                                                    values.put("fecha", strFecha);
+                                                    values.put("comentario_chofer", "");
+                                                    values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                                                    values.put("pago_id", "");
+                                                    values.put("motivo_cancelacion_id", "");
+                                                    values.put("estatus_id", Estatus.getSurtidoId());
+                                                    values.put("firma", "");
+                                                    values.put("foto_fuga", "");
+                                                    values.put("clave", "Up_1");
+                                                    db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+
+                                                    db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+
+                    }
+                });
+            }
+        }else {
+
+            Call call = service.up_pedido(pedidoID, strHora, strFecha,
+                    "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
+                    0, 0, "", "null",
+                    estatus, "Up_1", strtoken);
+
+            call.enqueue(new Callback() {
+
+                @Override
+                public void onResponse(Call call, Response response) {
+
+                    if (response.isSuccessful()) {
+                        ObjetoRes resObj = (ObjetoRes) response.body();
+                        if (resObj.geterror().equals("false")) {
+                            if (dialog.isShowing()) {
+                                dialog.dismiss();
+                                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                            }
+                        }
+                        if (resObj.geterror().equals("true")) {
+                            if (dialog.isShowing()) {
+                                dialog.dismiss();
+                            }
+                        }
                     }
                 }
-            }
-        });
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                        sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                        String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+
+                        Cursor record = db.rawQuery(sql, null);
+                        int count = record.getCount();
+                        if (count > 0) {
+                            record.moveToFirst();
+                            ContentValues values = new ContentValues();
+                            values.put("oid", pedidoID);
+                            values.put("hora", strHora);
+                            values.put("fecha", strFecha);
+                            values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
+                            values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                            values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
+                            values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
+                            values.put("estatus_id", Estatus.getSurtidoId());
+                            values.put("firma", record.getString(record.getColumnIndex("firma")));
+                            values.put("foto_fuga", record.getString(record.getColumnIndex("foto_fuga")));
+                            values.put("clave", "Up_1");
+                            db.update(SQLiteDBHelper.Pedidos_Mod_Table, values, "oid = ?", new String[]{pedidoID});
+
+                            db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                        } else {
+
+                            ContentValues values = new ContentValues();
+                            values.put("oid", pedidoID);
+                            values.put("hora", strHora);
+                            values.put("fecha", strFecha);
+                            values.put("comentario_chofer", "");
+                            values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
+                            values.put("pago_id", "");
+                            values.put("motivo_cancelacion_id", "");
+                            values.put("estatus_id", Estatus.getSurtidoId());
+                            values.put("firma", "");
+                            values.put("foto_fuga", "");
+                            values.put("clave", "Up_1");
+                            db.insert(SQLiteDBHelper.Pedidos_Mod_Table, null, values);
+
+                            db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{pedidoID});
+                        }
+                    }
+                }
+            });
+        }
     }
 
     @Override

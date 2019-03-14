@@ -22,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -46,6 +47,7 @@ import jac.infosyst.proyectogas.utils.Sessions;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 
 import android.content.Context;
@@ -65,7 +67,7 @@ import android.content.ContentValues;
 @SuppressLint("ValidFragment")
 public class DetallePedidoFragment  extends Fragment  implements LocationListener {
 
-    private TextView textViewCliente, textViewDireccion, textViewDescripcion, textViewEstatus, textViewDetalle
+    private TextView textViewCliente, textViewDireccion, textViewTelefono, textViewDescripcion, textViewEstatus, textViewDetalle
             , textViewFirma, textViewTotal, textViewObservaciones;
 
     /*firma*/
@@ -153,16 +155,36 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         final String strTelefono = ((Sessions) getActivity().getApplication()).getsestelefono();
         Producto[] producto = ((Sessions) getActivity().getApplication()).getSesDetalleProductoSurtir();
 
+        NumberFormat format = NumberFormat.getCurrencyInstance();
+
         ArrayList arrayListProductos = new ArrayList();
-
         if(producto != null && producto.length != 0){
-            for (int i=0; i < producto.length; i++)
-                arrayListProductos.add(producto[i].getdescripcion() +
-                "\nCantidad: " + producto[i].getCantidad() + "\nPrecio: " + producto[i].getPrecio());
-
             if(((Sessions)getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")){
                 arrayListProductos.add("Fuga");
+                arrayListProductos.add(Html.fromHtml(
+                        "<table style=\"width:100%\">" +
+                                "  <tr>" +
+                                "    <th>\tProducto\t</th>" +
+                                "    <th>\tCantidad\t</th>" +
+                                "    <th>\tPrecio\t</th>" +
+                                "</table>"));
+            }else {
+                arrayListProductos.add(Html.fromHtml(
+                        "<table style=\"width:200em\">" +
+                                "  <tr>" +
+                                "    <th>\tProducto\t</th>" +
+                                "    <th>\tCantidad\t</th>" +
+                                "    <th>\tPrecio\t</th>" +
+                                "</table>"));
             }
+            for (int i=0; i < producto.length; i++)
+            arrayListProductos.add(Html.fromHtml(
+                    "<table style=\"width:100%\">" +
+                            "  <tr>" +
+                            "    <td>\t" + producto[i].getdescripcion() +"\t</td>" +
+                            "    <td>\t" + producto[i].getCantidad() + "\t</td>" +
+                            "    <td>\t" + format.format(producto[i].getPrecio()) + "\t</td>" +
+                            "</table>"));
         }else {
             if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
                 arrayListProductos.add("Fuga");
@@ -180,40 +202,45 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         textViewObservaciones = (TextView) rootView.findViewById(R.id.textViewObservaciones);
         imageViewIncidencia = (ImageView) rootView.findViewById(R.id.imageViewIncidencia);
 
+        textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
+        textViewDireccion = (TextView) rootView.findViewById(R.id.tvDireccion);
+        textViewTelefono = (TextView) rootView.findViewById(R.id.tvTelefono);
+        textViewDescripcion = (TextView) rootView.findViewById(R.id.tvDescripcion);
+        textViewEstatus = (TextView) rootView.findViewById(R.id.tvEstatus);
+        textViewDetalle = (TextView) rootView.findViewById(R.id.tvDetalle);
+        textViewFirma = (TextView) rootView.findViewById(R.id.tvFirma);
+        textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
+
         if(strCliente == null){
-            strCliente = "N/A";
+            textViewCliente.setVisibility(View.GONE);
         }
         if(strDireccion == null){
-            strDireccion = "N/A";
+            textViewDireccion.setVisibility(View.GONE);
         }
         if(strDescripcion == null){
-            strDescripcion = "N/A";
+            textViewDescripcion.setVisibility(View.GONE);
         }
         if(strEstatus == null){
-            strEstatus = "N/A";
+            textViewEstatus.setVisibility(View.GONE);
         }
         if(strDetalle == null){
-            strDetalle = "N/A";
+            textViewDetalle.setVisibility(View.GONE);
         }
         if(strFirma == null){
-            strFirma = "N/A";
+            textViewFirma.setVisibility(View.GONE);
+        }
+        if(strTelefono == null){
+            textViewTelefono.setVisibility(View.GONE);
         }
 
-
-        textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
-        textViewCliente.setText("Nombre: " + strCliente);
-        textViewDireccion = (TextView) rootView.findViewById(R.id.tvDireccion);
-        textViewDireccion.setText("Direccion: " + strDireccion);
-        textViewDescripcion = (TextView) rootView.findViewById(R.id.tvDescripcion);
-        textViewDescripcion.setText("Descripcion: " + strDescripcion);
-        textViewEstatus = (TextView) rootView.findViewById(R.id.tvEstatus);
-        textViewEstatus.setText("Estatus: " + strEstatus);
-        textViewDetalle = (TextView) rootView.findViewById(R.id.tvDetalle);
-        textViewDetalle.setText("Detalle Producto: ");
-        textViewFirma = (TextView) rootView.findViewById(R.id.tvFirma);
+        textViewCliente.setText(Html.fromHtml    ("<b>Nombre:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + strCliente));
+        textViewDireccion.setText(Html.fromHtml  ("<b>Direccion:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + strDireccion));
+        textViewTelefono.setText(Html.fromHtml   ("<b>Teléfono:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + strTelefono));
+        textViewDescripcion.setText(Html.fromHtml("<b>Descripción:&nbsp&nbsp&nbsp&nbsp&nbsp</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + strDescripcion));
+        textViewEstatus.setText(Html.fromHtml    ("<b>Estatus:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + strEstatus));
+        textViewDetalle.setText(Html.fromHtml    ("<b>Detalle Producto:</b>"));
         textViewFirma.setText("Firma: " + strFirma);
-        textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
-        textViewTotal.setText("Total: " + strTotal);
+        textViewTotal.setText(Html.fromHtml    ("<b>Total: </b>" + format.format(Integer.parseInt(strTotal))));
 
         btnSurtirPedido = (Button) rootView.findViewById(R.id.btnSurtirPedido);
         btnSurtirPedido.setOnClickListener(new View.OnClickListener() {
@@ -268,7 +295,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         if(strTotal.equals("0")){
             if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
             } else {
-
                 LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 layout = layoutInflater.inflate(R.layout.layout_popup, null);
 

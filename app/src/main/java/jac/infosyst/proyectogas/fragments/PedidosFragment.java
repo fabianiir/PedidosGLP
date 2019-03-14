@@ -393,6 +393,11 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                     }
                                 }
                             }
+                            try {
+                                actualizarPedidosPendientes();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         } else {
                             Toast.makeText(ctx, "No existen Pedidos!", Toast.LENGTH_SHORT).show();
                         }

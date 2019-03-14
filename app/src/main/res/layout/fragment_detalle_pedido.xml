@@ -4,14 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
-
-
-    <android.support.constraint.ConstraintLayout
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+    android:fillViewport="true"
+    android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -27,7 +21,6 @@
             android:paddingLeft="24dp"
             android:paddingTop="10dp"
             android:paddingRight="24dp"
-            app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -43,7 +36,7 @@
 
                     android:layout_alignParentTop="true"
                     android:gravity="center"
-                    android:text="Detalle Pedido"
+                    android:text="Datos del cliente"
                     android:textColor="@color/colorAccent"
                     android:textSize="25dp"
                     android:textStyle="bold"
@@ -65,6 +58,16 @@
 
             <TextView
                 android:id="@+id/tvDireccion"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+
+                android:text="Datos Cliente"
+                android:textSize="18dp"
+                app:fontFamily="@font/roboto" />
+
+            <TextView
+                android:id="@+id/tvTelefono"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -107,18 +110,6 @@
                 app:fontFamily="@font/roboto" />
 
             <TextView
-                android:id="@+id/tvTotal"
-                android:layout_width="fill_parent"
-
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-
-                android:text="Datos Cliente"
-                android:textSize="18dp"
-
-                app:fontFamily="@font/roboto" />
-
-            <TextView
                 android:id="@+id/tvDetalle"
                 android:layout_width="fill_parent"
 
@@ -131,24 +122,20 @@
 
             <ListView
                 android:layout_width="match_parent"
-                android:layout_height="110dp"
+                android:layout_height="match_parent"
                 android:id="@+id/lvProductos"></ListView>
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/tvTotal"
+                android:layout_width="fill_parent"
+                android:gravity="right"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
 
+                android:text="Datos Cliente"
+                android:textSize="18dp"
 
-
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+                app:fontFamily="@font/roboto" />
 
             <Button
                 android:id="@+id/btnSurtirPedido"
@@ -159,7 +146,8 @@
                 android:text="Surtir"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="MissingConstraints" />
 
             <Button
                 android:id="@+id/btnComoLlegar"
@@ -189,16 +177,11 @@
                 android:id="@+id/btnCancelarPedido"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:layout_marginTop="16dp"
-
                 android:background="@color/colorAccent"
                 android:text="Cancelar"
                 android:textColor="@color/BotonGris"
                 app:layout_constraintTop_toBottomOf="@+id/btnLlamar" />
-
-        </android.support.constraint.ConstraintLayout>
-
-    </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
 
 </LinearLayout>
