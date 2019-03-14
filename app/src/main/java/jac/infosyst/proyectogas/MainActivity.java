@@ -13,6 +13,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -98,8 +101,7 @@ public class MainActivity extends AppCompatActivity
     BluetoothDevice bluetoothDevice;
 
 
-
-    public static Boolean DispositivoEncontrado=false;
+    private static Boolean DispositivoEncontrado;
 
     public void setDispositivoEncontrado(Boolean dispositivoEncontrado) {
         DispositivoEncontrado = dispositivoEncontrado;
@@ -108,7 +110,34 @@ public class MainActivity extends AppCompatActivity
     public static Boolean getDispositivoEncontrado() {
         return DispositivoEncontrado;
     }
+//endregion
 
+    //region variables localizacion
+    LocationManager locationManager;
+    Location location;
+
+    private static String latitud;
+    private static String longitud;
+
+    public void setLatitud(String latitud) {
+        this.latitud = latitud;
+    }
+
+    public void setLongitud(String longitud) {
+        this.longitud = longitud;
+    }
+
+
+    public static String getLatitud() {
+        return latitud;
+    }
+
+    public static String getLongitud() {
+        return longitud;
+    }
+
+
+    //endregion
     static OutputStream outputStream;
     InputStream inputStream;
     Thread thread;
@@ -189,19 +218,89 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //endregion
+
+
+
+    //The BroadcastReceiver that listens for bluetooth broadcasts
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                //Do something if connected
+                Toast.makeText(getApplicationContext(), "Conexión con Impresora exitosa", Toast.LENGTH_SHORT).show();
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                //Do something if disconnected
+                setDispositivoEncontrado(false);
+                Toast.makeText(getApplicationContext(), "Impresora desconectada", Toast.LENGTH_SHORT).show();
+
+                //region Ejecucion hilo Impresora
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            while(!getDispositivoEncontrado()) {
+                                FindBluetoothDevice();
+                                openBluetoothPrinter();
+                                if(bluetoothSocket.isConnected())
+                                {
+                                    setDispositivoEncontrado(true);
+                                }
+                                else {
+                                    setDispositivoEncontrado(false);
+                                }
+                            }
+
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }).start();
+                //endregion*/
+            }
+            //else if...
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setLatitud(null);
+        setLongitud(null);
+        getLocation();
+   
 
-//region Ejecucion hilo Impresora
+        //region Deteccion Impresora Bluetooth
+        setDispositivoEncontrado(false);
+        IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(mReceiver, filter1);
+        this.registerReceiver(mReceiver, filter2);
+        this.registerReceiver(mReceiver, filter3);
+
+
+
+
             //region Ejecucion hilo Impresora
-        new Thread(new Runnable() {
+       new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    FindBluetoothDevice();
-                    //openBluetoothPrinter();
+                    while(!getDispositivoEncontrado()) {
+                        FindBluetoothDevice();
+                        openBluetoothPrinter();
+                        if(bluetoothSocket.isConnected())
+                        {
+                            setDispositivoEncontrado(true);
+                        }
+                        else {
+                            setDispositivoEncontrado(false);
+                        }
+
+                    }
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -209,6 +308,9 @@ public class MainActivity extends AppCompatActivity
             }
         }).start();
             //endregion
+//endregion
+
+
 
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);
@@ -266,6 +368,7 @@ public class MainActivity extends AppCompatActivity
                 public void run() {
                     guardar_pedidos_productos();
                     obtener_pedidos();
+                    getLocation();
                     handler.postDelayed(this, 600000);
                 }
             }, 600000);  //the time is in miliseconds
@@ -639,21 +742,7 @@ public class MainActivity extends AppCompatActivity
 
                                                             setContentView(R.layout.activity_main);
 
-                                                            //region Ejecucion hilo Impresora
-                                                            new Thread(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    try {
-                                                                        FindBluetoothDevice();
-                                                                        //openBluetoothPrinter();
 
-                                                                    } catch (Exception ex) {
-                                                                        ex.printStackTrace();
-                                                                    }
-
-                                                                }
-                                                            }).start();
-                                                            //endregion
 
                                                             objSessions = new Sessions();
 
@@ -706,6 +795,7 @@ public class MainActivity extends AppCompatActivity
                                                                 public void run() {
                                                                     obtener_pedidos();
                                                                     guardar_pedidos_productos();
+                                                                    getLocation();
                                                                     handler.postDelayed(this, 600000);
                                                                 }
                                                             }, 600000);  //the time is in miliseconds
@@ -1053,21 +1143,7 @@ public class MainActivity extends AppCompatActivity
 
                             setContentView(R.layout.activity_main);
 
-                            //region Ejecucion hilo Impresora
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        FindBluetoothDevice();
-                                        //openBluetoothPrinter();
 
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
-
-                                }
-                            }).start();
-                            //endregion
 
                             objSessions = new Sessions();
 
@@ -1120,6 +1196,7 @@ public class MainActivity extends AppCompatActivity
                                 public void run() {
                                     obtener_pedidos();
                                     guardar_pedidos_productos();
+                                    getLocation();
                                     handler.postDelayed(this, 600000);
                                 }
                             }, 600000);  //the time is in miliseconds
@@ -1156,21 +1233,7 @@ public class MainActivity extends AppCompatActivity
 
                 setContentView(R.layout.activity_main);
 
-                //region Ejecucion hilo Impresora
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FindBluetoothDevice();
-                            //openBluetoothPrinter();
 
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-
-                    }
-                }).start();
-                //endregion
 
                 objSessions = new Sessions();
 
@@ -1221,7 +1284,9 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         obtener_pedidos();
+                        getLocation();
                         handler.postDelayed(this, 600000);
+
                     }
                 }, 600000);  //the time is in miliseconds
 
@@ -1853,14 +1918,15 @@ public class MainActivity extends AppCompatActivity
                     // My Bluetooth printer name is MTP-3
                     if(pairedDev.getName().equals("MTP-3")){
                         bluetoothDevice=pairedDev;
-                        setDispositivoEncontrado(true);
+                        Toast.makeText(getApplicationContext(), "Impresora encontrada", Toast.LENGTH_SHORT).show();
+
                         //lblPrinterName.setText("Impresora bluetooth adjunta: "+pairedDev.getName());
                         break;
                     } else {
-                        setDispositivoEncontrado(false);
+                        //Toast.makeText(getApplicationContext(), "Impresora no encontrada", Toast.LENGTH_SHORT).show();
                     }
                 }
-                openBluetoothPrinter();
+
             }
 
             //lblPrinterName.setText("Impresora Bluetooth adjuntada");
@@ -1879,6 +1945,11 @@ public class MainActivity extends AppCompatActivity
             UUID uuidSting = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
             bluetoothSocket=bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
             bluetoothSocket.connect();
+if(!bluetoothSocket.isConnected())
+{
+    setDispositivoEncontrado(false);
+}
+
             outputStream=bluetoothSocket.getOutputStream();
             inputStream=bluetoothSocket.getInputStream();
 
@@ -2074,5 +2145,35 @@ if(reImpresion){
                     + UnicodeFormatter.byteToHex(b[k]));
         }
         return b[3];
+    }
+
+
+
+    public void getLocation(){
+
+        try {
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+           // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) this);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+
+            if (location != null){
+
+                setLongitud( String.valueOf(location.getLongitude()));
+                setLatitud( String.valueOf(location.getLatitude()));
+            }else{
+
+
+              setLatitud(null);
+              setLongitud(null);
+                Toast.makeText(this, "Localización no encontrada", Toast.LENGTH_SHORT).show();
+            }
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error de  GPS!", Toast.LENGTH_SHORT).show();
+        }
+
     }
 }

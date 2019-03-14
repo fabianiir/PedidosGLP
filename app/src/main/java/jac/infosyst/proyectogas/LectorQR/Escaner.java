@@ -59,6 +59,8 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
         int PermisoCamara = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.CAMERA);
         if (PermisoCamara != PackageManager.PERMISSION_GRANTED) {
+
+
             Log.i("Mensaje", "No se tiene permiso.");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 225);
         } else {
@@ -80,15 +82,26 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
 
     public void btnEscanear(View v){
 
-
-    mScannerView = new ZXingScannerView(this);
-    setContentView(mScannerView);
-    mScannerView.setResultHandler(this);
-    mScannerView.startCamera();
-    inCamera = true;
+        int PermisoCamara = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.CAMERA);
+        if (PermisoCamara != PackageManager.PERMISSION_GRANTED) {
 
 
-    mScannerView.setAutoFocus(true);
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 225);
+        } else {
+            mScannerView = new ZXingScannerView(this);
+            setContentView(mScannerView);
+            mScannerView.setResultHandler(this);
+            mScannerView.startCamera();
+            inCamera = true;
+
+
+            mScannerView.setAutoFocus(true);
+        }
+
+
+
     }
 
     @Override

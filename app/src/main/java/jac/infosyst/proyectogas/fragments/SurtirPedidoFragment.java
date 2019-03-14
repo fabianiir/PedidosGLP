@@ -158,11 +158,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     static SimpleDateFormat simpleDateFormatFecha = new SimpleDateFormat("dd-MM-yyyy");
     static SimpleDateFormat simpleDateFormatHora = new SimpleDateFormat("HH:mm:ss");
-    LocationManager locationManager;
+
     String strLatitude = "";
     String strLongitude = "";
-    Location location;
-    FloatingActionButton fabAgregarProducto;
+
+    FloatingActionButton fabAgregarProducto, fabRestarProducto;
 
     String strGettoken = "";
     String strLocalIdPedido = "";
@@ -459,7 +459,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
 
-        FloatingActionButton fabRestarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabRestarProducto);
+        fabRestarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabRestarProducto);
         fabRestarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -773,10 +773,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void pedidoActualizarSurtido(){
-        fabAgregarProducto.setEnabled(false);
-        signaturePad.setEnabled(false);
-        btnLimpiar.setEnabled(false);
-        btnGuardar.setEnabled(false);
+        fabAgregarProducto.setVisibility(View.GONE);
+        fabRestarProducto.setVisibility(View.GONE);
+        btnLimpiar.setVisibility(View.GONE);
+        btnGuardar.setVisibility(View.GONE);
         favplus.setEnabled(false);
         imageViewIncidencia.setEnabled(false);
         getProductos(false);
@@ -1420,11 +1420,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("visible");
         } else {
             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
-            fabAgregarProducto.setEnabled(false);
+            fabAgregarProducto.setVisibility(View.GONE);
+            fabRestarProducto.setVisibility(View.GONE);
             imageViewIncidencia.setEnabled(false);
             signaturePad.setEnabled(false);
-            btnGuardar.setEnabled(false);
-            btnLimpiar.setEnabled(false);
+            btnGuardar.setVisibility(View.GONE);
+            btnLimpiar.setVisibility(View.GONE);
             getImageFirma();
         }
 
@@ -1463,34 +1464,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
             adapter = new ProductoAdapter(null, getActivity(), getFragmentManager(), pendiente);
             recyclerViewProductos.setAdapter(adapter);
+
         }
     }
 
-    public void getUbicacion(){
-        getLocation();
-    }
 
-    public void getLocation(){
-
-        try {
-            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
-            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if (location != null){
-                callSeguimiento();
-            }else{
-                Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        catch(SecurityException e) {
-            e.printStackTrace();
-            Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void callSeguimiento(){
-    }
 
     @Override
     public void onLocationChanged(Location location) {
