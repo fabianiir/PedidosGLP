@@ -180,7 +180,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center"
                     android:layout_margin="8dp"
-                    android:src="@android:drawable/ic_delete"
+                    android:src="@android:drawable/editbox_background"
                     android:tint="@color/BotonGris" />
 
                 <android.support.design.widget.FloatingActionButton

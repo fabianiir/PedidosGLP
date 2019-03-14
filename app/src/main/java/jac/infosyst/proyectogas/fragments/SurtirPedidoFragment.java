@@ -160,7 +160,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     String strLatitude = "";
     String strLongitude = "";
     Location location;
-    FloatingActionButton fabAgregarProducto;
+    FloatingActionButton fabAgregarProducto, fabRestarProducto;
 
     String strGettoken = "";
     String strLocalIdPedido = "";
@@ -449,7 +449,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
 
-        FloatingActionButton fabRestarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabRestarProducto);
+        fabRestarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabRestarProducto);
         fabRestarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -763,10 +763,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void pedidoActualizarSurtido(){
-        fabAgregarProducto.setEnabled(false);
-        signaturePad.setEnabled(false);
-        btnLimpiar.setEnabled(false);
-        btnGuardar.setEnabled(false);
+        fabAgregarProducto.setVisibility(View.GONE);
+        fabRestarProducto.setVisibility(View.GONE);
+        btnLimpiar.setVisibility(View.GONE);
+        btnGuardar.setVisibility(View.GONE);
         favplus.setEnabled(false);
         imageViewIncidencia.setEnabled(false);
         getProductos(false);
@@ -1277,11 +1277,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("visible");
         } else {
             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
-            fabAgregarProducto.setEnabled(false);
+            fabAgregarProducto.setVisibility(View.GONE);
+            fabRestarProducto.setVisibility(View.GONE);
             imageViewIncidencia.setEnabled(false);
             signaturePad.setEnabled(false);
-            btnGuardar.setEnabled(false);
-            btnLimpiar.setEnabled(false);
+            btnGuardar.setVisibility(View.GONE);
+            btnLimpiar.setVisibility(View.GONE);
             getImageFirma();
         }
 
