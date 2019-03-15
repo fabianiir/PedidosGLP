@@ -37,6 +37,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -163,8 +164,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     String strLatitude = "";
     String strLongitude = "";
 
-    FloatingActionButton fabAgregarProducto, fabRestarProducto;
-
+    FloatingActionButton fabAgregarProducto, fabRestarProducto, fabModificarProducto;
     String strGettoken = "";
     String strLocalIdPedido = "";
     String strcamion= Chofer.getCamion();
@@ -460,6 +460,47 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             }
         });
 
+        fabModificarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabEditarProducto);
+        fabModificarProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String producto = ((Sessions) getActivity().getApplicationContext()).getSesOidProducto();
+                if (producto != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                    final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+
+                    View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
+                    final EditText cantidad= (EditText) viewAlert.findViewById(R.id.tv_cantidad);
+                    builder.setView(viewAlert).setPositiveButton("Aceptar",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    if (!cantidad.getText().toString().isEmpty())
+                                    {
+                                        int cantidadProducto = Integer.parseInt(cantidad.getText().toString());
+                                        modificarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto(), cantidadProducto);
+                                    }
+                                    else{
+                                        dialog.dismiss();
+                                    }
+                                }
+                            }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                }else {
+                    Toast.makeText(getActivity(), "Debe de seleccionar un producto", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         fabRestarProducto = (FloatingActionButton) rootView.findViewById(R.id.fabRestarProducto);
         fabRestarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -676,7 +717,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     if(resObj.geterror().equals("false")) {
                         ContentValues values = new ContentValues();
                         values.put("surtido", 1);
-                        db.update(SQLiteDBHelper.Productos_Mod_Table, values,"oid = ?", new String[]{idProducto});
                         db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                         ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                         getProductos(true);
@@ -686,7 +726,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 } else {
                     ContentValues values = new ContentValues();
                     values.put("surtido", 1);
-                    db.update(SQLiteDBHelper.Productos_Mod_Table, values,"oid = ?", new String[]{idProducto});
                     db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                     ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                     getProductos(true);
@@ -704,6 +743,97 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
 
                 db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
+                ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
+                getProductos(true);
+            }
+        });
+    }
+
+    public void modificarProducto(final String idProducto, final int newcantidad){
+
+        int setcantidad = 0;
+        double setprecio = 0;
+        boolean surtido = true;
+        String token = "", descripcion = "";
+
+        sqLiteDBHelper = new SQLiteDBHelper(getActivity());
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+        String sql = "SELECT * FROM productos WHERE oid = '" + idProducto + "'";
+
+        Cursor cursor = db.rawQuery(sql, null);
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            setcantidad = Integer.parseInt(cursor.getString(cursor.getColumnIndex("cantidad")));
+            setprecio = Integer.parseInt(cursor.getString(cursor.getColumnIndex("precio")));
+            descripcion = cursor.getString(cursor.getColumnIndex("descripcion"));
+        }
+
+        final double precioUnitario = setprecio / setcantidad;
+        final double precioXcantidad = precioUnitario * newcantidad;
+        token = ((Sessions) getActivity().getApplicationContext()).getsessToken();
+
+        sql = "SELECT * FROM configuracion";
+
+        final Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+        }
+
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.up_detalle(idProducto, newcantidad, surtido, precioXcantidad, token);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if(response.isSuccessful()){
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if(resObj.geterror().equals("false")) {
+                        ContentValues values = new ContentValues();
+                        values.put("oid", idProducto);
+                        values.put("cantidad", newcantidad);
+                        values.put("surtido", 1);
+                        values.put("precio", precioXcantidad);
+                        db.update(SQLiteDBHelper.Productos_Table, values,"oid = ?", new String[]{idProducto});
+                        ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
+                        getProductos(true);
+                    } else {
+                        Toast.makeText(getActivity(), resObj.getMessage()  , Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    ContentValues values = new ContentValues();
+                    values.put("oid", idProducto);
+                    values.put("cantidad", newcantidad);
+                    values.put("surtido", 1);
+                    values.put("precio", precioXcantidad);
+                    db.update(SQLiteDBHelper.Productos_Table, values,"oid = ?", new String[]{idProducto});
+                    ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
+                    getProductos(true);
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                ContentValues values = new ContentValues();
+                values.put("oid", idProducto);
+                values.put("cantidad", newcantidad);
+                values.put("surtido", 1);
+                values.put("precio", precioXcantidad);
+                db.insert(SQLiteDBHelper.Productos_Mod_Table, null ,values);
+
+                values.put("oid", idProducto);
+                values.put("cantidad", newcantidad);
+                values.put("surtido", 1);
+                values.put("precio", precioXcantidad);
+                db.update(SQLiteDBHelper.Productos_Table, values,"oid = ?", new String[]{idProducto});
+
                 ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                 getProductos(true);
             }
@@ -775,6 +905,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     public void pedidoActualizarSurtido(){
         fabAgregarProducto.setVisibility(View.GONE);
+        fabModificarProducto.setVisibility(View.GONE);
         fabRestarProducto.setVisibility(View.GONE);
         btnLimpiar.setVisibility(View.GONE);
         btnGuardar.setVisibility(View.GONE);
@@ -1422,6 +1553,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         } else {
             ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
             fabAgregarProducto.setVisibility(View.GONE);
+            fabModificarProducto.setVisibility(View.GONE);
             fabRestarProducto.setVisibility(View.GONE);
             imageViewIncidencia.setEnabled(false);
             signaturePad.setEnabled(false);
@@ -1470,8 +1602,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         }
     }
-
-
 
     @Override
     public void onLocationChanged(Location location) {

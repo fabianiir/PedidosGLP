@@ -314,4 +314,12 @@ public class Sessions  extends Application {
     public void setStrFireTOken(String strFireTOken) {
         this.strFireTOken = strFireTOken;
     }
+
+    private Boolean boolPedidosRealizados;
+    public Boolean getBoolPedidosRealizados() {
+        return boolPedidosRealizados;
+    }
+    public void setBoolPedidosRealizados(Boolean boolPedidosRealizados) {
+        this.boolPedidosRealizados = boolPedidosRealizados;
+    }
 }

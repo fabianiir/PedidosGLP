@@ -11,6 +11,7 @@
     <string name="nav_item_operador">Operador</string>
     <string name="nav_item_mapa">Mapa</string>
     <string name="nav_item_ajustes">Ajustes</string>
+    <string name="nav_item_pedidos_realziados">Pedidos Realizados</string>
     <string name="nav_item_pedidos_cerrasesion">Cerrar Sesión</string>
 
 
@@ -20,6 +21,7 @@
         <item>@string/nav_item_operador</item>
         <item>@string/nav_item_mapa</item>
         <item>@string/nav_item_ajustes</item>
+        <item>@string/nav_item_pedidos_realziados</item>
         <item>@string/nav_item_pedidos_cerrasesion</item>
 
     </string-array>
@@ -39,6 +41,7 @@
     <string name="title_operador">Datos Operador</string>
     <string name="title_mapa">Mapa</string>
     <string name="title_ajustes">Ajustes</string>
+    <string name="title_pedidosrealizados">Pedidos Realizados</string>
     <string name="title_cerrarsesion">Cerrar Sesión</string>
 
     <string name="external_dir">firmas</string>

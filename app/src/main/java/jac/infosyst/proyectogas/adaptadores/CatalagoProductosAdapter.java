@@ -115,7 +115,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
 
                 final LayoutInflater inflater = (LayoutInflater) mCtx.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 
-View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
+                View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
                 final EditText cantidad= (EditText) viewAlert.findViewById(R.id.tv_cantidad);
                 builder.setView(viewAlert).setPositiveButton("Aceptar",
                         new DialogInterface.OnClickListener() {
@@ -124,28 +124,20 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
 
                                 if (!cantidad.getText().toString().isEmpty())
                                 {
-
-
                                     int cantidadProducto = Integer.parseInt(cantidad.getText().toString());
                                     sumarProducto( cantidadProducto, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
                                             catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
-
-
                                 }
                                 else{
                                     dialog.dismiss();
                                 }
-
                                  }
                         }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
-
                     }
                 });
-
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
@@ -174,7 +166,6 @@ View viewAlert = inflater.inflate(R.layout.layout_popup_cantidad,null);
         }
         LinearLayout parentLayout;
     }
-
 
     public void storeSqLiteProductos(double price){
 

@@ -1712,65 +1712,18 @@ public class MainActivity extends AppCompatActivity
                     startActivity(i);
                     ((Activity) MainActivity.this).overridePendingTransition(0, 0);
                 }
-                if(strRolUsuario.equals("Operador")) {
-                    //    title = getString(R.string.title_pedidosrealizados);
-                    //    fragment = new PedidosFragment();
-                    LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    layout = layoutInflater.inflate(R.layout.layout_popup, null);
-
-                    DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-                    int width = displayMetrics.widthPixels;
-                    int height = displayMetrics.heightPixels;
-
-                    layout.setVisibility(View.VISIBLE);
-                    POPUP_WINDOW_CONFIRMACION = new PopupWindow(this);
-                    POPUP_WINDOW_CONFIRMACION.setContentView(layout);
-                    POPUP_WINDOW_CONFIRMACION.setWidth(width);
-                    POPUP_WINDOW_CONFIRMACION.setHeight(height);
-                    POPUP_WINDOW_CONFIRMACION.setFocusable(true);
-
-                    POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
-
-                    POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
-
-                    TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
-                    txtMessage.setText("¿Desea cerrar sesión?");
-
-                    Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
-                    btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            POPUP_WINDOW_CONFIRMACION.dismiss();
-                        }
-                    });
-
-                    Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
-                    btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            POPUP_WINDOW_CONFIRMACION.dismiss();
-                            Log.v(TAG, "token: " + position);
-                            String strImei, strChofer, strCamion, strToken;
-
-                            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-
-                            strImei = ((Sessions) getApplicationContext()).getStrImei();
-                            strChofer = ((Sessions) getApplicationContext()).getStrChoferId();
-                            strCamion = ((Sessions) getApplicationContext()).getStrCamionId();
-                            strToken = ((Sessions) getApplicationContext()).getsessToken();
-
-                            insertBitacora(false, strImei, strChofer, strCamion, strToken);
-                        }
-                    });
+                if(strRolUsuario.equals("Operador")){
+                    title = getString(R.string.title_pedidosrealizados);
+                    fragment = new PedidosFragment();
                 }
 
                 break;
 
             case 3:
-                //if (strRolUsuario.equals("Admin")) {
-                //    title = getString(R.string.title_pedidosrealizados);
-                //    fragment = new PedidosFragment();
-                //}
+                if (strRolUsuario.equals("Admin")) {
+                    title = getString(R.string.title_pedidosrealizados);
+                    fragment = new PedidosFragment();
+                }
                 if(strRolUsuario.equals("Operador")){
                     LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     layout = layoutInflater.inflate(R.layout.layout_popup, null);
@@ -1816,14 +1769,60 @@ public class MainActivity extends AppCompatActivity
                             strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
                             strToken = ((Sessions)getApplicationContext()).getsessToken();
 
-                            insertBitacora(false, strImei, null, null,strToken);
+                            insertBitacora(false, strImei, strChofer, strCamion ,strToken);
                         }
                     });
                 }
                 break;
 
             case 4:
+                LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                layout = layoutInflater.inflate(R.layout.layout_popup, null);
 
+                DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+                int width = displayMetrics.widthPixels;
+                int height = displayMetrics.heightPixels;
+
+                layout.setVisibility(View.VISIBLE);
+                POPUP_WINDOW_CONFIRMACION = new PopupWindow(this);
+                POPUP_WINDOW_CONFIRMACION.setContentView(layout);
+                POPUP_WINDOW_CONFIRMACION.setWidth(width);
+                POPUP_WINDOW_CONFIRMACION.setHeight(height);
+                POPUP_WINDOW_CONFIRMACION.setFocusable(true);
+
+                POPUP_WINDOW_CONFIRMACION.setBackgroundDrawable(null);
+
+                POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
+
+                TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
+                txtMessage.setText("¿Desea cerrar sesión?");
+
+                Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
+                btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                    }
+                });
+
+                Button btnSurtirPedidoSi = (Button) layout.findViewById(R.id.btnSurtirPedidoSi);
+                btnSurtirPedidoSi.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        POPUP_WINDOW_CONFIRMACION.dismiss();
+                        Log.v(TAG,"token: " + position);
+                        String strImei, strChofer, strCamion, strToken;
+
+                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+                        strImei = ((Sessions)getApplicationContext()).getStrImei();
+                        strChofer = ((Sessions)getApplicationContext()).getStrChoferId();
+                        strCamion = ((Sessions)getApplicationContext()).getStrCamionId();
+                        strToken = ((Sessions)getApplicationContext()).getsessToken();
+
+                        insertBitacora(false, strImei, null, null,strToken);
+                    }
+                });
                 break;
             default:
                 break;

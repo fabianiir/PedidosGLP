@@ -114,8 +114,8 @@ public interface ServicioUsuario {
           @Field("comentario_chofer") String comentario_chofer,
           @Field("latitud") String latitud,
           @Field("longitud") String longitud,
-          @Field("suma_iva") int suma_iva,
-          @Field("total") int total,
+          @Field("suma_iva") double suma_iva,
+          @Field("total") double total,
           @Field("pago_id") String pago_id,
           @Field("motivo_cancelacion_id") String motivo_cancelacion_id,
           @Field("estatus_id") String estatus_id,
@@ -143,7 +143,7 @@ public interface ServicioUsuario {
   Call<ObjetoRes> sumarProducto(
           @Field("oid") String oid,
           @Field("cantidad") int cantidad,
-          @Field("precio") int precio,
+          @Field("precio") double precio,
           @Field("pedido_id") String pedido_id,
           @Field("producto_id") String producto_id,
           @Field("token") String token
@@ -155,7 +155,7 @@ public interface ServicioUsuario {
           @Field("id") String id,
           @Field("cantidad") int cantidad,
           @Field("surtido") boolean surtido,
-          @Field("precio") int precio,
+          @Field("precio") double precio,
           @Field("token") String token
   );
 

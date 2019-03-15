@@ -26,6 +26,7 @@ import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.FragmentDrawer;
 import jac.infosyst.proyectogas.fragments.DetallePedidoFragment;
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
+import jac.infosyst.proyectogas.fragments.ReimpresionPedidoFragment;
 import jac.infosyst.proyectogas.modelo.Pedido;
 import jac.infosyst.proyectogas.modelo.Pedidos;
 import jac.infosyst.proyectogas.modelo.Producto;
@@ -168,14 +169,25 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                     Toast.makeText(mCtx,  "Debe seleccionar un Pedido!" , Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    MainActivity mainActivity = (MainActivity)mCtx;
-                    Fragment fragment = new Fragment();
-                    DetallePedidoFragment dpf = new DetallePedidoFragment(mCtx);
-                    FragmentManager fragmentManager = mainActivity.getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.container_body, dpf);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+                    if(((Sessions)mCtx.getApplicationContext()).getBoolPedidosRealizados()){
+                        MainActivity mainActivity = (MainActivity) mCtx;
+                        Fragment fragment = new Fragment();
+                        ReimpresionPedidoFragment rpf = new ReimpresionPedidoFragment(mCtx);
+                        FragmentManager fragmentManager = mainActivity.getSupportFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.container_body, rpf);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                    }else {
+                        MainActivity mainActivity = (MainActivity) mCtx;
+                        Fragment fragment = new Fragment();
+                        DetallePedidoFragment dpf = new DetallePedidoFragment(mCtx);
+                        FragmentManager fragmentManager = mainActivity.getSupportFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.container_body, dpf);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                    }
                 }
             }
         });
