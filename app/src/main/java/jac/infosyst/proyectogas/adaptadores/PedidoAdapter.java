@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
 import jac.infosyst.proyectogas.FragmentDrawer;
@@ -152,6 +153,29 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
                     selected.clear();
                     selected.add(position);
                     notifyItemChanged(oldSelected);
+                }
+
+                if(MainActivity.getDispositivoEncontrado())
+                {
+                    Toast.makeText(mCtx,"Impresora conectada", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(mCtx,"Impresora no conectada", Toast.LENGTH_SHORT).show();
+                }
+                if(((Sessions)mCtx.getApplicationContext()).getSesIdPedido().equals("null")) {
+
+                    Toast.makeText(mCtx,  "Debe seleccionar un Pedido!" , Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    MainActivity mainActivity = (MainActivity)mCtx;
+                    Fragment fragment = new Fragment();
+                    DetallePedidoFragment dpf = new DetallePedidoFragment(mCtx);
+                    FragmentManager fragmentManager = mainActivity.getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.container_body, dpf);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
                 }
             }
         });

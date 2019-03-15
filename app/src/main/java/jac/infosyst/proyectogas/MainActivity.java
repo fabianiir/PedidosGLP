@@ -1885,7 +1885,7 @@ public class MainActivity extends AppCompatActivity
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("EL cierre de sesión no puede alcanzar el servidor, intente de nuevo")
                         .setCancelable(false)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {

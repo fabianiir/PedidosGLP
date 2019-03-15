@@ -235,7 +235,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
         String strNameTittle = String.valueOf(((AppCompatActivity)getActivity()).getSupportActionBar().getTitle());
 
         if(strNameTittle.equals("Pedidos")){
-            btnAtenderPedido.setVisibility(View.VISIBLE);
 
             btnImprimirPedido.setVisibility(View.GONE);
             tipoPedidos = 0;
@@ -243,7 +242,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             Toast.makeText(getActivity(), "Actualizando pedidos..." , Toast.LENGTH_SHORT).show();
         }
         if(strNameTittle.equals("Pedidos Realizados")){
-            btnAtenderPedido.setVisibility(View.GONE);
 
             btnImprimirPedido.setVisibility(View.VISIBLE);
             tipoPedidos = 1;

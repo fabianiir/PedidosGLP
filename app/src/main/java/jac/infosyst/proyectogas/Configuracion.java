@@ -168,6 +168,7 @@ public class Configuracion extends AppCompatActivity {
                 }
             });
         }catch (Exception ex){
+            progressDialog.dismiss();
             Toast.makeText(getApplicationContext(), "URL no valido", Toast.LENGTH_LONG).show();
         }
     }

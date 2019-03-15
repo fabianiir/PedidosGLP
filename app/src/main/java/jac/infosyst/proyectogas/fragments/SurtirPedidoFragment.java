@@ -50,6 +50,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,7 +113,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     private ContentValues values;
     private Uri imageUri;
     private Bitmap thumbnail;
-
+    String strestatus = "";
     String imageurl;
     File directory, directoryIncidencia;
     ImageView imgFirma;
@@ -804,8 +805,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 .build();
 
         final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-        String estatus = Estatus.getSurtidoId();
-        if(estatus.isEmpty()){
+        strestatus = Estatus.getSurtidoId();
+        if(strestatus.isEmpty()){
             String sql1 = "SELECT * FROM cat_estatus";
             Cursor record1 = db.rawQuery(sql1, null);
             if(record1.moveToFirst()) {
@@ -820,8 +821,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     }
                 }
             }
-            estatus = Estatus.getSurtidoId();
-            if (estatus.isEmpty()){
+            strestatus = Estatus.getSurtidoId();
+            if (strestatus.isEmpty()){
                 Call call = service.getCatalogoEstatus(strtoken);
                 call.enqueue(new Callback() {
                     @Override
@@ -830,7 +831,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                             ObjetoRes3 obj_estatus = (ObjetoRes3) response.body();
                             if (obj_estatus.geterror().equals("false")) {
                                 List<CatalogoEstatus> arrayListEstatus = Arrays.asList(obj_estatus.getCatalogoEstatus());
-                                Estatus estatus = new Estatus();
+                                final Estatus estatus = new Estatus();
 
                                 for (CatalogoEstatus catalogoEstatus : arrayListEstatus) {
                                     ContentValues values = new ContentValues();
@@ -847,11 +848,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                     } else if (arrayListEstatus.get(i).getdescripcion().equals("Cancelado")) {
                                         estatus.setCanceladoId(arrayListEstatus.get(i).getIdProducto());
                                     }
-                                    String estatusEnqueue = Estatus.getSurtidoId();
+                                    strestatus = Estatus.getSurtidoId();
                                     call = service.up_pedido(pedidoID, strHora, strFecha,
                                             "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
                                             0, 0, "", "null",
-                                            estatusEnqueue, "Up_1", strtoken);
+                                            strestatus, "Up_1", strtoken);
 
                                     call.enqueue(new Callback() {
 
@@ -895,7 +896,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                                     values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
                                                     values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
                                                     values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
-                                                    values.put("estatus_id", Estatus.getSurtidoId());
+                                                    values.put("estatus_id", strestatus);
                                                     values.put("firma", record.getString(record.getColumnIndex("firma")));
                                                     values.put("foto_fuga", record.getString(record.getColumnIndex("foto_fuga")));
                                                     values.put("clave", "Up_1");
@@ -912,7 +913,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                                     values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
                                                     values.put("pago_id", "");
                                                     values.put("motivo_cancelacion_id", "");
-                                                    values.put("estatus_id", Estatus.getSurtidoId());
+                                                    values.put("estatus_id", strestatus);
                                                     values.put("firma", "");
                                                     values.put("foto_fuga", "");
                                                     values.put("clave", "Up_1");
@@ -939,7 +940,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             Call call = service.up_pedido(pedidoID, strHora, strFecha,
                     "comentario_cliente", "comentario_chofer", strLatitude, strLongitude,
                     0, 0, "", "null",
-                    estatus, "Up_1", strtoken);
+                    strestatus, "Up_1", strtoken);
 
             call.enqueue(new Callback() {
 
@@ -983,7 +984,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                             values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
                             values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
                             values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));
-                            values.put("estatus_id", Estatus.getSurtidoId());
+                            values.put("estatus_id", strestatus);
                             values.put("firma", record.getString(record.getColumnIndex("firma")));
                             values.put("foto_fuga", record.getString(record.getColumnIndex("foto_fuga")));
                             values.put("clave", "Up_1");
@@ -1000,7 +1001,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                             values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
                             values.put("pago_id", "");
                             values.put("motivo_cancelacion_id", "");
-                            values.put("estatus_id", Estatus.getSurtidoId());
+                            values.put("estatus_id", strestatus);
                             values.put("firma", "");
                             values.put("foto_fuga", "");
                             values.put("clave", "Up_1");
@@ -1453,14 +1454,16 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 j++;
 
                 strTotal = String.valueOf(total);
-                textViewTotal.setText("Total $:" + total);
+                NumberFormat format = NumberFormat.getCurrencyInstance();
+                textViewTotal.setText("Total :" + format.format(total));
 
                 adapter = new ProductoAdapter(Arrays.asList(productos), getActivity(), getFragmentManager(), pendiente);
                 recyclerViewProductos.setAdapter(adapter);
             }
         }else {
             strTotal = String.valueOf(0);
-            textViewTotal.setText("Total $:" + 0);
+            NumberFormat format = NumberFormat.getCurrencyInstance();
+            textViewTotal.setText("Total :" + format.format(total));
 
             adapter = new ProductoAdapter(null, getActivity(), getFragmentManager(), pendiente);
             recyclerViewProductos.setAdapter(adapter);

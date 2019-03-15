@@ -32,6 +32,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.zip.Inflater;
@@ -83,7 +84,8 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     public void onBindViewHolder(ProductoAdapter.ViewHolder holder, final int position) {
         final Producto producto = productos.get(position);
         holder.textViewProducto.setText("" + producto.getdescripcion());
-        holder.textViewPrecio.setText("$" + producto.getPrecio());
+        NumberFormat format = NumberFormat.getCurrencyInstance();
+        holder.textViewPrecio.setText(format.format(producto.getPrecio()));
         holder.textViewCantidad.setText("Can:" + producto.getCantidad());
 
         holder.btnRestarProducto.setTag(producto.getOidProducto());

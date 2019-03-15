@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textViewProducto"
                 android:layout_alignParentLeft="true"
-                android:layout_marginLeft="100dp"
+                android:layout_marginLeft="150dp"
                 android:layout_weight="0"
                 android:text="Can"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />

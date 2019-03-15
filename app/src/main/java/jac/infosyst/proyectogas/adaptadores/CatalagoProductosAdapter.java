@@ -54,6 +54,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -94,7 +95,8 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
     public void onBindViewHolder(final CatalagoProductosAdapter.ViewHolder holder, final int position) {
         CatalagoProducto catalagoProducto = catalagoProductos.get(position);
         holder.textViewProducto.setText( "" + catalagoProducto.getdescripcion());
-        holder.textViewprecio_unitario.setText( "" + catalagoProducto.getprecio_unitario());
+        NumberFormat format = NumberFormat.getCurrencyInstance();
+        holder.textViewprecio_unitario.setText(format.format(catalagoProducto.getprecio_unitario()));
 
         holder.btnAgregarCatalagoProducto.setTag(catalagoProducto.getIdProducto());
 
