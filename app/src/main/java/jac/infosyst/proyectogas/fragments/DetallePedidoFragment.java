@@ -3,18 +3,15 @@ package jac.infosyst.proyectogas.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -25,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,19 +32,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
-import jac.infosyst.proyectogas.LoginActivity;
 import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.modelo.Producto;
-import jac.infosyst.proyectogas.modelo.Productos;
 import jac.infosyst.proyectogas.utils.Sessions;
 
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 
@@ -120,6 +116,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     String strLongitude = "";
 
     Location location;
+    private TableLayout mTableLayout;
 
     public DetallePedidoFragment(Context mCtx) {
         // Required empty public constructor
@@ -137,6 +134,12 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detalle_pedido, container, false);
         getLocation();
+
+
+        // setup the table
+
+
+
 
         MainActivity.setFragmentController(1);
 // path to /data/data/yourapp/app_data/imageDir
@@ -156,6 +159,16 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         Producto[] producto = ((Sessions) getActivity().getApplication()).getSesDetalleProductoSurtir();
 
         NumberFormat format = NumberFormat.getCurrencyInstance();
+
+
+        //region Tabla Productos
+        mTableLayout = (TableLayout) rootView.findViewById(R.id.tableInvoices);
+
+        mTableLayout.setStretchAllColumns(true);
+
+        cargarProductos(producto);
+        //endregion
+
 
         ArrayList arrayListProductos = new ArrayList();
         if(producto != null && producto.length != 0){
@@ -194,9 +207,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         }
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, arrayListProductos);
 
-        listView = (ListView) rootView.findViewById(R.id.lvProductos);
 
-        listView.setAdapter(arrayAdapter);
 
 
         textViewObservaciones = (TextView) rootView.findViewById(R.id.textViewObservaciones);
@@ -439,5 +450,167 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     @Override
     public void onProviderEnabled(String provider) {
 
+    }
+
+    public void cargarProductos(Producto[] productos) {
+
+        int leftRowMargin=0;
+        int topRowMargin=0;
+        int rightRowMargin=0;
+        int bottomRowMargin = 0;
+        int textSize = 0, smallTextSize =0, mediumTextSize = 0;
+
+        textSize = (int) getResources().getDimension(R.dimen.font_size_verysmall);
+        smallTextSize = (int) getResources().getDimension(R.dimen.font_size_small);
+        mediumTextSize = (int) getResources().getDimension(R.dimen.font_size_medium);
+
+
+
+
+        int rows = productos.length;
+        //getSupportActionBar().setTitle("Invoices (" + String.valueOf(rows) + ")");
+        TextView textSpacer = null;
+
+       mTableLayout.removeAllViews();
+
+        // -1 es la el heading
+        for(int i = -1; i < rows; i ++) {
+            Producto row = null;
+            if (i > -1)
+                row = productos[i];
+            else {
+                textSpacer = new TextView(getContext());
+                textSpacer.setText("");
+
+            }
+            //Columnas
+
+
+
+            //region columna 1
+            final TextView tv2 = new TextView(getContext());
+            if (i == -1) {
+                tv2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT));
+                tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+            } else {
+                tv2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                        TableRow.LayoutParams.MATCH_PARENT));
+                tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+            }
+
+            tv2.setGravity(Gravity.CENTER);
+
+            tv2.setPadding(5, 10, 0, 10);
+            if (i == -1) {
+                tv2.setText("Producto");
+                tv2.setBackgroundColor(Color.parseColor("#477ea0"));
+                tv2.setTextColor(Color.parseColor("#DBDCDC"));
+            }else {
+                tv2.setBackgroundColor(Color.parseColor("#ffffff"));
+
+                tv2.setText(row.getdescripcion());
+            }
+
+//endregion
+
+            //region columna 2
+            final TextView tv3 = new TextView(getContext());
+            tv3.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT));
+
+            tv3.setGravity(Gravity.CENTER);
+
+            tv3.setPadding(5, 10, 0, 10);
+            if (i == -1) {
+                tv3.setText("Cantidad");
+                tv3.setBackgroundColor(Color.parseColor("#477ea0"));
+                tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv3.setTextColor(Color.parseColor("#DBDCDC"));
+            } else {
+                tv3.setBackgroundColor(Color.parseColor("#f8f8f8"));
+                tv3.setText(String.valueOf(row.getCantidad()));
+                tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+            }
+
+//endregion
+
+            //region columna 3
+            final TextView tv4 = new TextView(getContext());
+            tv4.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT));
+
+            tv4.setGravity(Gravity.CENTER);
+
+            tv4.setPadding(5, 10, 0, 10);
+            if (i == -1) {
+                tv4.setText("Total");
+                tv4.setBackgroundColor(Color.parseColor("#477ea0"));
+                tv4.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv4.setTextColor(Color.parseColor("#DBDCDC"));
+            } else {
+                tv4.setBackgroundColor(Color.parseColor("#ffffff"));
+
+                tv4.setText(String.valueOf("$"+row.getPrecio()));
+                tv4.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+            }
+
+//endregion
+
+
+
+            // add table row
+            final TableRow tr = new TableRow(getContext());
+            tr.setId(i + 1);
+            TableLayout.LayoutParams trParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
+                    TableLayout.LayoutParams.WRAP_CONTENT);
+            trParams.setMargins(leftRowMargin, topRowMargin, rightRowMargin, bottomRowMargin);
+            tr.setPadding(0,0,0,0);
+            tr.setLayoutParams(trParams);
+
+
+
+            tr.addView(tv2);
+            tr.addView(tv3);
+            tr.addView(tv4);
+
+
+            if (i > -1) {
+
+                tr.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        TableRow tr = (TableRow) v;
+                        //do whatever action is needed
+
+                    }
+                });
+
+
+            }
+            mTableLayout.addView(tr, trParams);
+
+            if (i > -1) {
+
+                // add separator row
+                final TableRow trSep = new TableRow(getContext());
+                TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
+                        TableLayout.LayoutParams.WRAP_CONTENT);
+                trParamsSep.setMargins(leftRowMargin, topRowMargin, rightRowMargin, bottomRowMargin);
+
+                trSep.setLayoutParams(trParamsSep);
+                TextView tvSep = new TextView(getContext());
+                TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT);
+                tvSepLay.span = 3;
+                tvSep.setLayoutParams(tvSepLay);
+                tvSep.setBackgroundColor(Color.parseColor("#d9d9d9"));
+                tvSep.setHeight(1);
+
+                trSep.addView(tvSep);
+                mTableLayout.addView(trSep, trParamsSep);
+            }
+
+
+        }
     }
 }
