@@ -674,7 +674,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     public void restarProducto(final String idProducto){
         int setcantidad = 0;
         boolean surtido = false;
-        int setprecio = 0;
+        double setprecio = 0;
         String token = "";
         sqLiteDBHelper = new SQLiteDBHelper(getActivity());
         final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
@@ -685,10 +685,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             setcantidad = Integer.parseInt(cursor.getString(cursor.getColumnIndex("cantidad")));
-            setprecio = Integer.parseInt(cursor.getString(cursor.getColumnIndex("precio")));
+            setprecio = Double.parseDouble(cursor.getString(cursor.getColumnIndex("precio")));
         }
         final int cantidad = setcantidad;
-        final int precio = setprecio;
+        final double precio = setprecio;
         token = ((Sessions) getActivity().getApplicationContext()).getsessToken();
 
         sql = "SELECT * FROM configuracion";
