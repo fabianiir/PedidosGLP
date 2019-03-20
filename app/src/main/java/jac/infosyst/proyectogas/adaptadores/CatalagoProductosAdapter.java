@@ -125,7 +125,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
                                 if (!cantidad.getText().toString().isEmpty())
                                 {
                                     int cantidadProducto = Integer.parseInt(cantidad.getText().toString());
-                                    sumarProducto( cantidadProducto, (int) catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
+                                    sumarProducto( cantidadProducto, catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
                                             catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
                                 }
                                 else{
@@ -182,7 +182,7 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
         db.insert("productos", null, productosVal);
     }
 
-    public void sumarProducto(final int cantidad, final int precio, final String pedidoId, final String productoId, String token){
+    public void sumarProducto(final int cantidad, final double precio, final String pedidoId, final String productoId, String token){
 
         sqLiteDBHelper = new SQLiteDBHelper(mCtx);
 
