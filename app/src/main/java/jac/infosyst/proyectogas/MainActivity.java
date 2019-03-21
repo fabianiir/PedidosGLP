@@ -1339,6 +1339,7 @@ public class MainActivity extends AppCompatActivity
                             db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Pedidos_Table + "'");
                             db.execSQL("DELETE FROM '" + SQLiteDBHelper.Productos_Table + "'");
                             db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = '" + SQLiteDBHelper.Productos_Table + "'");
+
                             for (Pedido pedido : list) {
                                 ContentValues values = new ContentValues();
                                 values.put("oid", pedido.getOid());

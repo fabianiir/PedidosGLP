@@ -69,13 +69,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     /*firma*/
     RelativeLayout mContent;
     Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar, btnLlamar,btnCancelarPedido;
-    ListView listView;
-
-    Button mClear, mGetSign, mCancel;
-    File file;
-    View view;
-
-    Bitmap bitmap;
 
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     View layout;
@@ -201,12 +194,12 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             tableRow.setVisibility(View.GONE);
         }
 
-        textViewCliente.setText(Html.fromHtml    (strCliente));
-        textViewDireccion.setText(Html.fromHtml  (strDireccion));
-        textViewTelefono.setText(Html.fromHtml   (strTelefono));
-        textViewDescripcion.setText(Html.fromHtml(strDescripcion));
-        textViewEstatus.setText(Html.fromHtml    (strEstatus));
-        textViewDetalle.setText(Html.fromHtml    ("Detalle de Productos: "));
+        textViewCliente.setText(strCliente);
+        textViewDireccion.setText(strDireccion);
+        textViewTelefono.setText(strTelefono);
+        textViewDescripcion.setText(strDescripcion);
+        textViewEstatus.setText(strEstatus);
+        textViewDetalle.setText("Detalle de Productos: ");
         textViewTotal.setText(Html.fromHtml    ("<b>Total: </b>" + format.format(Integer.parseInt(strTotal))));
 
         btnSurtirPedido = (Button) rootView.findViewById(R.id.btnSurtirPedido);

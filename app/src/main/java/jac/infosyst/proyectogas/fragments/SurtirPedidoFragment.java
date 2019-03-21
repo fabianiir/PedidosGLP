@@ -1,6 +1,7 @@
 package jac.infosyst.proyectogas.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -480,7 +481,11 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                                     if (!cantidad.getText().toString().isEmpty())
                                     {
                                         int cantidadProducto = Integer.parseInt(cantidad.getText().toString());
-                                        modificarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto(), cantidadProducto);
+                                        if(cantidadProducto <= 0){
+                                            Toast.makeText(getActivity(), "La cantidad no puede ser 0 o menor", Toast.LENGTH_SHORT).show();
+                                        }else{
+                                            modificarProducto(((Sessions) getActivity().getApplicationContext()).getSesOidProducto(), cantidadProducto);
+                                        }
                                     }
                                     else{
                                         dialog.dismiss();
@@ -1472,6 +1477,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         }
     }
 
+    @SuppressLint("RestrictedApi")
     public void getProductos(final boolean pendiente) {
         SQLiteDBHelper sqLiteDBHelper = null;
 
