@@ -125,9 +125,16 @@ public class CatalagoProductosAdapter  extends RecyclerView.Adapter<CatalagoProd
                                 if (!cantidad.getText().toString().isEmpty())
                                 {
                                     int cantidadProducto = Integer.parseInt(cantidad.getText().toString());
-                                    sumarProducto( cantidadProducto, catalagoProductos.get(position).getprecio_unitario(), ((Sessions)mCtx.getApplicationContext()).getSesIdPedido(),
-                                            catalagoProductos.get(position).getIdProducto(),  ((Sessions)mCtx.getApplicationContext()).getsessToken());
-                                }
+                                    if(cantidadProducto <= 0 && !cantidad.getText().toString().equals('.'))
+                                    {
+                                        Toast.makeText(mCtx, "La cantidad no puede ser 0 o menor", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                    else {
+                                        sumarProducto(cantidadProducto, catalagoProductos.get(position).getprecio_unitario(), ((Sessions) mCtx.getApplicationContext()).getSesIdPedido(),
+                                                catalagoProductos.get(position).getIdProducto(), ((Sessions) mCtx.getApplicationContext()).getsessToken());
+                                    }
+                                    }
                                 else{
                                     dialog.dismiss();
                                 }

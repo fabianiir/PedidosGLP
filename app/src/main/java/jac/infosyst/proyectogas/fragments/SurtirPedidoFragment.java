@@ -247,20 +247,27 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         String strFirma = ((Sessions)getActivity().getApplication()).getsesFirmaURL();
         strTotal = ((Sessions)getActivity().getApplication()).getsesTotal();
 
+
+        textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
+        textViewDireccion = (TextView) rootView.findViewById(R.id.tvDireccion);
+        textViewDescripcion = (TextView) rootView.findViewById(R.id.tvDescripcion);
+        textViewEstatus = (TextView) rootView.findViewById(R.id.tvEstatus);
+        textViewDetalle = (TextView) rootView.findViewById(R.id.tvDetalle);
+        textViewFirma = (TextView) rootView.findViewById(R.id.tvFirma);
         if(strCliente == null){
-            strCliente = "N/A";
+            textViewCliente.setVisibility(View.GONE);
         }
         if(strDireccion == null){
-            strDireccion = "N/A";
+           textViewDireccion.setVisibility(View.GONE);
         }
         if(strDescripcion == null){
-            strDescripcion = "N/A";
+         textViewDescripcion.setVisibility(View.GONE);
         }
         if(strEstatus == null){
-            strEstatus = "N/A";
+           textViewEstatus.setVisibility(View.GONE);
         }
         if(strDetalle == null){
-            strDescripcion = "N/A";
+           textViewDetalle.setVisibility(View.GONE);
         }
         if(strFirma == null){
             strFirma = "N/A";
@@ -280,17 +287,16 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             tvTitulo.setText("Surtir Pedido");
         }
 
-        textViewCliente = (TextView) rootView.findViewById(R.id.tvCliente);
         textViewCliente.setText("Nombre: " + strCliente);
-        textViewDireccion = (TextView) rootView.findViewById(R.id.tvDireccion);
+
         textViewDireccion.setText("Direccion: " + strDireccion);
-        textViewDescripcion = (TextView) rootView.findViewById(R.id.tvDescripcion);
+
         textViewDescripcion.setText("Descripcion: " + strDescripcion);
-        textViewEstatus = (TextView) rootView.findViewById(R.id.tvEstatus);
+
         textViewEstatus.setText("Estatus: " + strEstatus);
-        textViewDetalle = (TextView) rootView.findViewById(R.id.tvDetalle);
+
         textViewDetalle.setText("Detalle Producto: ");
-        textViewFirma = (TextView) rootView.findViewById(R.id.tvFirma);
+
         textViewFirma.setText("Firma: " + strFirma);
         textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
         btnGuardar = (Button)rootView.findViewById(R.id.btnGuardar);
@@ -324,10 +330,20 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         Cursor cursorPr = db.rawQuery(sqlValidación, null);
                         if (cursorPr.getCount() > 0) {
                             if (!signaturePad.isEmpty()) {
-                                mostrarConfirmacion("¿Desea Confirmar?");
+                                if(!strTotal.equals("0.0"))
+                                {
+                                    mostrarConfirmacion("¿Desea Confirmar?");
+
+                                }
+                                else
+                                {
+                                    Toast.makeText(getActivity(), "No se puede surtir el pedido si el total es 0 ", Toast.LENGTH_SHORT).show();
+                                }
+
                             } else {
                                 Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
                             }
+
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             builder.setMessage("Este pedido no contiene productos y no puede ser guardado")
@@ -342,7 +358,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
                         }
                     }else{
-                        Toast.makeText(getActivity(), "No puede surtir el pedido sy el total es \"0\" ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "No puede surtir el pedido si el total es \"0\" ", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
