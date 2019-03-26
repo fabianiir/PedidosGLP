@@ -93,7 +93,7 @@ if (estatusCliente==null)
         btnReimprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
+
 
                     String placas = "", nombre = "";
 
@@ -106,10 +106,26 @@ if (estatusCliente==null)
                         nombre = record.getString(record.getColumnIndex("nombre"));
                         placas = record.getString(record.getColumnIndex("placas"));
                     }
-                    MainActivity.printData(nombCliente,direcCliente,totalCliente,nombre,placas,fecha,true);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                    final String finalNombre = nombre;
+                    final String finalPlacas = placas;
+
+
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                MainActivity.printData(nombCliente,direcCliente,totalCliente, finalNombre, finalPlacas,fecha,true);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
+
+
+
 
                 Toast.makeText(getActivity(), "Reimprimiendo Pedido" , Toast.LENGTH_SHORT).show();
 

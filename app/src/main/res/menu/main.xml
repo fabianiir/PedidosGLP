@@ -5,6 +5,6 @@
         android:id="@+id/action_settings"
         android:orderInCategory="300"
         android:title="Wifi"
-        android:visible="false"
+        android:visible="true"
         app:showAsAction="ifRoom" />
 </menu>

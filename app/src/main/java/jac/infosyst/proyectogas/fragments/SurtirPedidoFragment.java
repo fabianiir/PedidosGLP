@@ -383,7 +383,22 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     }
 
                     Toast.makeText(getActivity(), "Reimpimir ticket", Toast.LENGTH_SHORT).show();
-                    MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), nombre, placas, strFecha,true);
+
+
+                    final String finalNombre = nombre;
+                    final String finalPlacas = placas;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), finalNombre, finalPlacas, strFecha,true);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("¿Se imprimio el ticket?");
                     builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -660,8 +675,21 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 pedidoActualizarSurtido();
                 Toast.makeText(getActivity(), "Pedido Surtido Exitosamente!", Toast.LENGTH_SHORT).show();
                 POPUP_WINDOW_CONFIRMACION.dismiss();
-                try {
-                    MainActivity.printData(imprCliente, imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad, strFecha, false);
+
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                MainActivity.printData(imprCliente, imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad, strFecha, false);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("¿Se imprimio el ticket?");
                     builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -685,9 +713,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     AlertDialog dialog = builder.create();
                     dialog.show();
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
             }
         });
     }

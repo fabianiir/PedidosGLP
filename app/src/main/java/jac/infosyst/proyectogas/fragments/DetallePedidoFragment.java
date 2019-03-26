@@ -200,7 +200,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         textViewDescripcion.setText(strDescripcion);
         textViewEstatus.setText(strEstatus);
         textViewDetalle.setText("Detalle de Productos: ");
-        textViewTotal.setText(Html.fromHtml    ("<b>Total: </b>" + format.format(Integer.parseInt(strTotal))));
+        textViewTotal.setText(Html.fromHtml    ("<b>Total: </b>" + format.format(Double.parseDouble(strTotal))));
 
         btnSurtirPedido = (Button) rootView.findViewById(R.id.btnSurtirPedido);
         btnSurtirPedido.setOnClickListener(new View.OnClickListener() {
@@ -381,9 +381,22 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     }
 
     public void onClickLlamada(View v, String numTelefono) {
-        Intent i = new Intent(Intent.ACTION_CALL);
-        i.setData(Uri.parse("tel:" + numTelefono));
-        startActivity(i);
+
+        int PermisoTelefono = ContextCompat.checkSelfPermission(
+                getContext(), Manifest.permission.CALL_PHONE);
+        if (PermisoTelefono != PackageManager.PERMISSION_GRANTED) {
+
+
+            Log.i("Mensaje", "No se tiene permiso.");
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 225);
+        } else {
+            Log.i("Mensaje", "Se tiene permiso!");
+            Intent i = new Intent(Intent.ACTION_CALL);
+            i.setData(Uri.parse("tel:" + numTelefono));
+            startActivity(i);
+        }
+
+
     }
 
     @Override
