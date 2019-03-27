@@ -1,5 +1,6 @@
 package jac.infosyst.proyectogas;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -132,7 +133,8 @@ public class FragmentDrawer extends Fragment {
             final ServicioUsuario service = retrofit.create(ServicioUsuario.class);
 
             Call call = service.Foto(oid, "2", strtoken);
-            call.enqueue(new Callback() {
+                final String finalOid = oid;
+                call.enqueue(new Callback() {
                 @Override
                 public void onResponse(Call call, Response response) {
                     if (response.isSuccessful()) {
@@ -145,6 +147,15 @@ public class FragmentDrawer extends Fragment {
                             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
                             imageViewPerfil.setImageBitmap(decodedByte);
 
+
+                            ContentValues values = new ContentValues();
+
+                            values.put("foto", archivo);
+                            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+
+
+                            db.update(SQLiteDBHelper.Usuario_Table, values, "oid = ?", new String[]{finalOid});
+
                         }
 
                     }
@@ -155,7 +166,7 @@ public class FragmentDrawer extends Fragment {
             });
         } else{
             imageViewPerfil = (ImageView) layout.findViewById(R.id.profile_image) ;
-            imageViewPerfil.setImageBitmap(decodedByte);
+            imageViewPerfil.setImageBitmap(decodeBase64(foto));
         }
             TextView textViewInterno = (TextView) layout.findViewById(R.id.Nom_Operador);
             textViewInterno.setText(nombre);
