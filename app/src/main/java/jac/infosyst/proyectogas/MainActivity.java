@@ -100,26 +100,6 @@ public class MainActivity extends AppCompatActivity
     BluetoothSocket bluetoothSocket;
     BluetoothDevice bluetoothDevice;
 
-    Thread HiloImpresora = new Thread(new Runnable() {
-        @Override
-        public void run() {
-
-            try {
-
-                    FindBluetoothDevice();
-                    openBluetoothPrinter();
-
-
-
-
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-    });
-
 
     private static Boolean DispositivoEncontrado = false;
 
@@ -268,7 +248,7 @@ setDispositivoEncontrado(false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        HiloImpresora.start();
+
         super.onCreate(savedInstanceState);
         setLatitud(null);
         setLongitud(null);
@@ -1660,7 +1640,26 @@ if(bluetoothAdapter.isEnabled())
 {
     if(!getDispositivoEncontrado()) {
 
-        HiloImpresora.run();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+
+                    FindBluetoothDevice();
+                    openBluetoothPrinter();
+
+
+
+
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        }).start();
+
     }
     else
     {
