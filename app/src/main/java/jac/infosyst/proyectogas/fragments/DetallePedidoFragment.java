@@ -274,7 +274,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 POPUP_WINDOW_CONFIRMACION.showAtLocation(layout, Gravity.CENTER, 1, 1);
 
                 TextView txtMessage = (TextView) layout.findViewById(R.id.layout_popup_txtMessage);
-                txtMessage.setText("Este pedido tiene productos. ¿Desea surtirlo?");
+                txtMessage.setText("Este pedido no tiene productos. ¿Desea surtirlo?");
 
                 Button btnSurtirPedidoNo = (Button) layout.findViewById(R.id.btnSurtirPedidoNo);
                 btnSurtirPedidoNo.setOnClickListener(new View.OnClickListener() {
