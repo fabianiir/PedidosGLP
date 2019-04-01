@@ -58,24 +58,42 @@ public class ReimpresionPedidoFragment  extends Fragment {
 
         final String nombCliente= ((Sessions)getActivity().getApplicationContext()).getSesCliente();
         final String direcCliente = ((Sessions)getActivity().getApplicationContext()).getsesDireccion();
+        final  String descripCliente=  ((Sessions)getActivity().getApplicationContext()).getsesDescripcion();
+        final  String estatusCliente = ((Sessions)getActivity().getApplicationContext()).getsesEstatus();
         final String totalCliente = ((Sessions)getActivity().getApplicationContext()).getsesTotal();
         Calendar calendar = Calendar.getInstance();
         final String fecha = String.valueOf(simpleDateFormatFecha.format(calendar.getTime()));
 
+if(nombCliente==null)
+{
+    tvCanNombreOperador.setVisibility(View.GONE);
+}
+if(direcCliente==null)
+{
+    tvCanDireccion.setVisibility(View.GONE);
+}
+if (descripCliente==null)
+{
+    tvCanDescripcion.setVisibility(View.GONE);
+}
+if (estatusCliente==null)
+{
+    tvCanEstatus.setVisibility(View.GONE);
+}
 
 
         tvCanNombreOperador.setText("Nombre: " + nombCliente);
         tvCanDireccion.setText("Direccion: " + direcCliente);
-
-        tvCanDescripcion.setText("Descripcion: " + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion());
-        tvCanEstatus.setText("Estatus: " + ((Sessions)getActivity().getApplicationContext()).getsesEstatus());
+        tvCanDescripcion.setText("Descripción" + descripCliente);
+        tvCanDescripcion.setText("Descripcion: " + estatusCliente);
+        tvCanEstatus.setText("Estatus: " + estatusCliente);
         tvCanTotal.setText("Total: " + totalCliente);
 
         btnReimprimirPedido = (Button) rootView.findViewById(R.id.btnReimprimirPedido);
         btnReimprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
+
 
                     String placas = "", nombre = "";
 
@@ -88,10 +106,26 @@ public class ReimpresionPedidoFragment  extends Fragment {
                         nombre = record.getString(record.getColumnIndex("nombre"));
                         placas = record.getString(record.getColumnIndex("placas"));
                     }
-                    MainActivity.printData(nombCliente,direcCliente,totalCliente,nombre,placas,fecha,true);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                    final String finalNombre = nombre;
+                    final String finalPlacas = placas;
+
+
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                MainActivity.printData(nombCliente,direcCliente,totalCliente, finalNombre, finalPlacas,fecha,true);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
+
+
+
 
                 Toast.makeText(getActivity(), "Reimprimiendo Pedido" , Toast.LENGTH_SHORT).show();
 

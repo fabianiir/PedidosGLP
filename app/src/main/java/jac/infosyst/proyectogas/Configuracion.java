@@ -183,6 +183,11 @@ public class Configuracion extends AppCompatActivity {
             Toast.makeText(this, "Ingresar Telefono", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        if(telefono.trim().length() <8 ){
+            Toast.makeText(this, "El numero de telefono debe tener por lo menos 8 digitos", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         return true;
     }
 

@@ -29,6 +29,7 @@
         android:layout_marginBottom="4dp"
         android:hint="Cantidad"
         android:inputType="numberDecimal"
+        android:digits="0123456789"
         android:maxLength="3" />
 
     <LinearLayout

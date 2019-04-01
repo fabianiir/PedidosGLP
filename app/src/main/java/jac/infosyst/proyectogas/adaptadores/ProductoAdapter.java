@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -13,10 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 
 import jac.infosyst.proyectogas.fragments.PedidosFragment;
@@ -60,6 +63,7 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
     private Fragment fragment;
     private boolean pendiente;
 
+    int mCurrentPlayingPosition = -1;
     public ProductoAdapter(List<Producto> productos, Context mCtx, FragmentManager f_manager, boolean pendiente) {
         this.productos = productos;
         this.mCtx = mCtx;
@@ -80,8 +84,12 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
         }
     }
 
+
+
     @Override
-    public void onBindViewHolder(ProductoAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ProductoAdapter.ViewHolder holder, final int position) {
+        holder.getOldPosition();
+
         final Producto producto = productos.get(position);
         holder.textViewProducto.setText("" + producto.getdescripcion());
         NumberFormat format = NumberFormat.getCurrencyInstance();
@@ -95,11 +103,15 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
 
         ((Sessions)mCtx.getApplicationContext()).setSesarrayPriceTotal(listPriceTotal);
 
+
+
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                mCurrentPlayingPosition=position;
                 ((Sessions)mCtx.getApplicationContext()).setSesOidProducto(productos.get(position).getOidProducto());
+
                 String strIdProducto = String.valueOf(((Sessions)mCtx.getApplicationContext()).getSesOidProducto());
 
                 sqLiteDBHelper = new SQLiteDBHelper(mCtx);
@@ -114,9 +126,37 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                     descripcion = cursor3.getString(cursor3.getColumnIndex("descripcion"));
                 }
 
-                Toast.makeText(mCtx, "Producto seleccionado: " + descripcion, Toast.LENGTH_SHORT).show();
+
+
+
+
+
+
+                    notifyDataSetChanged();
+
+                    Toast.makeText(mCtx, "Producto seleccionado: " + descripcion, Toast.LENGTH_SHORT).show();
+
+
+
+
+
             }
+
         });
+
+        if (mCurrentPlayingPosition==position){
+            holder.relativeRow.setBackgroundColor(Color.parseColor("#004C7A"));
+            holder.textViewCantidad.setTextColor(Color.parseColor("#ffffff"));
+            holder.textViewPrecio.setTextColor(Color.parseColor("#ffffff"));
+            holder.textViewProducto.setTextColor(Color.parseColor("#ffffff"));
+        }
+        else
+        {
+            holder.relativeRow.setBackgroundColor(Color.parseColor("#ffffff"));
+            holder.textViewCantidad.setTextColor(Color.parseColor("#000000"));
+            holder.textViewPrecio.setTextColor(Color.parseColor("#000000"));
+            holder.textViewProducto.setTextColor(Color.parseColor("#000000"));
+        }
         holder.btnRestarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -158,8 +198,10 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
             btnRestarProducto = (Button) itemView.findViewById(R.id.btnRestarProducto);
 
             parentLayout = itemView.findViewById(R.id.parent_layout_producto);
+            relativeRow=itemView.findViewById(R.id.relative_producto);
         }
         LinearLayout parentLayout;
+        final RelativeLayout relativeRow;
     }
 
     public void restarProducto(final String idProducto, final int cantidad, boolean surtido, final int precio, String token){
