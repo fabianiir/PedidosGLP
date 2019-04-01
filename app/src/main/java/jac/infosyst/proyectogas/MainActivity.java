@@ -518,7 +518,7 @@ setDispositivoEncontrado(false);
                                                             public void onFailure(Call call, Throwable t) {
                                                                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                                                         .setCancelable(false)
                                                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                                             public void onClick(DialogInterface dialog, int id) {
@@ -562,7 +562,7 @@ setDispositivoEncontrado(false);
                                                             public void onFailure(Call call, Throwable t) {
                                                                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                                                         .setCancelable(false)
                                                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                                             public void onClick(DialogInterface dialog, int id) {
@@ -608,7 +608,7 @@ setDispositivoEncontrado(false);
                                                             public void onFailure(Call call, Throwable t) {
                                                                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                                                         .setCancelable(false)
                                                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                                             public void onClick(DialogInterface dialog, int id) {
@@ -766,7 +766,7 @@ setDispositivoEncontrado(false);
                                                         public void onFailure(Call call, Throwable t) {
                                                             Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                                                     .setCancelable(false)
                                                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                                         public void onClick(DialogInterface dialog, int id) {
@@ -804,7 +804,7 @@ setDispositivoEncontrado(false);
                                         public void onFailure(Call call, Throwable t) {
                                             Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                                     .setCancelable(false)
                                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int id) {
@@ -853,7 +853,7 @@ setDispositivoEncontrado(false);
                         @Override
                         public void onFailure(Call call, Throwable t) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                            builder.setMessage("Error en la descarga inicial")
+                            builder.setMessage("Error en la descarga inicial. Revise su conexión")
                                     .setCancelable(false)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
@@ -919,7 +919,7 @@ setDispositivoEncontrado(false);
                             public void onFailure(Call call, Throwable t) {
                                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                         .setCancelable(false)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
@@ -963,7 +963,7 @@ setDispositivoEncontrado(false);
                             public void onFailure(Call call, Throwable t) {
                                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                         .setCancelable(false)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
@@ -1009,7 +1009,7 @@ setDispositivoEncontrado(false);
                             public void onFailure(Call call, Throwable t) {
                                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                                builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                         .setCancelable(false)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
@@ -1165,7 +1165,7 @@ setDispositivoEncontrado(false);
                         @Override
                         public void onFailure(Call call, Throwable t) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación")
+                            builder.setMessage("Hubo un error en la descarga de datos iniciales, se cerrará la aplicación. Revise su conexión")
                                     .setCancelable(false)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {

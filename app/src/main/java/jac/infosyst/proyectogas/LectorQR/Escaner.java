@@ -151,7 +151,9 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
             }
             catch (Exception ex)
             {
-                Toast.makeText(getApplicationContext(),"Codigo No valido",Toast.LENGTH_SHORT );
+                AlertDialog.Builder builder1= new AlertDialog.Builder(this);
+                builder1.setTitle("QR no valido");
+                builder1.setMessage(builder.toString());
             }
             final AlertDialog alertDialog = builder.create();
             alertDialog.show();

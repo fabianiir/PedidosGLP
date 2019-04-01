@@ -11,6 +11,7 @@ import android.nfc.tech.MifareClassic;
 import android.nfc.tech.MifareUltralight;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -129,7 +130,9 @@ public class NFC extends AppCompatActivity {
         }
         catch (Exception e)
         {
-            Toast.makeText(this,"Codigo No Valido", Toast.LENGTH_SHORT);
+            AlertDialog.Builder builder1= new AlertDialog.Builder(this);
+            builder1.setTitle("NFC no valido");
+            builder1.setMessage(builder.toString());
         }
 
         text.setText(builder.toString());
