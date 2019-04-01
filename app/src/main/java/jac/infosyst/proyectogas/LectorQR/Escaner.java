@@ -134,7 +134,7 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
             builder.setTitle("Resultado del Scan");
             builder.setMessage(result.getText());
             Chofer codigoQR = new Chofer();
-            codigoQR.setCamion(result.getText());
+            codigoQR.setCamion(Integer.parseInt(result.getText()));
             final AlertDialog alertDialog = builder.create();
 
             Intent intent = new Intent(Escaner.this, MainActivity.class);
@@ -146,7 +146,13 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
             builder.setTitle("Resultado no valido");
             builder.setMessage(result.getText());
             Chofer codigoQR = new Chofer();
-            codigoQR.setCamion(result.getText());
+            try {
+                codigoQR.setCamion(Integer.parseInt(result.getText()));
+            }
+            catch (Exception ex)
+            {
+                Toast.makeText(getApplicationContext(),"Codigo No valido",Toast.LENGTH_SHORT );
+            }
             final AlertDialog alertDialog = builder.create();
             alertDialog.show();
 

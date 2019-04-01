@@ -2,7 +2,7 @@ package jac.infosyst.proyectogas.modelo;
 
 public class Chofer {
 
-    private  static String camion;
+    private  static int camion;
     private static String imei;
 
     public Chofer() {
@@ -10,7 +10,7 @@ public class Chofer {
         this.imei = imei;
     }
 
-    public static String getCamion() {
+    public static int getCamion() {
         return camion;
     }
 
@@ -18,7 +18,7 @@ public class Chofer {
         return imei;
     }
 
-    public void setCamion(String  camion) {
+    public void setCamion(int  camion) {
 
         this.camion = camion;
     }

@@ -48,7 +48,7 @@ public class NFC extends AppCompatActivity {
         NFCActivity = this;
 
         if (nfcAdapter == null) {
-            Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No existe un dispositivo NFC", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -123,7 +123,14 @@ public class NFC extends AppCompatActivity {
         }
 
         Chofer codigoNFC =new Chofer();
-        codigoNFC.setCamion(builder.toString());
+
+        try{
+        codigoNFC.setCamion( Integer.parseInt( builder.toString()));
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(this,"Codigo No Valido", Toast.LENGTH_SHORT);
+        }
 
         text.setText(builder.toString());
 
@@ -135,7 +142,7 @@ public class NFC extends AppCompatActivity {
     }
 
     private void showWirelessSettings() {
-        Toast.makeText(this, "You need to enable NFC", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Necesitas activar el NFC", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
         startActivity(intent);
     }

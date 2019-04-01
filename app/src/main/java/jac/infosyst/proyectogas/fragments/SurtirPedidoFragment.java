@@ -168,7 +168,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     FloatingActionButton fabAgregarProducto, fabRestarProducto, fabModificarProducto;
     String strGettoken = "";
     String strLocalIdPedido = "";
-    String strcamion= Chofer.getCamion();
+    int strcamion= Chofer.getCamion();
     String strimei=Chofer.getImei();
 
     String archivo = "";

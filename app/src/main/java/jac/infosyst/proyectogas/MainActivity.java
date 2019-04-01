@@ -373,7 +373,7 @@ setDispositivoEncontrado(false);
                 admin = record.getString(record.getColumnIndex("token"));
             }
 
-            String strcamion = Chofer.getCamion();
+            int strcamion = Chofer.getCamion();
 
             BASEURL = strIP + "glpservices/webresources/glpservices/";
             Retrofit retrofit = new Retrofit.Builder()
@@ -388,7 +388,7 @@ setDispositivoEncontrado(false);
             record = db.rawQuery(sql, null);
             if (record.getCount() <= 0) {
                 if (admin == null) {
-                    Call call = service.camion(Integer.parseInt(strcamion));
+                    Call call = service.camion(strcamion);
                     call.enqueue(new Callback() {
                         @Override
                         public void onResponse(Call call, Response response) {
