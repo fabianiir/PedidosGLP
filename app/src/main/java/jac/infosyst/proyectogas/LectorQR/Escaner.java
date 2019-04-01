@@ -2,9 +2,11 @@ package jac.infosyst.proyectogas.LectorQR;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Camera;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -12,7 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.zxing.Result;
 
@@ -80,25 +84,40 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
         });
     }
 
+
+
+
     public void btnEscanear(View v){
 
-        int PermisoCamara = ContextCompat.checkSelfPermission(
-                this, Manifest.permission.CAMERA);
-        if (PermisoCamara != PackageManager.PERMISSION_GRANTED) {
+
+        if (this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+
+
+            int PermisoCamara = ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.CAMERA);
+            if (PermisoCamara != PackageManager.PERMISSION_GRANTED) {
 
 
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 225);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 225);
+            } else {
+                mScannerView = new ZXingScannerView(this);
+                setContentView(mScannerView);
+                mScannerView.setResultHandler(this);
+                mScannerView.startCamera();
+                inCamera = true;
+
+
+                mScannerView.setAutoFocus(true);
+            }
+
         } else {
-            mScannerView = new ZXingScannerView(this);
-            setContentView(mScannerView);
-            mScannerView.setResultHandler(this);
-            mScannerView.startCamera();
-            inCamera = true;
+
+            Toast.makeText(this,"No se encuentra ninguna Cámara",Toast.LENGTH_SHORT);
 
 
-            mScannerView.setAutoFocus(true);
         }
+
 
 
 

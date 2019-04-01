@@ -77,7 +77,8 @@
                     android:layout_height="wrap_content"
                     android:hint="Número Telefonico"
                     android:inputType="phone"
-                    android:maxLength="10" />
+                    android:maxLength="10"
+                    android:digits="1234567890"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.v7.widget.AppCompatButton
