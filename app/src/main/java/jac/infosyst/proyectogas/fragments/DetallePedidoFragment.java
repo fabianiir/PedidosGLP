@@ -77,6 +77,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/firmas/";
     String pic_name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
     String StoredPath = DIRECTORY + pic_name + ".png";
+    String latitud, longitud;
     ImageView firmaImage, imageViewIncidencia;
 
     public static String tempDir;
@@ -218,6 +219,13 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             }
         });
 
+        if(strTelefono.isEmpty() || strTelefono == null){
+            btnLlamar.setVisibility(View.GONE);
+        } else {
+            btnLlamar.setVisibility(View.VISIBLE);
+        }
+
+
         btnCancelarPedido = (Button) rootView.findViewById(R.id.btnCancelarPedido);
         btnCancelarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -235,22 +243,26 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         btnComoLlegar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude() != null ||
-                        ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude() != null ) {
+                if (latitud == null || latitud.isEmpty() || longitud == null || longitud.isEmpty()){
+                    Toast.makeText(getActivity(), "Ubicacion No disponible!", Toast.LENGTH_SHORT).show();
+                } else{
                     String query = "google.navigation:q=" + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude()
                             + "," + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude() + "";
-
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(query));
-
                     startActivity(intent);
-                }
-                else{
-
-                    Toast.makeText(getActivity(), "Ubicacion No disponible!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        latitud = ((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude();
+        longitud = ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude();
+
+        if (latitud == null || latitud.isEmpty() || longitud == null || longitud.isEmpty()){
+            btnComoLlegar.setVisibility(View.GONE);
+        }
+        else {
+            btnComoLlegar.setVisibility(View.VISIBLE);
+        }
 
         if(strTotal.equals("0")){
             if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
