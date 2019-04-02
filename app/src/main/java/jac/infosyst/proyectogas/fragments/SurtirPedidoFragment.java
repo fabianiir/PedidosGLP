@@ -651,21 +651,41 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         imageViewIncidencia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    //Check permissions for Android 6.0+
-                    if (!checkExternalStoragePermission()) {
-                        return;
-                    }
-                }
-                values = new ContentValues();
-                values.put(MediaStore.Images.Media.TITLE, "incidencia" );
-                values.put(MediaStore.Images.Media.DESCRIPTION, "tomada en: " + System.currentTimeMillis());
-                imageUri = getActivity().getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
 
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, PICTURE_RESULT);
+
+                    int PermisoCamara = ContextCompat.checkSelfPermission(
+                            getContext(), Manifest.permission.CAMERA);
+                    if (PermisoCamara != PackageManager.PERMISSION_GRANTED) {
+
+
+
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, 225);
+                    } else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            //Check permissions for Android 6.0+
+                            if (!checkExternalStoragePermission()) {
+                                return;
+                            }
+                        }
+                        values = new ContentValues();
+                        values.put(MediaStore.Images.Media.TITLE, "incidencia" );
+                        values.put(MediaStore.Images.Media.DESCRIPTION, "tomada en: " + System.currentTimeMillis());
+                        imageUri = getActivity().getContentResolver().insert(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                        startActivityForResult(intent, PICTURE_RESULT);
+                    }
+
+                } else {
+
+                    Toast.makeText(getContext(),"No se encuentra ninguna Cámara",Toast.LENGTH_SHORT);
+
+
+                }
+
 
             }
         });
