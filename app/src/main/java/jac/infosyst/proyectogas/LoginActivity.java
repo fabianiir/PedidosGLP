@@ -94,13 +94,6 @@ public class LoginActivity extends AppCompatActivity{
               String username = edtUsername.getText().toString();
               String password = edtPassword.getText().toString();
 
-
-
-
-
-
-
-
               //Obtiene Token del dispositivo
                 Log.w("tokenFire",FirebaseInstanceId.getInstance().getToken());
                 ((Sessions) getApplication()).setStrFireTOken(FirebaseInstanceId.getInstance().getToken());
