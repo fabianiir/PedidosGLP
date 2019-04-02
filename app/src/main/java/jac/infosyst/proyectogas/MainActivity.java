@@ -1090,7 +1090,7 @@ setDispositivoEncontrado(false);
                                     Toast.makeText(getApplicationContext(), "No hay pedidos nuevos!", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Error, No hay conexión a internet ", Toast.LENGTH_SHORT).show();
                             }
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                             java.util.Date date = new Date();
@@ -1361,7 +1361,7 @@ setDispositivoEncontrado(false);
                         Toast.makeText(getApplicationContext(), "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "error! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Error. No hay conexión ha internet ", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -1453,7 +1453,7 @@ setDispositivoEncontrado(false);
                         record.getString(record.getColumnIndex("estatus_id")),
                         "Up_8",
                         strtoken);
-                Toast.makeText(MainActivity.this, "error! ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Error. No hay conexión ha internet ", Toast.LENGTH_SHORT).show();
                 call.enqueue(new Callback() {
                     @Override
                     public void onResponse(Call call, Response response) {

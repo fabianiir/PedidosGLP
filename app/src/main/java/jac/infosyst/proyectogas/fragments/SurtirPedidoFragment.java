@@ -1705,7 +1705,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(getActivity(), "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Necesitas Activar GPS e Internet", Toast.LENGTH_SHORT).show();
     }
 
     @Override
