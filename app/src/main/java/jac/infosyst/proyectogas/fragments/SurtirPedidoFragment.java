@@ -328,11 +328,56 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
                         String sqlValidación = "SELECT * FROM productos WHERE pedido = '" + pedidoID + "'";
                         Cursor cursorPr = db.rawQuery(sqlValidación, null);
+
+                        int Producto_precio=0, Producto_cantidad=0;
+                        cursorPr.moveToFirst();
+                        while(!cursorPr.isAfterLast()) {
+
+
+                            if(Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("precio")))<=0)
+                            {
+                                Producto_precio++;
+
+
+                            }
+
+                            if(Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad")))<=0)
+                            {
+
+                                Producto_cantidad++;
+                            }
+                                cursorPr.moveToNext();
+                        }
+
+
+
+
+
                         if (cursorPr.getCount() > 0) {
                             if (!signaturePad.isEmpty()) {
                                 if(!strTotal.equals("0.0"))
                                 {
-                                    mostrarConfirmacion("¿Desea Confirmar?");
+
+
+                                    if(Producto_precio==0) {
+
+
+                                        if (Producto_cantidad==0) {
+
+                                            mostrarConfirmacion("¿Desea Confirmar?");
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(getActivity(), "No se puede surtir el pedido si un producto tiene cantidad 0 ", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+
+                                    else {
+                                        Toast.makeText(getActivity(), "No se puede surtir el pedido si un producto tiene precio 0 ", Toast.LENGTH_SHORT).show();
+
+
+                                    }
 
                                 }
                                 else
@@ -951,9 +996,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     }
 
     public void pedidoActualizarSurtido(){
-        fabAgregarProducto.setVisibility(View.GONE);
-        fabModificarProducto.setVisibility(View.GONE);
-        fabRestarProducto.setVisibility(View.GONE);
+
+        fabAgregarProducto.hide();
+       fabModificarProducto.hide();
+        fabRestarProducto.hide();
         btnLimpiar.setVisibility(View.GONE);
         btnGuardar.setVisibility(View.GONE);
         favplus.setEnabled(false);

@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,17 +146,27 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
         });
 
         if (mCurrentPlayingPosition==position){
+            try{
             holder.relativeRow.setBackgroundColor(Color.parseColor("#004C7A"));
             holder.textViewCantidad.setTextColor(Color.parseColor("#ffffff"));
             holder.textViewPrecio.setTextColor(Color.parseColor("#ffffff"));
-            holder.textViewProducto.setTextColor(Color.parseColor("#ffffff"));
+            holder.textViewProducto.setTextColor(Color.parseColor("#ffffff"));}
+            catch (Exception e) {
+                Log.w("Excepcion", "Ningun Producto se selecciono"+e);
+
+            }
         }
         else
         {
+            try{
             holder.relativeRow.setBackgroundColor(Color.parseColor("#ffffff"));
             holder.textViewCantidad.setTextColor(Color.parseColor("#000000"));
             holder.textViewPrecio.setTextColor(Color.parseColor("#000000"));
-            holder.textViewProducto.setTextColor(Color.parseColor("#000000"));
+            holder.textViewProducto.setTextColor(Color.parseColor("#000000"));}
+            catch (Exception e)
+            {
+                Log.w("Excepcion", "Ningun Producto se selecciono"+e);
+            }
         }
         holder.btnRestarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
