@@ -194,9 +194,7 @@ public class LoginActivity extends AppCompatActivity{
                 if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                Toast.makeText(LoginActivity.this, "Conexion No alcanza un servidor!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, Configuracion.class);
-                startActivity(intent);
+                Toast.makeText(LoginActivity.this, "Conexion la alcanza un servidor!", Toast.LENGTH_SHORT).show();
             }
         });
     }
