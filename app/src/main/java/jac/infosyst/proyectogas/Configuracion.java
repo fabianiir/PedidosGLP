@@ -2,10 +2,12 @@ package jac.infosyst.proyectogas;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -63,6 +65,7 @@ public class Configuracion extends AppCompatActivity {
     private static SQLiteDBHelper sqLiteDBHelper = null;
 
     boolean fromSplash = false;
+    boolean firstTime = true;
 
     @Override
     public void onBackPressed() {
@@ -124,52 +127,79 @@ public class Configuracion extends AppCompatActivity {
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
-        try{
-            Base_Url = dominio + "glpservices/webresources/glpservices/";
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(Base_Url)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .build();
-
-            //Defining retrofit api service
-            ServicioUsuario service = retrofit.create(ServicioUsuario.class);
-
-            Call call = service.registroConfiguracion(dominio, telefono);
-
-            call.enqueue(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    if(response.isSuccessful()) {
-                        progressDialog.dismiss();
-                        ObjetoRes resObj = (ObjetoRes) response.body();
-                        sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
-                        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-                        /*primera vez */
-                        ContentValues values = new ContentValues();
-                        values.put("oid", resObj.getConfiguracion_id());
-                        values.put("ip", dominio);
-                        values.put("telefono", telefono);
-                        values.put("imei", ObtenerIMEI());
-
-                        db.insert(SQLiteDBHelper.Config_Table, null, values);
-                        //poner if de la primera vez
-                        ((Sessions)getApplication()).setStrDominio(dominio);
-
-                        Intent intent = new Intent(Configuracion.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
+        if(ObtenerIMEI() == null) {
+            if (firstTime == false) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("La aplicación no tiene los permisos necesarios para su correcto funcionamiento.")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                finish();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }else{
+                int PermisoAlmacenamiento = ContextCompat.checkSelfPermission(
+                        this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                if (PermisoAlmacenamiento != PackageManager.PERMISSION_GRANTED) {
+                    Log.i("Mensaje", "No se tiene permiso.");
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 225);
+                } else {
+                    Log.i("Mensaje", "Se tiene permiso!");
                 }
-
-                @Override
-                public void onFailure(Call call, Throwable t) {
-                    progressDialog.dismiss();
-                    Toast.makeText(getApplicationContext(), "No hay conexión a internet o la IP no es valida", Toast.LENGTH_LONG).show();
-                }
-            });
-        }catch (Exception ex){
+                firstTime = false;
+            }
             progressDialog.dismiss();
-            Toast.makeText(getApplicationContext(), "URL no valido", Toast.LENGTH_LONG).show();
+        }else{
+            try {
+                Base_Url = dominio + "glpservices/webresources/glpservices/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(Base_Url)
+                        .addConverterFactory(GsonConverterFactory.create(gson))
+                        .build();
+
+
+                //Defining retrofit api service
+                ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+                Call call = service.registroConfiguracion(dominio, telefono);
+
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        if (response.isSuccessful()) {
+                            progressDialog.dismiss();
+                            ObjetoRes resObj = (ObjetoRes) response.body();
+                            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+                            final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                            /*primera vez */
+                            ContentValues values = new ContentValues();
+                            values.put("oid", resObj.getConfiguracion_id());
+                            values.put("ip", dominio);
+                            values.put("telefono", telefono);
+                            values.put("imei", ObtenerIMEI());
+
+                            db.insert(SQLiteDBHelper.Config_Table, null, values);
+                            //poner if de la primera vez
+                            ((Sessions) getApplication()).setStrDominio(dominio);
+
+                            Intent intent = new Intent(Configuracion.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "No hay conexión a internet o la IP no es valida", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Exception ex) {
+                progressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), "No hay conexion a internet o la URL no es valida", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -312,15 +342,15 @@ public class Configuracion extends AppCompatActivity {
 
     public String ObtenerIMEI()
     {
-        int permissionCheck = ContextCompat.checkSelfPermission(
-                this, Manifest.permission.READ_PHONE_STATE );
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+        int PermisoAlmacenamiento = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (PermisoAlmacenamiento != PackageManager.PERMISSION_GRANTED) {
             Log.i("Mensaje", "No se tiene permiso.");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE }, 225);
+            return null;
         } else {
-            Log.i("Mensaje", "Se tiene permiso!");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 225);
         }
-
+        Log.i("Mensaje", "Se tiene permiso!");
         String myIMEI = "";
 
         TelephonyManager mTelephony = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
