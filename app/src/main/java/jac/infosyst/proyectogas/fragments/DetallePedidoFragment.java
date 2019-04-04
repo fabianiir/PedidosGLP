@@ -221,8 +221,10 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
         if(strTelefono.isEmpty() || strTelefono == null){
             btnLlamar.setVisibility(View.GONE);
+            textViewTelefono.setVisibility(View.GONE);
         } else {
             btnLlamar.setVisibility(View.VISIBLE);
+            textViewTelefono.setVisibility(View.VISIBLE);
         }
 
 

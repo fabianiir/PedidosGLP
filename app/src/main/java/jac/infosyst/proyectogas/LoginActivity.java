@@ -194,7 +194,7 @@ public class LoginActivity extends AppCompatActivity{
                 if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                Toast.makeText(LoginActivity.this, "Conexion la alcanza un servidor!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Verifique su conexion de red!", Toast.LENGTH_SHORT).show();
             }
         });
     }

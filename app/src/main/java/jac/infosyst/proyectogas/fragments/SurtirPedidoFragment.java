@@ -1699,9 +1699,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 }
                 j++;
 
-                strTotal = String.valueOf(total);
+                strTotal = String.valueOf(total * 1.16);
                 NumberFormat format = NumberFormat.getCurrencyInstance();
-                textViewTotal.setText("Total :" + format.format(total));
+                textViewTotal.setText("Total :" + format.format(total * 1.16));
 
                 adapter = new ProductoAdapter(Arrays.asList(productos), getActivity(), getFragmentManager(), pendiente);
                 recyclerViewProductos.setAdapter(adapter);
@@ -1709,7 +1709,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         }else {
             strTotal = String.valueOf(0);
             NumberFormat format = NumberFormat.getCurrencyInstance();
-            textViewTotal.setText("Total :" + format.format(total));
+            textViewTotal.setText("Total :" + format.format(total * 1.16));
 
             adapter = new ProductoAdapter(null, getActivity(), getFragmentManager(), pendiente);
             recyclerViewProductos.setAdapter(adapter);
