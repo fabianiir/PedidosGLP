@@ -166,17 +166,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (tipoPedidos == 0){
-                    try {
-                        guardar_pedidos_productos();
-                        obtener_pedidos();
-                        actualizarPedidosPendientes();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }else if(tipoPedidos == 1){
-                    actualizarPedidosSurtidos();
-                }
+                obtener_pedidos();
+                guardar_pedidos_productos();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -226,7 +217,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
             }
         });
 
-
         String strNameTittle = String.valueOf(((AppCompatActivity)getActivity()).getSupportActionBar().getTitle());
 
         if(strNameTittle.equals("Pedidos")){
@@ -252,17 +242,8 @@ public class PedidosFragment extends Fragment implements LocationListener {
 
     @Override
     public void onResume() {
-        if (tipoPedidos == 0){
-            try {
-                guardar_pedidos_productos();
-                obtener_pedidos();
-                actualizarPedidosPendientes();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else if(tipoPedidos == 1){
-            actualizarPedidosSurtidos();
-        }
+        guardar_pedidos_productos();
+        obtener_pedidos();
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -350,7 +331,129 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 values.put("tipo_pedido", pedido.gettipo_pedido());
                                 values.put("forma_pago", pedido.getForma_pago());
                                 values.put("estatus", pedido.getestatus());
-                                values.put("surtido", 0);
+                                values.put("surtido", "0");
+                                db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
+
+                                if (pedido.getHobbies() != null) {
+
+                                    List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
+
+                                    for (Producto producto : listproductos) {
+                                        ContentValues valuesProd = new ContentValues();
+                                        valuesProd.put("oid", producto.getOidProducto());
+                                        valuesProd.put("cantidad", producto.getCantidad());
+                                        valuesProd.put("surtido", producto.getsurtido());
+                                        valuesProd.put("precio", producto.getPrecio());
+                                        valuesProd.put("descripcion", producto.getdescripcion());
+                                        valuesProd.put("pedido", pedido.getOid());
+                                        db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
+                                    }
+                                }
+                                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                                String sql = "SELECT * FROM pedidos_modificados";
+                                Cursor record = db.rawQuery(sql, null);
+                                if(record.getCount()>0) {
+                                    for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
+                                        try {
+                                            db.delete(SQLiteDBHelper.Pedidos_Table,"oid = ?", new String[] {record.getString(record.getColumnIndex("oid"))});
+                                        }catch(Exception ex){
+
+                                        }
+                                    }
+                                }
+                            }
+                                if (tipoPedidos == 0){
+                                    try {
+                                        actualizarPedidosPendientes();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }else if(tipoPedidos == 1) {
+                                    actualizarPedidosSurtidos();
+                                }
+                        } else {
+                            Toast.makeText(ctx, "No existen Pedidos!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(ctx, "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ctx, "error! ", Toast.LENGTH_SHORT).show();
+                }
+                obtener_pedidos_surtidos();
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Toast.makeText(ctx, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void obtener_pedidos_surtidos(){
+        final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+        String sql = "SELECT * FROM configuracion";
+        Cursor record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            strIP = record.getString(record.getColumnIndex("ip"));
+            Imei = record.getString(record.getColumnIndex("imei"));
+        }
+
+        String oid = "", token = "";
+        sql = "SELECT * FROM usuario";
+        record = db.rawQuery(sql, null);
+
+        if (record.moveToFirst()) {
+            oid = record.getString(record.getColumnIndex("oid"));
+            token = record.getString(record.getColumnIndex("token"));
+        }
+
+        BASEURL = strIP + "glpservices/webresources/glpservices/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServicioUsuario service = retrofit.create(ServicioUsuario.class);
+
+        Call call = service.getPedidos(oid, "Surtido", token);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    ObjetoRes resObj = (ObjetoRes) response.body();
+                    if (resObj.geterror().equals("false")) {
+                        if (resObj.getpedido() != null) {
+                            List<Pedido> list = Arrays.asList(resObj.getpedido());
+
+                            for (Pedido pedido : list) {
+                                ContentValues values = new ContentValues();
+                                values.put("oid", pedido.getOid());
+                                String datetime = pedido.getfechaprogramada();
+                                datetime.replace('T', ' ');
+                                values.put("fecha_hora_programada", datetime);
+                                values.put("cliente", pedido.getcliente());
+                                values.put("direccion", pedido.getdireccion());
+                                values.put("cp", pedido.getcp());
+                                values.put("telefono", pedido.gettelefono());
+                                values.put("lat", pedido.getubicacion_lat());
+                                values.put("lon", pedido.getubicacion_long());
+                                values.put("comentario_cliente", pedido.getcomentarios_cliente());
+                                if (pedido.getsuma_iva() == null) {
+                                    values.put("suma_iva", 0);
+                                } else {
+                                    values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
+                                }
+                                if (pedido.gettotal() == null) {
+                                    values.put("total", 0);
+                                } else {
+                                    values.put("total", Double.parseDouble(pedido.gettotal()));
+                                }
+                                values.put("empresa", pedido.getEmpresa());
+                                values.put("tipo_pedido", pedido.gettipo_pedido());
+                                values.put("forma_pago", pedido.getForma_pago());
+                                values.put("estatus", pedido.getestatus());
+                                values.put("surtido", "1");
                                 db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
 
                                 if (pedido.getHobbies() != null) {
@@ -382,8 +485,16 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                 }
                             }
                             try {
-                                actualizarPedidosPendientes();
-                            } catch (JSONException e) {
+                                if (tipoPedidos == 0){
+                                    try {
+                                        actualizarPedidosPendientes();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }else if(tipoPedidos == 1) {
+                                    actualizarPedidosSurtidos();
+                                }
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         } else {
@@ -401,88 +512,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 Toast.makeText(ctx, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
             }
         });
-        call = service.getPedidos(oid, "Surtido", token);
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) {
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                    if (resObj.geterror().equals("false")) {
-                        if (resObj.getpedido() != null) {
-                            List<Pedido> list = Arrays.asList(resObj.getpedido());
-                            for (Pedido pedido : list) {
-                                ContentValues values = new ContentValues();
-                                values.put("oid", pedido.getOid());
-                                String datetime = pedido.getfechaprogramada();
-                                datetime.replace('T', ' ');
-                                values.put("fecha_hora_programada", datetime);
-                                values.put("cliente", pedido.getcliente());
-                                values.put("direccion", pedido.getdireccion());
-                                values.put("cp", pedido.getcp());
-                                values.put("telefono", pedido.gettelefono());
-                                values.put("lat", pedido.getubicacion_lat());
-                                values.put("lon", pedido.getubicacion_long());
-                                values.put("comentario_cliente", pedido.getcomentarios_cliente());
-                                if (pedido.getsuma_iva() == null) {
-                                    values.put("suma_iva", 0);
-                                } else {
-                                    values.put("suma_iva", Double.parseDouble(pedido.getsuma_iva()));
-                                }
-                                if (pedido.gettotal() == null) {
-                                    values.put("total", 0);
-                                } else {
-                                    values.put("total", Double.parseDouble(pedido.gettotal()));
-                                }
-                                values.put("empresa", pedido.getEmpresa());
-                                values.put("tipo_pedido", pedido.gettipo_pedido());
-                                values.put("forma_pago", pedido.getForma_pago());
-                                values.put("estatus", pedido.getestatus());
-                                values.put("surtido", 1);
-                                db.insert(SQLiteDBHelper.Pedidos_Table, null, values);
 
-                                if (pedido.getHobbies() != null) {
-
-                                    List<Producto> listproductos = Arrays.asList(pedido.getHobbies());
-
-                                    for (Producto producto : listproductos) {
-                                        ContentValues valuesProd = new ContentValues();
-                                        valuesProd.put("oid", producto.getOidProducto());
-                                        valuesProd.put("cantidad", producto.getCantidad());
-                                        valuesProd.put("surtido", producto.getsurtido());
-                                        valuesProd.put("precio", producto.getPrecio());
-                                        valuesProd.put("descripcion", producto.getdescripcion());
-                                        valuesProd.put("pedido", pedido.getOid());
-                                        db.insert(SQLiteDBHelper.Productos_Table, null, valuesProd);
-                                    }
-                                }
-                                final SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-                                String sql = "SELECT * FROM pedidos_modificados";
-                                Cursor record = db.rawQuery(sql, null);
-                                if(record.getCount()>0) {
-                                    for (record.moveToFirst(); !record.isAfterLast(); record.moveToNext()) {
-                                        try {
-                                            db.delete(SQLiteDBHelper.Pedidos_Table,"oid = ?", new String[] {record.getString(record.getColumnIndex("oid"))});
-                                        }catch(Exception ex){
-
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            Toast.makeText(ctx, "No existen Pedidos!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(ctx, "No hay pedidos nuevos", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(ctx, "error! ", Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(ctx, "No hay conexión a Internet", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     public void actualizarPedidosPendientes() throws JSONException {
@@ -508,7 +538,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
             strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
         }
 
-        String sqlPedido = "SELECT * FROM pedidos WHERE surtido = 0";
+        String sqlPedido = "SELECT * FROM pedidos WHERE surtido = '0'";
 
         Cursor cursor = db.rawQuery(sqlPedido, null);
 
@@ -822,8 +852,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
         }
     }
 
-
-
     public void actualizarPedidosSurtidos() {
         BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
@@ -852,7 +880,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                         strtoken = cursor3.getString(cursor3.getColumnIndex("token"));
                     }
 
-                    String sqlPedido = "SELECT * FROM pedidos WHERE surtido = 1";
+                    String sqlPedido = "SELECT * FROM pedidos WHERE surtido = '1'";
 
                     Cursor cursor = db.rawQuery(sqlPedido, null);
 
@@ -930,7 +958,6 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }
             } while (flag == false);
         }catch (Exception e){
-
         }
     }
 

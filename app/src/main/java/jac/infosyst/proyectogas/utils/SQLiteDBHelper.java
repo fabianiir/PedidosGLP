@@ -209,7 +209,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper{
                 Pedidos_Colum13 + " TEXT, " +
                 Pedidos_Colum14 + " TEXT, " +
                 Pedidos_Colum15 + " TEXT, " +
-                Pedidos_Colum16 + " BOOLEAN" +
+                Pedidos_Colum16 + " TEXT" +
                 ")";
         db.execSQL(createPedidos_Table);
 
