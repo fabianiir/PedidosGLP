@@ -313,9 +313,54 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             @Override
             public void onClick(View v) {
                 if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
+
+                        sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                        SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                        String sqlValidación = "SELECT * FROM productos WHERE pedido = '" + pedidoID + "'";
+                        Cursor cursorPr = db.rawQuery(sqlValidación, null);
+                    int Producto_precio = 0, Producto_cantidad = 0;
+                    cursorPr.moveToFirst();
+                        if(cursorPr.getCount()>0){
+
+                        while (!cursorPr.isAfterLast()) {
+
+
+                            if (Float.parseFloat(cursorPr.getString(cursorPr.getColumnIndex("precio"))) <= 0) {
+                                Producto_precio++;
+
+
+                            }
+
+                            if (Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("cantidad"))) <= 0) {
+
+                                Producto_cantidad++;
+                            }
+                            cursorPr.moveToNext();
+                        }
+
+                    }
+
                     if (thumbnail != null) {
                         if (!signaturePad.isEmpty()) {
-                            mostrarConfirmacion("¿Desea Confirmar?");
+                            if(Producto_precio==0) {
+
+
+                                if (Producto_cantidad==0) {
+
+                                    mostrarConfirmacion("¿Desea Confirmar?");
+                                }
+                                else
+                                {
+                                    Toast.makeText(getActivity(), "No se puede surtir el pedido si un producto tiene cantidad 0 ", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+
+                            else {
+                                Toast.makeText(getActivity(), "No se puede surtir el pedido si un producto tiene precio 0 ", Toast.LENGTH_SHORT).show();
+
+
+                            }
                         } else {
                             Toast.makeText(getActivity(), "No existe una firma", Toast.LENGTH_SHORT).show();
                         }
