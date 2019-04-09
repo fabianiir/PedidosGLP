@@ -127,19 +127,9 @@ public class ProductoAdapter  extends RecyclerView.Adapter<ProductoAdapter.ViewH
                     descripcion = cursor3.getString(cursor3.getColumnIndex("descripcion"));
                 }
 
-
-
-
-
-
-
                     notifyDataSetChanged();
 
                     Toast.makeText(mCtx, "Producto seleccionado: " + descripcion, Toast.LENGTH_SHORT).show();
-
-
-
-
 
             }
 

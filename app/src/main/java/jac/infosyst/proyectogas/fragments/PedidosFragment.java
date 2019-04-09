@@ -693,14 +693,13 @@ public class PedidosFragment extends Fragment implements LocationListener {
                         record.getString(record.getColumnIndex("estatus_id")),
                         "Up_8",
                         token);
-                Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
                 call.enqueue(new Callback() {
                     @Override
                     public void onResponse(Call call, Response response) {
                         if (response.isSuccessful()) {
                             ObjetoRes resObj = (ObjetoRes) response.body();
                             if (resObj.geterror().equals("false")) {
-                                db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                db.delete(SQLiteDBHelper.Pedidos_Mod_Table, "oid = ?", new String[]{resObj.getMessage()});
                             }
                         }
                     }
@@ -746,7 +745,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 if(prueba.equals("1")){
                     Call call = service.sumarProducto(record.getString(record.getColumnIndex("oid")),
                             Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))),
-                            Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                            Double.parseDouble(record.getString(record.getColumnIndex("precio"))),
                             record.getString(record.getColumnIndex("pedido_id")),
                             record.getString(record.getColumnIndex("producto_id")),
                             token);
@@ -820,7 +819,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                 }else {
                     Call call = service.up_detalle(record.getString(record.getColumnIndex("oid")),
                                              Integer.parseInt(record.getString(record.getColumnIndex("cantidad"))), Boolean.parseBoolean(record.getString(record.getColumnIndex("surtido"))),
-                                             Integer.parseInt(record.getString(record.getColumnIndex("precio"))),
+                                             Double.parseDouble(record.getString(record.getColumnIndex("precio"))),
                                      token);
                     call.enqueue(new Callback() {
                                          @Override
@@ -828,7 +827,7 @@ public class PedidosFragment extends Fragment implements LocationListener {
                                              if (response.isSuccessful()) {
                                                  ObjetoRes resObj = (ObjetoRes) response.body();
                                                  if (resObj.geterror().equals("false")) {
-                                                     db.delete(SQLiteDBHelper.Pedidos_Table, "oid = ?", new String[]{resObj.getMessage()});
+                                                     db.delete(SQLiteDBHelper.Productos_Mod_Table, "oid = ?", new String[]{resObj.getMessage()});
                                                  }
                                              }
                                          }

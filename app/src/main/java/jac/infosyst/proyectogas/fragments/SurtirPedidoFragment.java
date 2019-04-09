@@ -159,7 +159,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     String strFecha = "";
     String pedidoID = "";
 
-    static SimpleDateFormat simpleDateFormatFecha = new SimpleDateFormat("dd-MM-yyyy");
+    static SimpleDateFormat simpleDateFormatFecha = new SimpleDateFormat("yyyy-MM-dd");
     static SimpleDateFormat simpleDateFormatHora = new SimpleDateFormat("HH:mm:ss");
 
     String strLatitude = "";
@@ -828,7 +828,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     ObjetoRes resObj = (ObjetoRes) response.body();
                     if(resObj.geterror().equals("false")) {
                         ContentValues values = new ContentValues();
-                        values.put("surtido", 1);
+                        values.put("surtido", "1");
                         db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                         ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                         getProductos(true);
@@ -837,7 +837,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     }
                 } else {
                     ContentValues values = new ContentValues();
-                    values.put("surtido", 1);
+                    values.put("surtido", "1");
                     db.delete(SQLiteDBHelper.Productos_Table, "oid = ?", new String[]{idProducto});
                     ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
                     getProductos(true);
@@ -850,7 +850,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 ContentValues values = new ContentValues();
                 values.put("oid", idProducto);
                 values.put("cantidad", cantidad);
-                values.put("surtido", 0);
+                values.put("surtido", "0");
                 values.put("precio", precio);
                 db.insert(SQLiteDBHelper.Productos_Mod_Table, null, values);
 
@@ -912,7 +912,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         ContentValues values = new ContentValues();
                         values.put("oid", idProducto);
                         values.put("cantidad", newcantidad);
-                        values.put("surtido", 1);
+                        values.put("surtido", "1");
                         values.put("precio", precioXcantidad);
                         db.update(SQLiteDBHelper.Productos_Table, values,"oid = ?", new String[]{idProducto});
                         ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
@@ -924,7 +924,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     ContentValues values = new ContentValues();
                     values.put("oid", idProducto);
                     values.put("cantidad", newcantidad);
-                    values.put("surtido", 1);
+                    values.put("surtido", "1");
                     values.put("precio", precioXcantidad);
                     db.update(SQLiteDBHelper.Productos_Table, values,"oid = ?", new String[]{idProducto});
                     ((Sessions) getActivity().getApplicationContext()).setSesOidProducto(null);
@@ -936,13 +936,13 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 ContentValues values = new ContentValues();
                 values.put("oid", idProducto);
                 values.put("cantidad", newcantidad);
-                values.put("surtido", 1);
+                values.put("surtido", "1");
                 values.put("precio", precioXcantidad);
                 db.insert(SQLiteDBHelper.Productos_Mod_Table, null ,values);
 
                 values.put("oid", idProducto);
                 values.put("cantidad", newcantidad);
-                values.put("surtido", 1);
+                values.put("surtido", "1");
                 values.put("precio", precioXcantidad);
                 db.update(SQLiteDBHelper.Productos_Table, values,"oid = ?", new String[]{idProducto});
 
@@ -1538,7 +1538,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
                         sqLiteDBHelper = new SQLiteDBHelper(getContext());
 
-                        String sql = "SELECT * FROM pedidos_modificados WHERE oid = '" + pedidoID + "'";
+                        String sql = "SELECT * FROM pedidos WHERE oid = '" + pedidoID + "'";
 
                         Cursor record = db.rawQuery(sql, null);
 
@@ -1547,7 +1547,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                             values.put("oid", pedidoID);
                             values.put("hora", hora);
                             values.put("fecha", fecha);
-                            values.put("comentario_chofer", record.getString(record.getColumnIndex("comentario_chofer")));
                             values.put("suma_iva", ((Sessions) getActivity().getApplicationContext()).getsessumaiva());
                             values.put("pago_id", record.getString(record.getColumnIndex("pago_id")));
                             values.put("motivo_cancelacion_id", record.getString(record.getColumnIndex("motivo_cancelacion_id")));

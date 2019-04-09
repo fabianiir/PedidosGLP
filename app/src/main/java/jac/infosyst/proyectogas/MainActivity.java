@@ -282,6 +282,28 @@ setDispositivoEncontrado(false);
         //endregion
 //endregion
 
+        if(!strtoken.isEmpty()){
+            setContentView(R.layout.activity_main);
+
+            //endregion
+            sqLiteDBHelper = new SQLiteDBHelper(getApplicationContext());
+            final SQLiteDatabase db1 = sqLiteDBHelper.getWritableDatabase();
+
+            String sql1 = "SELECT * FROM cat_estatus";
+            Cursor record1 = db1.rawQuery(sql1, null);
+            if (record1.moveToFirst()) {
+                Estatus estatus1 = new Estatus();
+                for (record1.moveToFirst(); !record1.isAfterLast(); record1.moveToNext()) {
+                    if (record1.getString(record1.getColumnIndex("nombre")).equals("Pendiente")) {
+                        estatus1.setPendienteId(record1.getString(record1.getColumnIndex("oid")));
+                    } else if (record1.getString(record1.getColumnIndex("nombre")).equals("Surtido")) {
+                        estatus1.setSurtidoId(record1.getString(record1.getColumnIndex("oid")));
+                    } else if (record1.getString(record1.getColumnIndex("nombre")).equals("Cancelado")) {
+                        estatus1.setCanceladoId(record1.getString(record1.getColumnIndex("oid")));
+                    }
+                }
+            }
+        }
 
         if (getIntent().getBooleanExtra("User", false)) {
             setContentView(R.layout.activity_main);

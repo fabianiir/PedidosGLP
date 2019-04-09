@@ -41,6 +41,7 @@ public class NFC extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc);
         text = (TextView) findViewById(R.id.text);
@@ -124,6 +125,7 @@ public class NFC extends AppCompatActivity {
         }
 
         Chofer codigoNFC =new Chofer();
+        codigoNFC.setCamion(-1);
 
         try{
         codigoNFC.setCamion( Integer.parseInt( builder.toString()));

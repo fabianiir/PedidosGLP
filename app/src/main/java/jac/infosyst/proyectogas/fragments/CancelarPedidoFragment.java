@@ -154,6 +154,14 @@ public class CancelarPedidoFragment  extends Fragment {
 
         tvCanNombreOperador.setText(Html.fromHtml("<b>Nombre: </b>"+ ((Sessions)getActivity().getApplicationContext()).getSesCliente()));
         tvCanDireccion.setText(Html.fromHtml("<b>Direccion: </b>" + ((Sessions)getActivity().getApplicationContext()).getsesDireccion()));
+        String descripcion = ((Sessions)getActivity().getApplicationContext()).getsesDescripcion();
+        if(descripcion == null){
+            tvCanDescripcion.setVisibility(View.GONE);
+        }else if(descripcion.isEmpty()){
+            tvCanDescripcion.setVisibility(View.GONE);
+        }else{
+            tvCanDescripcion.setVisibility(View.VISIBLE);
+        }
         tvCanDescripcion.setText(Html.fromHtml("<b>Descripcion: </b>" + ((Sessions)getActivity().getApplicationContext()).getsesDescripcion()));
 
         idPedido = ((Sessions)getActivity().getApplicationContext()).getSesIdPedido();
