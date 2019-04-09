@@ -116,7 +116,7 @@ if (estatusCliente==null)
                         @Override
                         public void run() {
                             try {
-                                MainActivity.printData(nombCliente,direcCliente,totalCliente, finalNombre, finalPlacas,fecha,true);
+                                MainActivity.printData(nombCliente,direcCliente,String.valueOf(Double.parseDouble(totalCliente)/1.16), finalNombre, finalPlacas,fecha,true);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

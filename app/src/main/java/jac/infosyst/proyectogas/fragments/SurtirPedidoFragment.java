@@ -481,7 +481,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         @Override
                         public void run() {
                             try {
-                                MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), finalNombre, finalPlacas, strFecha,true);
+                                MainActivity.printData(imprCliente,imprDireccion, String.valueOf(Double.parseDouble(strTotal)), finalNombre, finalPlacas, strFecha,true);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -791,7 +791,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         @Override
                         public void run() {
                             try {
-                                MainActivity.printData(imprCliente, imprDireccion, String.valueOf(Double.parseDouble(strTotal) * 1.16), imprChofer, imprUnidad, strFecha, false);
+                                MainActivity.printData(imprCliente, imprDireccion, String.valueOf(Double.parseDouble(strTotal)), imprChofer, imprUnidad, strFecha, false);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -918,6 +918,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         String sql = "SELECT * FROM productos WHERE oid = '" + idProducto + "'";
 
+
         Cursor cursor = db.rawQuery(sql, null);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -926,7 +927,12 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             descripcion = cursor.getString(cursor.getColumnIndex("descripcion"));
         }
 
-        final double precioUnitario = setprecio / setcantidad;
+        String sql1 = "SELECT * FROM cat_productos WHERE descripcion ='" + descripcion + "'";
+        Cursor cursor1 = db.rawQuery(sql1, null);
+
+        cursor1.moveToFirst();
+        final double precioUnitario =Integer.parseInt(cursor1.getString(cursor1.getColumnIndex("precio_unitario")));
+
         final double precioXcantidad = precioUnitario * newcantidad;
         token = ((Sessions) getActivity().getApplicationContext()).getsessToken();
 
@@ -1748,8 +1754,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                     productos[j] = producto;
                 }
                 j++;
-
-                strTotal = String.valueOf(total * 1.16);
+                Sessions.setImpProductos(productos);
+                strTotal = String.valueOf(total);
                 NumberFormat format = NumberFormat.getCurrencyInstance();
                 textViewTotal.setText("Total :" + format.format(total * 1.16));
 
@@ -1757,7 +1763,8 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 recyclerViewProductos.setAdapter(adapter);
             }
         }else {
-            strTotal = String.valueOf(0);
+
+            strTotal = String.valueOf(total);
             NumberFormat format = NumberFormat.getCurrencyInstance();
             textViewTotal.setText("Total :" + format.format(total * 1.16));
 

@@ -2123,7 +2123,7 @@ setDispositivoEncontrado(false);
 
             if (producto != null && producto.length != 0) {
                 for (int i = 0; i < producto.length; i++)
-                    BILL = BILL + "\n" + String.format("%1$-10s %2$10s %3$11s %4$10s", producto[i].getdescripcion(), producto[i].getCantidad(), "0", producto[i].getPrecio());
+                    BILL = BILL + "\n" + String.format("%1$-10s %2$10s %3$11s %4$10s", producto[i].getdescripcion().substring(0,12), producto[i].getCantidad(),String.valueOf(producto[i].getPrecio()/producto[i].getCantidad()),producto[i].getPrecio());
             }
 
             BILL = BILL
@@ -2138,12 +2138,13 @@ setDispositivoEncontrado(false);
             separadoresPersonalizados.setDecimalSeparator('.');
 
             DecimalFormat formato1 = new DecimalFormat("#.##", separadoresPersonalizados);
-            double subtotal = (Double.parseDouble(total) / 1.16);
-            double IVA = Double.parseDouble(total) - subtotal;
+            double subtotal = Double.parseDouble(total);
+            double totalconIVA= subtotal*1.16;
+            double IVA = totalconIVA - subtotal;
 
             BILL = BILL + "                          SUBTOTAL:" + "   $" + String.valueOf(formato1.format(subtotal)) + "\n";
             BILL = BILL + "                            I.V.A.:" + "   $" + String.valueOf(formato1.format(IVA)) + "\n";
-            BILL = BILL + "                             TOTAL:" + "   $" + String.valueOf(formato1.format(Double.parseDouble(total))) + "\n";
+            BILL = BILL + "                             TOTAL:" + "   $" + String.valueOf(formato1.format(totalconIVA)) + "\n";
 
             BILL = BILL
                     + "-----------------------------------------------\n\n";
