@@ -334,7 +334,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                         while(!cursorPr.isAfterLast()) {
 
 
-                            if(Integer.parseInt(cursorPr.getString(cursorPr.getColumnIndex("precio")))<=0)
+                            if(Float.parseFloat(cursorPr.getString(cursorPr.getColumnIndex("precio")))<=0)
                             {
                                 Producto_precio++;
 
