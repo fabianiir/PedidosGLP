@@ -1413,20 +1413,26 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             public void onResponse(Call call, Response response) {
                 if (response.isSuccessful()) {
                     ObjetoRes resObj = (ObjetoRes) response.body();
+                    try {
+                        if (resObj.geterror().equals("false")) {
+                            List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
+                            archivo = arrayListImagen.get(0).getArchivo();
 
-                    if (resObj.geterror().equals("false")) {
-                        List<Imagen> arrayListImagen = Arrays.asList(resObj.getImagen());
-                        archivo = arrayListImagen.get(0).getArchivo();
+                            signaturePad.setVisibility(View.GONE);
 
-                        signaturePad.setVisibility(View.GONE);
+                            decodedByte = decodeBase64(archivo);
 
-                        decodedByte = decodeBase64(archivo);
+                            imgFirma.setImageBitmap(decodedByte);
+                        } else {
+                            Toast.makeText(getActivity(), "No fue posible obtener la firma!", Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (Exception e)
+                    {
 
-                        imgFirma.setImageBitmap(decodedByte);
-                    }else {
-                        Toast.makeText(getActivity(), "No fue posible obtener la firma!", Toast.LENGTH_SHORT).show();
                     }
                 }
+
+
             }
             @Override
             public void onFailure(Call call, Throwable t) {
