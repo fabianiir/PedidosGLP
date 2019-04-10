@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="jac.infosyst.proyectogas">
+
+   <!-- Permisos-->
 <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED"
     tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -12,18 +14,16 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+
+    <!--Permisos uso de hardware-->
     <uses-feature android:name="android.hardware.nfc" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality. 
-    -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
 
     <application
         android:name=".utils.Sessions"
@@ -35,6 +35,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
+
+        <!--Configuración de tema y orientación de activities-->
         <activity
             android:name=".LectorNFC.NFC"
             android:screenOrientation="portrait" />
@@ -54,6 +56,8 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <!--activity principal-->
         <activity
             android:name=".Configuracion$SplashActivity"
             android:screenOrientation="portrait"
@@ -65,8 +69,7 @@
             </intent-filter>
         </activity>
 
-
-
+        <!--Uso de servicio de Firebase para las notificaciones-->
         <service android:name=".utils.MyFirebaseMessagingService"
             android:enabled="true">
             <intent-filter>
@@ -90,6 +93,7 @@
 
         <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
              See README(https://goo.gl/l4GJaQ) for more. -->
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/icono_notificacion" />

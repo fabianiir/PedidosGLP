@@ -23,6 +23,8 @@ import jac.infosyst.proyectogas.MainActivity;
 import jac.infosyst.proyectogas.R;
 import jac.infosyst.proyectogas.utils.SQLiteDBHelper;
 
+/*Fragment donde se muestra los datos del operador*/
+
 public class OperadorFragment  extends Fragment {
 
     private static SQLiteDBHelper sqLiteDBHelper = null;
@@ -38,8 +40,11 @@ public class OperadorFragment  extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_operador, container, false);
 
+        //variables de los datos del operador
         String foto = "", placas = "", nombre = "", imei = "", telefono = "";
 
+        //region obtencion datos
+        //se obtienen los datos del operador desde la base de datos local
         sqLiteDBHelper = new SQLiteDBHelper(getContext());
         SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
         String sql = "SELECT * FROM usuario";
@@ -58,6 +63,10 @@ public class OperadorFragment  extends Fragment {
             imei = record.getString(record.getColumnIndex("imei"));
             telefono = record.getString(record.getColumnIndex("telefono"));
         }
+        //endregion
+
+        //region mostrar datos
+        //Se muestran la informacion del chofer en el layout
 
         TextView textViewInterno;
 
@@ -75,6 +84,7 @@ public class OperadorFragment  extends Fragment {
 
         textViewInterno = (TextView) rootView.findViewById(R.id.tvIMEIOperador2);
         textViewInterno.setText(imei);
+//endregion
 
         return rootView;
     }

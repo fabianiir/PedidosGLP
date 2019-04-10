@@ -57,8 +57,7 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escaner);
 
-        //escanerActivity = this;
-        //Permiso
+
 
         int PermisoCamara = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.CAMERA);
@@ -158,14 +157,6 @@ public class Escaner extends AppCompatActivity implements ZXingScannerView.Resul
            final AlertDialog alertDialog = builder.create();
             alertDialog.show();
 
-
-           /* final Timer t = new Timer();
-            t.schedule(new TimerTask() {
-                public void run() {
-                    alertDialog.dismiss(); // when the task active then close the dialog
-                    t.cancel(); // also just top the timer thread, otherwise, you may receive a crash report
-                }
-            }, 20000);*/
 
             Intent intent = new Intent(Escaner.this, Escaner.class);
             startActivity(intent);

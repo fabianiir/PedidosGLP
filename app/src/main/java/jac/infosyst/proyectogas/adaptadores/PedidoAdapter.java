@@ -59,7 +59,7 @@ public class PedidoAdapter  extends RecyclerView.Adapter<PedidoAdapter.ViewHolde
    public PedidoAdapter(List<Pedido> pedidos, Context mCtx, FragmentManager f_manager) {
         this.pedidos = pedidos;
         this.mCtx = mCtx;
-        // this.listener = listener;
+
         this.f_manager = f_manager;
     }
 

@@ -136,10 +136,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
     private static final String TAG = "SurtirPedidoFragment";
 
     private List<Pedido> pedidos;
-    //   private List<Producto> productos;
-    //
 
-    // List<Producto> listAdapter;
     List<String> listAdapter;
 
     Producto myCustomProducto;
@@ -202,7 +199,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         MainActivity.setFragmentController(2);
 
-// path to /data/data/yourapp/app_data/imageDir
+
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
         directory = cw.getDir("firmas", Context.MODE_PRIVATE);
         directoryIncidencia = cw.getDir("incidencias", Context.MODE_PRIVATE);
@@ -682,14 +679,9 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
 
         if(((Sessions)getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")){
-            // recyclerViewProductos.setVisibility(View.GONE);
-            // fabAgregarProducto.setVisibility(View.GONE);
 
             imageViewIncidencia.setVisibility(View.VISIBLE);
 
-            // signaturePad.setEnabled(false);
-            // btnLimpiar.setEnabled(false);
-            // btnGuardar.setEnabled(false);
         }
 
 
@@ -1028,7 +1020,6 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
         recyclerViewCatalagoProductos.setHasFixedSize(true);
         recyclerViewCatalagoProductos.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        /*section - getCatalagoProductos*/
         BASEURL = strIP + "glpservices/webresources/glpservices/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASEURL)
@@ -1091,7 +1082,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         getHora();
         getFecha();
-        //  getUbicacion();
+
         BASEURL = strIP + "glpservices/webresources/glpservices/";
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -1667,55 +1658,7 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
 
         pedidoID = ((Sessions) getActivity().getApplicationContext()).getSesIdPedido();
 
-        /*Call call = service.getProductos(pedidoID, strtoken);
 
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) {
-                    ObjetoRes resObj = (ObjetoRes) response.body();
-                    if(pendiente){
-                        if (resObj.getestatus().equals("Pendiente")) {
-                            btnReimpresionTicket.setVisibility(View.GONE);
-                            ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("visible");
-
-                        } else {
-                            ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
-                            fabAgregarProducto.setEnabled(false);
-                            signaturePad.setEnabled(false);
-                            btnGuardar.setEnabled(false);
-                            btnLimpiar.setEnabled(false);
-                            getImageFirma();
-                        }
-                    }else{
-                        ((Sessions) getActivity().getApplicationContext()).setSessstrRestarProducto("gone");
-                        fabAgregarProducto.setEnabled(false);
-
-                        signaturePad.setEnabled(false);
-                        btnGuardar.setEnabled(false);
-                        btnLimpiar.setEnabled(false);
-                        getImageFirma();
-                    }
-                    strTotal = String.valueOf(resObj.getsumaTotal());
-                    textViewTotal.setText("Total $:" + resObj.getsumaTotal());
-                    if (resObj.getproducto() != null) {
-                        adapter = new ProductoAdapter(Arrays.asList(resObj.getproducto()), getActivity(), getFragmentManager(), pendiente);
-                        Sessions sessions = new Sessions();
-                        sessions.setSesDetalleProductoSurtir(resObj.getproducto());
-                        recyclerViewProductos.setAdapter(adapter);
-                    } else {
-                        Toast.makeText(getActivity(), "No Productos!", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "error! ", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });*/
 
         if (pendiente) {
             btnReimpresionTicket.setVisibility(View.GONE);

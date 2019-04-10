@@ -61,14 +61,13 @@ import com.github.gcacace.signaturepad.views.SignaturePad;
 import android.content.ContentValues;
 
 @SuppressLint("ValidFragment")
-public class DetallePedidoFragment  extends Fragment  implements LocationListener {
+public class DetallePedidoFragment extends Fragment implements LocationListener {
 
-    private TextView textViewCliente, textViewDireccion, textViewTelefono, textViewDescripcion, textViewEstatus, textViewDetalle
-            , textViewTotal, textViewObservaciones;
+    private TextView textViewCliente, textViewDireccion, textViewTelefono, textViewDescripcion, textViewEstatus, textViewDetalle, textViewTotal, textViewObservaciones;
 
     /*firma*/
     RelativeLayout mContent;
-    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar, btnLlamar,btnCancelarPedido;
+    Button btnFirmar, btnLimpiarFirma, btnSurtirPedido, btnComoLlegar, btnLlamar, btnCancelarPedido;
 
     private PopupWindow POPUP_WINDOW_CONFIRMACION = null;
     View layout;
@@ -95,13 +94,13 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     private static final String TAG = "DetallePedidoFragment";
 
     /*foto incidencia*/
-    private static final int PICTURE_RESULT = 122 ;
+    private static final int PICTURE_RESULT = 122;
     private ContentValues values;
     private Uri imageUri;
     private Bitmap thumbnail;
 
 
-    File directory,directoryIncidencia;
+    File directory, directoryIncidencia;
     ImageView imgFirma;
     String imageurl;
 
@@ -133,8 +132,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         // setup the table
 
 
-
-
         MainActivity.setFragmentController(1);
 // path to /data/data/yourapp/app_data/imageDir
         ContextWrapper cw = new ContextWrapper(getActivity().getApplicationContext());
@@ -158,7 +155,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         mTableLayout = (TableLayout) rootView.findViewById(R.id.tableInvoices);
 
         mTableLayout.setStretchAllColumns(true);
-        if(producto != null){
+        if (producto != null) {
             cargarProductos(producto);
         }
         //endregion
@@ -174,23 +171,23 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         textViewDetalle = (TextView) rootView.findViewById(R.id.tvDetalle);
         textViewTotal = (TextView) rootView.findViewById(R.id.tvTotal);
 
-        if(strCliente == null){
+        if (strCliente == null) {
             TableRow tableRow = rootView.findViewById(R.id.trCliente);
             tableRow.setVisibility(View.GONE);
         }
-        if(strDireccion == null){
+        if (strDireccion == null) {
             TableRow tableRow = rootView.findViewById(R.id.trDireccion);
             tableRow.setVisibility(View.GONE);
         }
-        if(strDescripcion == null){
+        if (strDescripcion == null) {
             TableRow tableRow = rootView.findViewById(R.id.trDescripcion);
             tableRow.setVisibility(View.GONE);
         }
-        if(strEstatus == null){
+        if (strEstatus == null) {
             TableRow tableRow = rootView.findViewById(R.id.trEstatus);
             tableRow.setVisibility(View.GONE);
         }
-        if(strTelefono == null){
+        if (strTelefono == null) {
             TableRow tableRow = rootView.findViewById(R.id.trTelefono);
             tableRow.setVisibility(View.GONE);
         }
@@ -201,7 +198,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         textViewDescripcion.setText(strDescripcion);
         textViewEstatus.setText(strEstatus);
         textViewDetalle.setText("Detalle de Productos: ");
-        textViewTotal.setText(Html.fromHtml    ("<b>Total: </b>" + format.format(Double.parseDouble(strTotal))));
+        textViewTotal.setText(Html.fromHtml("<b>Total: </b>" + format.format(Double.parseDouble(strTotal))));
 
         btnSurtirPedido = (Button) rootView.findViewById(R.id.btnSurtirPedido);
         btnSurtirPedido.setOnClickListener(new View.OnClickListener() {
@@ -219,7 +216,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             }
         });
 
-        if(strTelefono.isEmpty() || strTelefono == null){
+        if (strTelefono.isEmpty() || strTelefono == null) {
             btnLlamar.setVisibility(View.GONE);
             textViewTelefono.setVisibility(View.GONE);
         } else {
@@ -234,7 +231,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             public void onClick(View v) {
                 CancelarPedidoFragment cpf = new CancelarPedidoFragment(getActivity().getBaseContext());
                 FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction =        fragmentManager.beginTransaction();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.container_body, cpf);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -245,9 +242,9 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         btnComoLlegar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (latitud == null || latitud.isEmpty() || longitud == null || longitud.isEmpty()){
+                if (latitud == null || latitud.isEmpty() || longitud == null || longitud.isEmpty()) {
                     Toast.makeText(getActivity(), "Ubicacion No disponible!", Toast.LENGTH_SHORT).show();
-                } else{
+                } else {
                     String query = "google.navigation:q=" + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude()
                             + "," + ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude() + "";
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(query));
@@ -259,14 +256,13 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         latitud = ((Sessions) mCtx.getApplicationContext()).getSesubicacion_latitude();
         longitud = ((Sessions) mCtx.getApplicationContext()).getSesubicacion_longitude();
 
-        if (latitud == null || latitud.isEmpty() || longitud == null || longitud.isEmpty()){
+        if (latitud == null || latitud.isEmpty() || longitud == null || longitud.isEmpty()) {
             btnComoLlegar.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             btnComoLlegar.setVisibility(View.VISIBLE);
         }
 
-        if(strTotal.equals("0")){
+        if (strTotal.equals("0")) {
             if (((Sessions) getActivity().getApplicationContext()).getSestipo_pedido().equals("Fuga")) {
             } else {
                 LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -312,7 +308,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                     }
                 });
             }
-        }else{
+        } else {
         }
         return rootView;
     }
@@ -348,7 +344,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
     }
 
     public String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
+        String[] proj = {MediaStore.Images.Media.DATA};
         Cursor cursor = getActivity().managedQuery(contentUri, proj, null, null, null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
@@ -369,7 +365,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
         return false;
     }
 
-    public void getLocation(){
+    public void getLocation() {
 
         try {
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -377,16 +373,16 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-            if (location != null){
-            }else{
+            if (location != null) {
+            } else {
                 Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
             }
-        }
-        catch(SecurityException e) {
+        } catch (SecurityException e) {
             e.printStackTrace();
             Toast.makeText(getActivity(), "Error de  GPS!", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public void onLocationChanged(Location location) {
         // locationText.setText("Current Location: " + location.getLatitude() + ", " + location.getLongitude());
@@ -428,29 +424,27 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
     }
 
+
+    //region tabla de productos
     public void cargarProductos(Producto[] productos) {
 
-        int leftRowMargin=0;
-        int topRowMargin=0;
-        int rightRowMargin=0;
+        int leftRowMargin = 0;
+        int topRowMargin = 0;
+        int rightRowMargin = 0;
         int bottomRowMargin = 0;
-        int textSize = 0, smallTextSize =0, mediumTextSize = 0;
+        int TextSize = 0;
 
-        textSize = (int) getResources().getDimension(R.dimen.font_size_verysmall);
-        smallTextSize = (int) getResources().getDimension(R.dimen.font_size_small);
-        mediumTextSize = (int) getResources().getDimension(R.dimen.font_size_medium);
-
-
+        TextSize = (int) getResources().getDimension(R.dimen.font_size_medium);
 
 
         int rows = productos.length;
-        //getSupportActionBar().setTitle("Invoices (" + String.valueOf(rows) + ")");
+
         TextView textSpacer = null;
 
-       mTableLayout.removeAllViews();
+        mTableLayout.removeAllViews();
 
-        // -1 es la el heading
-        for(int i = -1; i < rows; i ++) {
+        // -1 es  el heading de la tabla
+        for (int i = -1; i < rows; i++) {
             Producto row = null;
             if (i > -1)
                 row = productos[i];
@@ -462,17 +456,16 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             //Columnas
 
 
-
             //region columna 1
             final TextView tv2 = new TextView(getContext());
             if (i == -1) {
                 tv2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
                         TableRow.LayoutParams.WRAP_CONTENT));
-                tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
             } else {
                 tv2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.MATCH_PARENT));
-                tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
             }
 
             tv2.setGravity(Gravity.CENTER);
@@ -482,7 +475,7 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
                 tv2.setText("Producto");
                 tv2.setBackgroundColor(Color.parseColor("#477ea0"));
                 tv2.setTextColor(Color.parseColor("#DBDCDC"));
-            }else {
+            } else {
                 tv2.setBackgroundColor(Color.parseColor("#ffffff"));
 
                 tv2.setText(row.getdescripcion());
@@ -501,12 +494,12 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             if (i == -1) {
                 tv3.setText("Cantidad");
                 tv3.setBackgroundColor(Color.parseColor("#477ea0"));
-                tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
                 tv3.setTextColor(Color.parseColor("#DBDCDC"));
             } else {
                 tv3.setBackgroundColor(Color.parseColor("#f8f8f8"));
                 tv3.setText(String.valueOf(row.getCantidad()));
-                tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
             }
 
 //endregion
@@ -522,19 +515,17 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             if (i == -1) {
                 tv4.setText("Total");
                 tv4.setBackgroundColor(Color.parseColor("#477ea0"));
-                tv4.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv4.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
                 tv4.setTextColor(Color.parseColor("#DBDCDC"));
             } else {
                 tv4.setBackgroundColor(Color.parseColor("#ffffff"));
 
                 tv4.setText(String.valueOf(format.format(row.getPrecio())));
-                tv4.setTextSize(TypedValue.COMPLEX_UNIT_PX, mediumTextSize);
+                tv4.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
             }
 
 
-
 //endregion
-
 
 
             // add table row
@@ -543,9 +534,8 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             TableLayout.LayoutParams trParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
                     TableLayout.LayoutParams.WRAP_CONTENT);
             trParams.setMargins(leftRowMargin, topRowMargin, rightRowMargin, bottomRowMargin);
-            tr.setPadding(0,0,0,0);
+            tr.setPadding(0, 0, 0, 0);
             tr.setLayoutParams(trParams);
-
 
 
             tr.addView(tv2);
@@ -553,23 +543,12 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
             tr.addView(tv4);
 
 
-            if (i > -1) {
 
-                tr.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        TableRow tr = (TableRow) v;
-                        //do whatever action is needed
-
-                    }
-                });
-
-
-            }
             mTableLayout.addView(tr, trParams);
 
             if (i > -1) {
 
-                // add separator row
+                // agregar separador de filas
                 final TableRow trSep = new TableRow(getContext());
                 TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
                         TableLayout.LayoutParams.WRAP_CONTENT);
@@ -591,4 +570,6 @@ public class DetallePedidoFragment  extends Fragment  implements LocationListene
 
         }
     }
+    //endregion
+
 }

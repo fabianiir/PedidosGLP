@@ -78,9 +78,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity
-     //   implements NavigationView.OnNavigationItemSelectedListener {
-    implements FragmentDrawer.FragmentDrawerListener {
+public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
+
+
     private static String TAG = MainActivity.class.getSimpleName();
 
     private Toolbar mToolbar;
@@ -113,6 +113,15 @@ public class MainActivity extends AppCompatActivity
     public static Boolean getDispositivoEncontrado() {
         return DispositivoEncontrado;
     }
+
+    static OutputStream outputStream;
+    InputStream inputStream;
+    Thread thread;
+
+    byte[] readBuffer;
+    int readBufferPosition;
+    volatile boolean stopWorker;
+
 //endregion
 
     //region variables localizacion
@@ -141,13 +150,7 @@ public class MainActivity extends AppCompatActivity
 
 
     //endregion
-    static OutputStream outputStream;
-    InputStream inputStream;
-    Thread thread;
 
-    byte[] readBuffer;
-    int readBufferPosition;
-    volatile boolean stopWorker;
 
     public static int fragmentController;
 
@@ -221,17 +224,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //The BroadcastReceiver that listens for bluetooth broadcasts
+    //region Instancia Escuchador Conexión Impresora
+    // Metodo para detectar el evento cuando la impresora ha sido desconectada o conectada
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
             if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                //Do something if connected
+                //Cuando se conecta
                 Toast.makeText(getApplicationContext(), "Conexión con Impresora exitosa", Toast.LENGTH_SHORT).show();
             } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                //Do something if disconnected
+                //Cuando se desconecta
                 try {
                     disconnectBT();
                 } catch (IOException e) {
@@ -239,37 +243,37 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 Toast.makeText(getApplicationContext(), "Impresora desconectada", Toast.LENGTH_SHORT).show();
-setDispositivoEncontrado(false);
-                //region Ejecucion hilo Impresora
+                setDispositivoEncontrado(false);
 
-                //HiloImpresora.start();
-                //endregion*/
             }
-            //else if...
+
         }
     };
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //region Permiso usuarion localización
         int PermisoLocalizacion = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION);
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION }, 225);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 225);
         if (PermisoLocalizacion != PackageManager.PERMISSION_GRANTED) {
             Log.i("Mensaje", "No se tiene permiso.");
             finish();
         } else {
             Log.i("Mensaje", "Se tiene permiso!");
         }
-
+//endregion
 
         super.onCreate(savedInstanceState);
+
         setLatitud(null);
         setLongitud(null);
         getLocation();
 
 
-        //region Deteccion Impresora Bluetooth
+        //region Deteccion de conexion Impresora Bluetooth
 
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
@@ -280,9 +284,9 @@ setDispositivoEncontrado(false);
 
 
         //endregion
-//endregion
 
-        if(!strtoken.isEmpty()){
+
+        if (!strtoken.isEmpty()) {
             setContentView(R.layout.activity_main);
 
             //endregion
@@ -1649,6 +1653,8 @@ setDispositivoEncontrado(false);
         }
     }
 
+
+    //region Icono Establecer conexion impresora
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -1667,50 +1673,41 @@ setDispositivoEncontrado(false);
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            /*if(DispositivoEncontrado==true)
-            {-*/
-            // item.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_conection_enable));
 
 
-if(bluetoothAdapter.isEnabled())
-{
-    if(!getDispositivoEncontrado()) {
+            if (bluetoothAdapter.isEnabled()) {
+                if (!getDispositivoEncontrado()) {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+                    //conexion impresora en otro hilo
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                try {
+                            try {
 
-                    FindBluetoothDevice();
-                    openBluetoothPrinter();
-
-
+                                FindBluetoothDevice();
+                                openBluetoothPrinter();
 
 
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
 
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    }).start();
+
+                } else {
+                    Toast.makeText(MainActivity.this, "La impresora ya esta conectada", Toast.LENGTH_SHORT).show();
+
+
                 }
+            } else {
+
+                Toast.makeText(MainActivity.this, "El Bluetooth se encuentra apagado", Toast.LENGTH_SHORT).show();
+                setDispositivoEncontrado(false);
             }
 
-        }).start();
 
-    }
-    else
-    {
-        Toast.makeText(MainActivity.this, "La impresora ya esta conectada", Toast.LENGTH_SHORT).show();
-
-
-    }
-}
-else {
-
-    Toast.makeText(MainActivity.this, "El Bluetooth se encuentra apagado", Toast.LENGTH_SHORT).show();
-setDispositivoEncontrado(false);
-}
-
-               //Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_SHORT).show();
 
             return true;
         }
@@ -1722,6 +1719,7 @@ setDispositivoEncontrado(false);
     public void onDrawerItemSelected(View view, int position) {
         displayView(position);
     }
+    //endregion
 
     private void displayView(final int position) {
         Fragment fragment = null;
@@ -1738,10 +1736,7 @@ setDispositivoEncontrado(false);
                 fragment = new OperadorFragment();
                 title = getString(R.string.title_operador);
                 break;
-            //case 2:
-            //    fragment = new MapsActivity();
-            //    title = getString(R.string.title_mapa);
-            //    break;
+
             case 2:
                 if (strRolUsuario.equals("Admin")) {
                     Intent i = new Intent(MainActivity.this, Configuracion.class);
@@ -1933,6 +1928,10 @@ setDispositivoEncontrado(false);
         });
     }
 
+
+    //region Metodos Impresora
+
+    //region Buscar Impresora Bluetooth
     void FindBluetoothDevice() {
 
         try {
@@ -1940,7 +1939,7 @@ setDispositivoEncontrado(false);
 
             if (bluetoothAdapter == null) {
 
-              Toast.makeText(getApplicationContext(), "No se encuentra antena bluetooth",Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(), "No se encuentra antena bluetooth", Toast.LENGTH_SHORT);
             }
             if (bluetoothAdapter.isEnabled()) {
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -1952,7 +1951,7 @@ setDispositivoEncontrado(false);
             if (pairedDevice.size() > 0) {
                 for (BluetoothDevice pairedDev : pairedDevice) {
 
-                    // My Bluetooth printer name is MTP-3
+                    //MTP-3 corresponde al nombre de la impresora que ha sido emparejada con el dispositivo
                     if (pairedDev.getName().equals("MTP-3")) {
                         bluetoothDevice = pairedDev;
                         Toast.makeText(getApplicationContext(), "Impresora encontrada", Toast.LENGTH_SHORT).show();
@@ -1973,45 +1972,42 @@ setDispositivoEncontrado(false);
         }
     }
 
-    // Open Bluetooth Printer
 
+    //endregion
+
+
+    //region Establecer conexión con impresora
     void openBluetoothPrinter() throws IOException {
 
         try {
 
             //Standard uuid from string //
 
-                UUID uuidSting = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-                bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
+            UUID uuidSting = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+            bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuidSting);
 
-                bluetoothSocket.connect();
-                setDispositivoEncontrado(true);
+            bluetoothSocket.connect();
+            setDispositivoEncontrado(true);
 
-                    outputStream = bluetoothSocket.getOutputStream();
-                    inputStream = bluetoothSocket.getInputStream();
+            outputStream = bluetoothSocket.getOutputStream();
+            inputStream = bluetoothSocket.getInputStream();
 
-                    beginListenData();
-                }
-
-
-
-         catch (Exception ex) {
-        if(!bluetoothSocket.isConnected())
-        {
-            setDispositivoEncontrado(false);
-            Toast.makeText(MainActivity.this, "Dispositivo no encontrado", Toast.LENGTH_SHORT).show();
-        }
-
-
-
-
-
+            beginListenData();
+        } catch (Exception ex) {
+            if (!bluetoothSocket.isConnected()) {
+                setDispositivoEncontrado(false);
+                Toast.makeText(MainActivity.this, "Dispositivo no encontrado", Toast.LENGTH_SHORT).show();
+            }
 
 
         }
 
     }
 
+    //endregion
+
+
+    //region Iniciar comunicación de datos con impresora
     void beginListenData() {
         try {
 
@@ -2046,7 +2042,7 @@ setDispositivoEncontrado(false);
                                         handler.post(new Runnable() {
                                             @Override
                                             public void run() {
-                                                //lblPrinterName.setText(data);
+
                                             }
                                         });
                                     } else {
@@ -2066,7 +2062,12 @@ setDispositivoEncontrado(false);
         }
     }
 
-    // Printing Text to Bluetooth Printer //
+    //endregion
+
+
+    //region Formato ticket impresora
+
+
     public static void printData(String cliente, String direccion, String total, String chofer, String unidad, String fecha, boolean reImpresion) throws IOException {
         try {
 
@@ -2123,7 +2124,7 @@ setDispositivoEncontrado(false);
 
             if (producto != null && producto.length != 0) {
                 for (int i = 0; i < producto.length; i++)
-                    BILL = BILL + "\n" + String.format("%1$-10s %2$10s %3$11s %4$10s", producto[i].getdescripcion().substring(0,12), producto[i].getCantidad(),String.valueOf(producto[i].getPrecio()/producto[i].getCantidad()),producto[i].getPrecio());
+                    BILL = BILL + "\n" + String.format("%1$-10s %2$10s %3$11s %4$10s", producto[i].getdescripcion().substring(0, 12), producto[i].getCantidad(), String.valueOf(producto[i].getPrecio() / producto[i].getCantidad()), producto[i].getPrecio());
             }
 
             BILL = BILL
@@ -2139,7 +2140,7 @@ setDispositivoEncontrado(false);
 
             DecimalFormat formato1 = new DecimalFormat("#.##", separadoresPersonalizados);
             double subtotal = Double.parseDouble(total);
-            double totalconIVA= subtotal*1.16;
+            double totalconIVA = subtotal * 1.16;
             double IVA = totalconIVA - subtotal;
 
             BILL = BILL + "                          SUBTOTAL:" + "   $" + String.valueOf(formato1.format(subtotal)) + "\n";
@@ -2174,19 +2175,25 @@ setDispositivoEncontrado(false);
         }
     }
 
-    // Disconnect Printer //
+    //endregion
+
+
+    //region Metodo desonectar impresora
     void disconnectBT() throws IOException {
         try {
             stopWorker = true;
             outputStream.close();
             inputStream.close();
             bluetoothSocket.close();
-            //lblPrinterName.setText("Impresora Desconectada");
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+    //endregion
 
+
+    //region Tranformar en arreglo de bytes
     public static byte intToByteArray(int value) {
         byte[] b = ByteBuffer.allocate(4).putInt(value).array();
 
@@ -2196,14 +2203,17 @@ setDispositivoEncontrado(false);
         }
         return b[3];
     }
+//endregion
+
+    //endregion
 
 
+    //region Obtener ubicación GPS
     public void getLocation() {
 
         try {
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-            // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) this);
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
 
@@ -2223,6 +2233,8 @@ setDispositivoEncontrado(false);
             Toast.makeText(this, "Error de  GPS!", Toast.LENGTH_SHORT).show();
         }
     }
+
+    //endregion
 
     public void seguimiento(String imei, String token) {
         BASEURL = strIP + "glpservices/webresources/glpservices/";
@@ -2256,14 +2268,4 @@ setDispositivoEncontrado(false);
         });
     }
 
-  /*  @Override
-    protected void onStart() {
-        super.onStart();
-
-        if(!getDispositivoEncontrado())
-        {
-
-            HiloImpresora.start();
-        }
-    }*/
 }

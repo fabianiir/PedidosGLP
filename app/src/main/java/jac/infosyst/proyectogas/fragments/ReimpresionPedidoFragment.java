@@ -25,9 +25,10 @@ import jac.infosyst.proyectogas.utils.Sessions;
 
 import static jac.infosyst.proyectogas.fragments.SurtirPedidoFragment.simpleDateFormatFecha;
 
+/*Fragment con los datos del cliente de los Pedidos Realizados*/
 
 @SuppressLint("ValidFragment")
-public class ReimpresionPedidoFragment  extends Fragment {
+public class ReimpresionPedidoFragment extends Fragment {
 
     private Context mCtx;
     TextView tvCanNombreOperador, tvCanDireccion, tvCanDescripcion, tvCanEstatus, tvCanTotal;
@@ -49,38 +50,50 @@ public class ReimpresionPedidoFragment  extends Fragment {
 
         MainActivity.setFragmentController(1);
 
+        //region asignacion variables
+        // se asignan los controles del layout a variables
+
         tvCanNombreOperador = (TextView) rootView.findViewById(R.id.tvCanNombreOperador);
         tvCanDireccion = (TextView) rootView.findViewById(R.id.tvCanDireccion);
         tvCanDescripcion = (TextView) rootView.findViewById(R.id.tvCanDescripcion);
         tvCanEstatus = (TextView) rootView.findViewById(R.id.tvCanEstatus);
         tvCanTotal = (TextView) rootView.findViewById(R.id.tvCanTotal);
 
+        //endregion
 
-        final String nombCliente= ((Sessions)getActivity().getApplicationContext()).getSesCliente();
-        final String direcCliente = ((Sessions)getActivity().getApplicationContext()).getsesDireccion();
-        final  String descripCliente=  ((Sessions)getActivity().getApplicationContext()).getsesDescripcion();
-        final  String estatusCliente = ((Sessions)getActivity().getApplicationContext()).getsesEstatus();
-        final String totalCliente = ((Sessions)getActivity().getApplicationContext()).getsesTotal();
+        //region obtencion de datos del cliente
+        //se obtienen los datos de acuerdo a la sesión
+
+        final String nombCliente = ((Sessions) getActivity().getApplicationContext()).getSesCliente();
+        final String direcCliente = ((Sessions) getActivity().getApplicationContext()).getsesDireccion();
+        final String descripCliente = ((Sessions) getActivity().getApplicationContext()).getsesDescripcion();
+        final String estatusCliente = ((Sessions) getActivity().getApplicationContext()).getsesEstatus();
+        final String totalCliente = ((Sessions) getActivity().getApplicationContext()).getsesTotal();
         Calendar calendar = Calendar.getInstance();
         final String fecha = String.valueOf(simpleDateFormatFecha.format(calendar.getTime()));
 
-if(nombCliente==null)
-{
-    tvCanNombreOperador.setVisibility(View.GONE);
-}
-if(direcCliente==null)
-{
-    tvCanDireccion.setVisibility(View.GONE);
-}
-if (descripCliente==null)
-{
-    tvCanDescripcion.setVisibility(View.GONE);
-}
-if (estatusCliente==null)
-{
-    tvCanEstatus.setVisibility(View.GONE);
-}
+        //endregion
 
+        //region ocultar datos
+        // Se ocultan los datos del cliente si vienen vacios
+
+        if (nombCliente == null) {
+            tvCanNombreOperador.setVisibility(View.GONE);
+        }
+        if (direcCliente == null) {
+            tvCanDireccion.setVisibility(View.GONE);
+        }
+
+        if (descripCliente == null) {
+            tvCanDescripcion.setVisibility(View.GONE);
+        }
+        if (estatusCliente == null) {
+            tvCanEstatus.setVisibility(View.GONE);
+        }
+        //endregion
+
+        //region mostrar datos en Fragment
+        // se muestran los datos del cliente en la vista
 
         tvCanNombreOperador.setText("Nombre: " + nombCliente);
         tvCanDireccion.setText("Direccion: " + direcCliente);
@@ -88,60 +101,67 @@ if (estatusCliente==null)
         tvCanDescripcion.setText("Descripcion: " + estatusCliente);
         tvCanEstatus.setText("Estatus: " + estatusCliente);
         tvCanTotal.setText("Total: " + totalCliente);
-
         btnReimprimirPedido = (Button) rootView.findViewById(R.id.btnReimprimirPedido);
+
+        //endregion
+
+        //region presionar boton Reimprimir
         btnReimprimirPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //region  obtener datos chofer
+                // obtencion de datos del chofer en base de datos local
 
+                String placas = "", nombre = "";
 
-                    String placas = "", nombre = "";
+                SQLiteDBHelper sqLiteDBHelper = new SQLiteDBHelper(getContext());
+                SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
+                String sql = "SELECT * FROM usuario";
+                Cursor record = db.rawQuery(sql, null);
 
-                    SQLiteDBHelper sqLiteDBHelper = new SQLiteDBHelper(getContext());
-                    SQLiteDatabase db = sqLiteDBHelper.getWritableDatabase();
-                    String sql = "SELECT * FROM usuario";
-                    Cursor record = db.rawQuery(sql, null);
+                if (record.moveToFirst()) {
+                    nombre = record.getString(record.getColumnIndex("nombre"));
+                    placas = record.getString(record.getColumnIndex("placas"));
+                }
 
-                    if (record.moveToFirst()) {
-                        nombre = record.getString(record.getColumnIndex("nombre"));
-                        placas = record.getString(record.getColumnIndex("placas"));
-                    }
+                final String finalNombre = nombre;
+                final String finalPlacas = placas;
 
-                    final String finalNombre = nombre;
-                    final String finalPlacas = placas;
+                //endregion
 
+                //region impresion
+                //se envian datos para impresion en un nuevo hilo
 
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                MainActivity.printData(nombCliente,direcCliente,String.valueOf(Double.parseDouble(totalCliente)/1.16), finalNombre, finalPlacas,fecha,true);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            MainActivity.printData(nombCliente, direcCliente, String.valueOf(Double.parseDouble(totalCliente) / 1.16), finalNombre, finalPlacas, fecha, true);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    }).start();
+                    }
+                }).start();
+
+                //endregion
 
 
-
-
-
-                Toast.makeText(getActivity(), "Reimprimiendo Pedido" , Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Reimprimiendo Pedido", Toast.LENGTH_SHORT).show();
 
             }
         });
+        //endregion
 
-        return  rootView;
+        return rootView;
     }
 
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-        }
-
-        @Override
-        public void onDetach() {
-            super.onDetach();
-        }
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+}
