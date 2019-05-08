@@ -513,7 +513,7 @@ public class DetallePedidoFragment extends Fragment implements LocationListener 
             NumberFormat format = NumberFormat.getCurrencyInstance();
             tv4.setPadding(5, 10, 0, 10);
             if (i == -1) {
-                tv4.setText("Total");
+                tv4.setText("Subtotal");
                 tv4.setBackgroundColor(Color.parseColor("#477ea0"));
                 tv4.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextSize);
                 tv4.setTextColor(Color.parseColor("#DBDCDC"));

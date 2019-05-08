@@ -1702,6 +1702,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
                 NumberFormat format = NumberFormat.getCurrencyInstance();
                 textViewTotal.setText("Total :" + format.format(total * 1.16));
 
+                ContentValues values = new ContentValues();
+                values.put("total", total);
+                db.update(SQLiteDBHelper.Pedidos_Table, values,"oid = ?", new String[]{pedidoID});
+
                 adapter = new ProductoAdapter(Arrays.asList(productos), getActivity(), getFragmentManager(), pendiente);
                 recyclerViewProductos.setAdapter(adapter);
             }
@@ -1710,6 +1714,10 @@ public class SurtirPedidoFragment  extends Fragment implements LocationListener 
             strTotal = String.valueOf(total);
             NumberFormat format = NumberFormat.getCurrencyInstance();
             textViewTotal.setText("Total :" + format.format(total * 1.16));
+
+            ContentValues values = new ContentValues();
+            values.put("total", total);
+            db.update(SQLiteDBHelper.Pedidos_Table, values,"oid = ?", new String[]{pedidoID});
 
             adapter = new ProductoAdapter(null, getActivity(), getFragmentManager(), pendiente);
             recyclerViewProductos.setAdapter(adapter);
